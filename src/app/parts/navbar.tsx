@@ -17,10 +17,6 @@ export default function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  // Detect mobile device
-  const isMobile =
-    typeof window !== "undefined" && /Mobi|Android/i.test(navigator.userAgent);
-
   const handleLogin = () => {
     if (user) {
       logOut();
