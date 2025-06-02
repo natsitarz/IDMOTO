@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
+import { getRedirectResult, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
@@ -65,6 +65,20 @@ export const addUserToDB = async (user: any) => {
     console.error("Error adding/updating document: ", error);
   }
 };
+
+export const redirectResults = () => {
+  getRedirectResult(auth)
+    .then(async (result) => {
+      if (result && result.user) {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const user = result.user;
+      }
+    })
+    .catch((error) => {
+      console.error("Google redirect error:", error);
+    });
+      
+    }
 
 export const checkUser = () => {
   if(typeof window !== "undefined") {

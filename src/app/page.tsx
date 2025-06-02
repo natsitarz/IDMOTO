@@ -4,8 +4,9 @@ import {
   addUserToDB,
   checkUser,
   googleSignIn,
+  redirectResults,
 } from "@/app/parts/firebase-sign";
-import { getRedirectResult, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,20 +17,10 @@ export default function Signup() {
   const router = useRouter();
   const [user, setUser] = useState(auth.currentUser);
 
-  // 1. Obsługa Google redirect (mobile)
   useEffect(() => {
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result && result.user) {
-          addUserToDB(result.user);
-        }
-      })
-      .catch((error) => {
-        console.error("Google redirect error:", error);
-      });
+    redirectResults();
   }, []);
 
-  // 2. Przekierowanie po zalogowaniu
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
