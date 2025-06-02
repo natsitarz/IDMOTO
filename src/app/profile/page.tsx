@@ -101,8 +101,15 @@ function ProfileInner() {
   const [displayName, setDisplayName] = useState<string>("Loading…");
   const [photoURL, setPhotoURL] = useState<string>("/logo.png");
   const [email, setEmail] = useState<string>("Loading…");
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    // If no uid in searchParams and user is not logged in, show "Profile not found"
+    if (!searchParams.get("uid") && !user) {
+      setNotFound(true);
+      return;
+    }
+    setNotFound(false);
     if (!profileUid) return;
     async function fetchUserData() {
       const userDoc = await getDoc(doc(db, "users", profileUid));
@@ -122,6 +129,40 @@ function ProfileInner() {
     if (!profileUid) return;
     await updateDoc(doc(db, "users", profileUid), { bio: newBio });
     setBio(newBio); // update local state
+  }
+
+  if (notFound) {
+    return (
+      <div
+        className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
+        style={{ minHeight: "100vh" }}
+      >
+        <div className="bg-white/10 border border-blue-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
+          <svg
+            className="w-10 h-10 text-blue-400"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+          <span className="text-lg font-semibold text-blue-400">
+            Profile not found
+          </span>
+        </div>
+      </div>
+    );
   }
 
   return (
