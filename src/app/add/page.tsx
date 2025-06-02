@@ -4,7 +4,6 @@ import { auth, db } from "@/app/parts/firebase";
 import { firebaseAddVehiclePublic } from "@/app/parts/firebase-add-vehicle";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function Profile() {

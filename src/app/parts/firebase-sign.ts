@@ -21,6 +21,7 @@ export const googleSignIn = () => {
   if (isMobile) {
     // On mobile, always use redirect
     signInWithRedirect(auth, provider);
+    const user = auth.currentUser;
   } else {
     // On desktop, use popup
     signInWithPopup(auth, provider)
