@@ -251,27 +251,28 @@ function CarPageInner() {
         className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
         style={{ minHeight: "calc(100vh - 67px)" }}
       >
-        <div className="bg-white/10 border border-blue-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
+        <div className="bg-white/10 border border-red-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
           <svg
-            className="w-10 h-10 text-blue-400"
+            className="w-10 h-10 text-red-400"
             fill="none"
             viewBox="0 0 24 24"
           >
             <circle
-              className="opacity-25"
               cx="12"
               cy="12"
               r="10"
               stroke="currentColor"
-              strokeWidth="4"
+              strokeWidth="2"
             />
             <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              stroke="currentColor"
+              d="M12 8v4m0 4h.01"
             />
           </svg>
-          <span className="text-lg font-semibold text-blue-400">
+          <span className="text-lg font-semibold text-red-400">
             Couldn't find car. Check ID
           </span>
         </div>
