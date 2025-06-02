@@ -14,7 +14,6 @@ import {
   listAll,
   ref as storageRef,
 } from "firebase/storage";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FiMoreVertical } from "react-icons/fi";
@@ -220,8 +219,8 @@ function VehicleCard({
                 backgroundSize: "cover",
               }}
               onMouseDown={(e) => {
-                let startX = e.clientX;
-                let startAlign = bgAlignX;
+                const startX = e.clientX;
+                const startAlign = bgAlignX;
                 let dragging = true;
 
                 const onMouseMove = (moveEvent: MouseEvent) => {
@@ -229,7 +228,7 @@ function VehicleCard({
                   const deltaX = moveEvent.clientX - startX;
                   // 216px szerokości = 100%
                   const percentDelta = (deltaX / 216) * 100;
-                  let newAlign = Math.max(
+                  const newAlign = Math.max(
                     0,
                     Math.min(100, startAlign + percentDelta)
                   );

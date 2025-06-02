@@ -53,7 +53,7 @@ export default function CarPage() {
       const carRef = doc(db, "vehicles", carId);
       const carSnap = await getDoc(carRef);
       if (carSnap.exists()) {
-        let carData: any = { id: carSnap.id, ...carSnap.data() };
+        const carData: any = { id: carSnap.id, ...carSnap.data() };
         // Try to fetch backgroundPic from storage
         try {
           const url = await getDownloadURL(

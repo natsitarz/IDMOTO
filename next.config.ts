@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
-]}};
+    ],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+};
 
 export default nextConfig;

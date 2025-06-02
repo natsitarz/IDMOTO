@@ -4,16 +4,7 @@ import { auth, db } from "@/app/parts/firebase";
 import { useFirebaseUser } from "@/app/parts/firebase-use-user";
 import { sendEmailVerification, updateProfile } from "firebase/auth";
 
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-  writeBatch,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 

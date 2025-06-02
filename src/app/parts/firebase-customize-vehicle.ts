@@ -1,5 +1,5 @@
 import { User } from "firebase/auth";
-import { getDownloadURL, listAll, ref, uploadBytesResumable, UploadTaskSnapshot } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytesResumable, UploadTaskSnapshot } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { storage } from "./firebase";
 

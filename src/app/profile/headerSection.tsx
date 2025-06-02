@@ -1,5 +1,4 @@
 import { db, storage } from "@/app/parts/firebase";
-import { useFirebaseUser } from "@/app/parts/firebase-use-user";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
@@ -499,8 +498,8 @@ export function ProfileHeader({
                 backgroundPosition: `center ${bgAlign}%`,
               }}
               onMouseDown={(e) => {
-                let startY = e.clientY;
-                let startAlign = bgAlign;
+                const startY = e.clientY;
+                const startAlign = bgAlign;
                 let dragging = true;
 
                 const onMouseMove = (moveEvent: MouseEvent) => {
@@ -508,7 +507,7 @@ export function ProfileHeader({
                   const deltaY = moveEvent.clientY - startY;
                   // Przesuwanie: 40px wysokości = 100%
                   const percentDelta = (deltaY / 160) * 100;
-                  let newAlign = Math.max(
+                  const newAlign = Math.max(
                     0,
                     Math.min(100, startAlign + percentDelta)
                   );

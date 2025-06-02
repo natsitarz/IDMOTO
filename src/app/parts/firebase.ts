@@ -28,7 +28,7 @@ export const db = getFirestore(app)
 export const storage = getStorage(app)
 export const auth = getAuth();
 
-let appCheck: AppCheck | null = null;
+const appCheck: AppCheck | null = null;
 
 const initAppCheck = () => {
   if(!appCheck){ initializeAppCheck(app, {
