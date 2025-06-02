@@ -42,6 +42,7 @@ export const googleSignIn = () => {
 export const googleSignInRedirect = () => {
   const provider = new GoogleAuthProvider();
   signInWithRedirect(auth, provider);
+  return checkUser;
 };
 
 export const addUserToDB = async (user: any) => {
