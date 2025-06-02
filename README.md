@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IDMOTO 🚗✨
 
-## Getting Started
+**IDMOTO** is a modern, social web app for car enthusiasts.  
+Showcase your vehicles, personalize your profile, and get instant AI-powered car advice!
 
-First, run the development server:
+![IDMOTO Profile Screenshot](https://user-images.githubusercontent.com/your-screenshot.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Personal Profiles:**  
+  Create your own automotive profile with a custom bio, country, and profile photo.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Vehicle Cards:**  
+  Add, edit, and showcase your cars with beautiful, customizable cards (including photo alignment).
 
-## Learn More
+- **AI Assistant:**  
+  Ask IDMOTO AI anything about your car, maintenance, or features – powered by Gemini & ChatGPT.
 
-To learn more about Next.js, take a look at the following resources:
+- **Responsive Design:**  
+  Fully mobile-friendly and visually stunning, with animated gradients and smooth transitions.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Privacy & Security:**  
+  All confidential data (API keys, Firebase config) are stored in Vercel.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🛠️ Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 14** (App Router)
+- **React 18**
+- **Firebase** (Auth, Firestore, Storage)
+- **Tailwind CSS**
+- **Google Gemini API** & **OpenAI ChatGPT**
+- **TypeScript**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+   
