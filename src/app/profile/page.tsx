@@ -5,8 +5,7 @@ import { useFirebaseUser } from "@/app/parts/firebase-use-user";
 import { useShowMainDom } from "@/app/parts/showMainProf";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
-
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { ProfileHeader } from "./headerSection";
 import { ProfileVehiclesSection } from "./vehicleSection";
 
@@ -90,7 +89,8 @@ function AIAssistantCard({ isOwnProfile }: { isOwnProfile: boolean }) {
   }
 }
 
-export default function Profile() {
+// --- Wrap Profile in Suspense for useSearchParams ---
+function ProfileInner() {
   const searchParams = useSearchParams();
   const user = useFirebaseUser();
   useShowMainDom(user);
@@ -156,5 +156,13 @@ export default function Profile() {
         </footer>
       </div>
     </div>
+  );
+}
+
+export default function Profile() {
+  return (
+    <Suspense>
+      <ProfileInner />
+    </Suspense>
   );
 }

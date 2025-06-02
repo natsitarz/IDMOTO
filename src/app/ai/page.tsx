@@ -4,7 +4,7 @@ import { useFirebaseUser } from "@/app/parts/firebase-use-user";
 import { askChatGPT } from "@/lib/chatgpt-client";
 import { askGemini } from "@/lib/gemini";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 function NotLoggedInMessage() {
   return (
@@ -41,7 +41,7 @@ function NotLoggedInMessage() {
   );
 }
 
-export default function AIPage() {
+function AIPageInner() {
   const user = useFirebaseUser();
   const searchParams = useSearchParams();
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -246,5 +246,13 @@ export default function AIPage() {
         </form>
       </main>
     </div>
+  );
+}
+
+export default function AIPage() {
+  return (
+    <Suspense>
+      <AIPageInner />
+    </Suspense>
   );
 }

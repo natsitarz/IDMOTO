@@ -19,9 +19,9 @@ import {
 } from "firebase/storage";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 
-export default function CarPage() {
+function CarPageInner() {
   const [hasMounted, setHasMounted] = useState(false);
   const searchParams = useSearchParams();
   const carId = searchParams.get("id");
@@ -408,5 +408,13 @@ export default function CarPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CarPage() {
+  return (
+    <Suspense>
+      <CarPageInner />
+    </Suspense>
   );
 }
