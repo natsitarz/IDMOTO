@@ -1,9 +1,7 @@
-import ClientErrorToaster from "@/app/parts/ClientErrorToaster";
-import PageLoaderWrapper from "@/app/parts/PageLoaderWrapper";
 import { Watermark } from "@/app/parts/watermark";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,25 +14,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IDMOTO | Log In",
+  title: "IDMOTO | About",
   description: "Show the world your dream car",
 };
 
-export default function RootLayout({
+export default function AboutLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <PageLoaderWrapper />
-        <ClientErrorToaster />
-        {children}
-        <Watermark />
-      </body>
-    </html>
+    <>
+      {children}
+      <Watermark />
+    </>
   );
 }

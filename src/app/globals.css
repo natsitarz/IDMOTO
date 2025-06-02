@@ -24,3 +24,79 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@theme {
+  --animate-fade-in-scale: fade-in-scale 1s ease-out;
+  --animate-fade-in-scale-faster: fade-in-scale-faster 0.5s ease-out;
+  --animate-fade-in-opacity: fade-in-opacity 0.5s ease-out;
+
+  @keyframes fade-in-scale {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes fade-in-scale-faster {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+@keyframes fade-in-opacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.6s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+@keyframes slide-up-fade-faster {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade-faster {
+  animation: slide-up-fade 0.2s cubic-bezier(.2,0,.2,0.2) forwards;
+}
+
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.fade-out {
+  animation: fade-out 0.4s ease forwards;
+}
+
