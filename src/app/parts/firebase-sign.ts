@@ -17,32 +17,30 @@ export const logOut = () => {
 const provider = new GoogleAuthProvider();
 
 export const googleSignIn = () => {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    // On mobile, always use redirect
+    const provider = new GoogleAuthProvider();
+    signInWithRedirect(auth, provider);
+    return checkUser;
+  } else {
+    // On desktop, use popup
     signInWithPopup(auth, provider)
-  .then((result) => {
-    // This gives you a Google Access Token. You can use it to access the Google API.
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    // The signed-in user info.
-    const user = result.user;
-    if (credential) {
-      return checkUser;
-    }
-    // Go to the user's profile page
-  }).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
-  });
-}
-
-export const googleSignInRedirect = () => {
-  const provider = new GoogleAuthProvider();
-  signInWithRedirect(auth, provider);
-  return checkUser;
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const user = result.user;
+        if (credential) {
+          return checkUser;
+        }
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
+      });
+  }
 };
 
 export const addUserToDB = async (user: any) => {
@@ -104,7 +102,7 @@ export const logIn = () => {
     if (user) {
       window.location.href = `/profile?uid=${user.uid}`;
     } else {
-      googleSignInRedirect();
+      googleSignIn();
     }
   }
 };

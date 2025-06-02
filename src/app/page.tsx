@@ -4,7 +4,6 @@ import {
   addUserToDB,
   checkUser,
   googleSignIn,
-  googleSignInRedirect,
 } from "@/app/parts/firebase-sign";
 import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
@@ -13,20 +12,10 @@ import { useEffect, useState } from "react";
 checkUser();
 
 export default function Signup() {
-  function isMobile() {
-    if (typeof window === "undefined") return false;
-    return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
-      navigator.userAgent
-    );
-  }
-
   const handleGoogleSignIn = () => {
-    if (isMobile()) {
-      googleSignInRedirect();
-    } else {
-      googleSignIn();
-    }
+    googleSignIn();
   };
+
   const [user, setUser] = useState(auth.currentUser);
   useEffect(() => {
     onAuthStateChanged(auth, setUser), [];
