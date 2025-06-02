@@ -17,12 +17,6 @@ export const logOut = () => {
 const provider = new GoogleAuthProvider();
 
 export const googleSignIn = () => {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    // On mobile, always use redirect
-    signInWithRedirect(auth, provider);
-    const user = auth.currentUser;
-  } else {
     // On desktop, use popup
     signInWithPopup(auth, provider)
       .then((result) => {
@@ -39,7 +33,7 @@ export const googleSignIn = () => {
         console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
       });
   }
-};
+
 
 export const addUserToDB = async (user: any) => {
   try {
