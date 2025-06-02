@@ -13,30 +13,39 @@ import { useEffect, useState } from "react";
 checkUser();
 
 export default function Signup() {
+  const router = useRouter();
+  const [user, setUser] = useState(auth.currentUser);
+
+  // 1. Obsługa Google redirect (mobile)
   useEffect(() => {
     getRedirectResult(auth)
       .then((result) => {
         if (result && result.user) {
-          const user = result.user;
           addUserToDB(result.user);
         }
       })
       .catch((error) => {
-        // Możesz dodać obsługę błędów
         console.error("Google redirect error:", error);
       });
   }, []);
+
+  // 2. Przekierowanie po zalogowaniu
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      if (firebaseUser) {
+        // Dodaj do bazy, jeśli trzeba
+        await addUserToDB(firebaseUser);
+        // Teraz przekieruj
+        router.replace(`/profile?uid=${firebaseUser.uid}`);
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
+
   const handleGoogleSignIn = () => {
     googleSignIn();
   };
-
-  const [user, setUser] = useState(auth.currentUser);
-  useEffect(() => {
-    onAuthStateChanged(auth, setUser), [];
-    if (user) {
-      addUserToDB(user);
-    }
-  });
 
   return (
     <div className="flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 min-h-screen">

@@ -49,11 +49,10 @@ export const addUserToDB = async (user: any) => {
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
-      // Only update fields, don't overwrite the whole document
       await updateDoc(userRef, {
+        // ...fields to update if needed
       });
     } else {
-      // Create new user document
       await setDoc(userRef, {
         uid: user.uid,
         displayName: user.displayName,
@@ -61,7 +60,7 @@ export const addUserToDB = async (user: any) => {
         photoURL: user.photoURL,
       });
     }
-    window.location.href = `/profile?uid=${user.uid}`;
+    // REMOVE window.location.href from here!
   } catch (error) {
     console.error("Error adding/updating document: ", error);
   }
