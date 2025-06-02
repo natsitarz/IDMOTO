@@ -2,7 +2,6 @@
 
 import { auth, db } from "@/app/parts/firebase";
 import { firebaseAddVehiclePublic } from "@/app/parts/firebase-add-vehicle";
-import { checkUserOut } from "@/app/parts/firebase-sign";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import Image from "next/image";
@@ -33,8 +32,6 @@ export default function Profile() {
       checkUserCars();
     }
   }, [user]);
-
-  checkUserOut();
 
   return (
     <div
