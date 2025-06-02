@@ -20,9 +20,7 @@ export const googleSignIn = () => {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile) {
     // On mobile, always use redirect
-    const provider = new GoogleAuthProvider();
     signInWithRedirect(auth, provider);
-    return checkUser;
   } else {
     // On desktop, use popup
     signInWithPopup(auth, provider)
@@ -30,7 +28,6 @@ export const googleSignIn = () => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const user = result.user;
         if (credential) {
-          return checkUser;
         }
       })
       .catch((error) => {
@@ -79,34 +76,6 @@ export const redirectResults = () => {
       console.error("Google redirect error:", error);
     });
 };
-export const checkUser = () => {
-  if(typeof window !== "undefined") {
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-  }
-    else {
-      document.getElementById("landing")?.style.setProperty("display", "grid");
-    }
-  }
-  );
-}
-}
-
-export const checkUserOut = () => {
-  auth.onAuthStateChanged((user) => {
-    if (!user && typeof window !== "undefined") {
-      changeDisplay();
-      window.location.href = "/";
-    }
-  }
-  );
-}
-
-const changeDisplay = () => {
-  document.getElementById("profile")?.style.setProperty("display", "none");
-  document.getElementById("watermark")?.style.setProperty("display", "none");
-  document.getElementById("navbar")?.style.setProperty("display", "none");
-}
 
 export const logIn = () => {
   if (typeof window !== "undefined") {

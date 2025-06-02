@@ -2,7 +2,6 @@
 import { auth } from "@/app/parts/firebase";
 import {
   addUserToDB,
-  checkUser,
   googleSignIn,
   redirectResults,
 } from "@/app/parts/firebase-sign";
