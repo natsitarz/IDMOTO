@@ -5,13 +5,27 @@ import {
   checkUser,
   googleSignIn,
 } from "@/app/parts/firebase-sign";
-import { onAuthStateChanged } from "firebase/auth";
+import { getRedirectResult, onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 checkUser();
 
 export default function Signup() {
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result && result.user) {
+          const user = result.user;
+          addUserToDB(result.user);
+        }
+      })
+      .catch((error) => {
+        // Możesz dodać obsługę błędów
+        console.error("Google redirect error:", error);
+      });
+  }, []);
   const handleGoogleSignIn = () => {
     googleSignIn();
   };

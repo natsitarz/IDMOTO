@@ -1,21 +1,8 @@
 "use client";
-import { getRedirectResult, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { useEffect } from "react";
 import { auth, db } from "./firebase";
 
-
-useEffect(() => {
-  getRedirectResult(auth).then((result) => {
-    if (result && result.user) {
-      const user = result.user;
-      addUserToDB(result.user);
-    }
-  }).catch((error) => {
-    // Możesz dodać obsługę błędów
-    console.error("Google redirect error:", error);
-  });
-}, []);
 
 export const logOut = () => {
   if(typeof window !== "undefined") {
