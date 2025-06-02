@@ -3,12 +3,7 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
-import {
-  googleSignIn,
-  googleSignInRedirect,
-  logIn,
-  logOut,
-} from "./firebase-sign";
+import { googleSignIn, logOut } from "./firebase-sign";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -30,11 +25,7 @@ export default function Navbar() {
     if (user) {
       logOut();
     } else {
-      if (isMobile) {
-        googleSignInRedirect();
-      } else {
-        googleSignIn();
-      }
+      googleSignIn();
     }
   };
 
