@@ -70,16 +70,15 @@ export const redirectResults = () => {
   getRedirectResult(auth)
     .then(async (result) => {
       if (result && result.user) {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const user = result.user;
+        await addUserToDB(result.user);
+        // Możesz przekierować tutaj, ale lepiej zrobić to w onAuthStateChanged (patrz niżej)
+        // window.location.href = `/profile?uid=${result.user.uid}`;
       }
     })
     .catch((error) => {
       console.error("Google redirect error:", error);
     });
-      
-    }
-
+};
 export const checkUser = () => {
   if(typeof window !== "undefined") {
   auth.onAuthStateChanged((user) => {

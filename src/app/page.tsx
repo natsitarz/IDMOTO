@@ -11,8 +11,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-checkUser();
-
 export default function Signup() {
   const router = useRouter();
   const [user, setUser] = useState(auth.currentUser);
@@ -25,9 +23,7 @@ export default function Signup() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        // Dodaj do bazy, jeśli trzeba
         await addUserToDB(firebaseUser);
-        // Teraz przekieruj
         router.replace(`/profile?uid=${firebaseUser.uid}`);
       }
     });
