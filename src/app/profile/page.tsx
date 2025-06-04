@@ -2,12 +2,12 @@
 
 import { db } from "@/app/parts/firebase";
 import { useFirebaseUser } from "@/app/parts/firebase-use-user";
+import { ProfileHeader } from "@/app/parts/headerSection";
 import { useShowMainDom } from "@/app/parts/showMainProf";
+import { ProfileVehiclesSection } from "@/app/parts/vehicleSection";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useState } from "react";
-import { ProfileHeader } from "./headerSection";
-import { ProfileVehiclesSection } from "./vehicleSection";
 
 const aiCardBgAnimation = (
   <style jsx global>{`

@@ -1,5 +1,5 @@
 "use client";
-import PageLoader from "@/app/PageLoader";
+import PageLoader from "@/app/parts/PageLoader";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 

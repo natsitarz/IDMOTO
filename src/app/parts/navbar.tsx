@@ -45,7 +45,7 @@ export default function Navbar() {
           <>
             <a
               href="/feed"
-              className="hover:text-gray-400 cursor-pointer animate-fade-in-opacity block uppercase text-zinc-100 tracking-widest font-bold"
+              className="hidden hover:text-gray-400 cursor-pointer animate-fade-in-opacity uppercase text-zinc-100 tracking-widest font-bold"
             >
               Feed
             </a>

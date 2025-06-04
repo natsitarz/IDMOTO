@@ -1,10 +1,10 @@
 "use client";
 
+import CarForm from "@/app/parts/CarForm";
 import { db } from "@/app/parts/firebase";
+import { useAuthUser, useCarData } from "@/app/parts/useCarEditHooks";
 import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import CarForm from "./CarForm";
-import { useAuthUser, useCarData } from "./useCarEditHooks";
 
 function LoadingMessage() {
   return (
