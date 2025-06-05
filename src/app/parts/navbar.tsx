@@ -86,7 +86,7 @@ export default function Navbar() {
               <div className="flex flex-col gap-4 w-full h-full mt-4">
                 {user && (
                   <a
-                    href={`/profile/${user.uid}`}
+                    href={`/profile?uid=${user.uid}`}
                     className="block text-xl uppercase text-zinc-100 tracking-widest font-bold hover:text-gray-400 transition"
                     onClick={() => setMobileMenu(false)}
                   >
