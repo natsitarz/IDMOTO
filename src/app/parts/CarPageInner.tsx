@@ -61,7 +61,7 @@ export default function CarPageInner() {
           );
           carData.image = url;
         } catch (e) {
-          carData.image = "/logo.png";
+          carData.image = "/background-car-placeholder.png";
         }
         carData.gallery = await fetchGallery(carId);
         setCar(carData);

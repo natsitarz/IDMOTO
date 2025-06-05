@@ -134,7 +134,7 @@ function ProfileInner() {
   if (notFound) {
     return (
       <div
-        className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
+        className="flex flex-grow flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
         style={{ minHeight: "100vh" }}
       >
         <div className="bg-white/10 border border-red-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
@@ -167,11 +167,11 @@ function ProfileInner() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800">
+    <div className="w-full flex items-start bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800">
       <div
         id="profile"
-        className="w-full grid grid-rows-[auto,1fr,auto] min-h-screen p-8 gap-4 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
-        style={{ minHeight: "100vh" }}
+        className="w-full flex flex-col min-h-[calc(100vh-67px)] p-8 sm:gap-8 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
+        style={{ display: "flex" }}
       >
         <ProfileHeader
           displayName={displayName}
@@ -185,7 +185,7 @@ function ProfileInner() {
           onSaveBio={isOwnProfile ? handleSaveBio : undefined}
           isOwnProfile={isOwnProfile}
         />
-        <div>
+        <div className="flex flex-col flex-grow">
           <AIAssistantCard isOwnProfile={isOwnProfile} />
           <ProfileVehiclesSection
             uid={profileUid}
@@ -193,7 +193,7 @@ function ProfileInner() {
             isOwnProfile={isOwnProfile}
           />
         </div>
-        <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+        <footer className="flex gap-[24px] flex-wrap items-center justify-center mt-8">
           <p>IDMOTO 2025©</p>
         </footer>
       </div>

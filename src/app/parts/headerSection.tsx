@@ -146,10 +146,9 @@ export function ProfileHeader({
   };
 
   return (
-    <section className="relative w-full mx-auto">
-      {/* Cover background with extra bottom padding */}
+    <section className="w-full relative mx-auto">
       <div
-        className="relative h-48 sm:h-84 w-full rounded-3xl shadow-lg flex items-end px-6 pb-6 overflow-hidden"
+        className="relative h-45 sm:h-84 w-full rounded-3xl shadow-lg flex items-end px-6 pb-6 overflow-hidden"
         style={{
           backgroundImage: bgUrl
             ? `url(${bgUrl})`

@@ -109,7 +109,7 @@ function VehicleCard({
         );
         if (isMounted) setImageUrl(url);
       } catch {
-        setImageUrl("/car-placeholder.jpg");
+        setImageUrl("/car-placeholder.png");
       }
     }
     fetchImage();

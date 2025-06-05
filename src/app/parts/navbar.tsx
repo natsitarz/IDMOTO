@@ -75,7 +75,7 @@ export default function Navbar() {
         </button>
         {mobileMenu && (
           <div className="fixed inset-0 z-[999] bg-black/60 flex flex-col items-end">
-            <div className="w-2/3 max-w-xs bg-zinc-900 shadow-2xl h-full flex flex-col items-center gap-6 p-6 ">
+            <div className="w-2/3 max-w-xs bg-zinc-900 shadow-2xl h-full flex flex-col items-center gap-6 p-6 animate-slide-in-right">
               <button
                 className="self-end text-zinc-400 hover:text-white text-2xl"
                 onClick={() => setMobileMenu(false)}
