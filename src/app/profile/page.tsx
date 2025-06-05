@@ -170,8 +170,7 @@ function ProfileInner() {
     <div className="w-full flex items-start bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800">
       <div
         id="profile"
-        className="w-full flex flex-col min-h-[calc(100vh-67px)] p-3 sm:gap-8 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
-        style={{ display: "flex" }}
+        className="w-full !flex flex-col min-h-[calc(100vh-67px)] p-3 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
       >
         <ProfileHeader
           displayName={displayName}

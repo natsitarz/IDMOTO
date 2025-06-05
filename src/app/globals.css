@@ -114,3 +114,6 @@ body {
   animation: fade-out 0.4s ease forwards;
 }
 
+#profile {
+  display: flex;
+}

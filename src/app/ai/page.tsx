@@ -154,7 +154,7 @@ function AIPageInner() {
             <button
               type="button"
               onClick={() => setAiProvider("chatgpt")}
-              className={`px-4 py-1 rounded-full text-xs font-bold transition-all duration-150 ${
+              className={`hidden px-4 py-1 rounded-full text-xs font-bold transition-all duration-150 ${
                 aiProvider === "chatgpt"
                   ? "bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow"
                   : "text-zinc-300 hover:text-white"
