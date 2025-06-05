@@ -118,7 +118,7 @@ function VehicleCard({
     };
   }, [vehicle.id]);
 
-  const bgImage = imageUrl || "/car-placeholder.jpg";
+  const bgImage = imageUrl || "/car-placeholder.png";
 
   return (
     <>
