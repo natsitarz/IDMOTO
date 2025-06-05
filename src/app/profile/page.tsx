@@ -135,7 +135,7 @@ function ProfileInner() {
     return (
       <div
         className="flex flex-grow flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
-        style={{ minHeight: "100vh" }}
+        style={{ minHeight: "calc(100vh - 67px)" }}
       >
         <div className="bg-white/10 border border-red-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
           <svg
@@ -170,7 +170,7 @@ function ProfileInner() {
     <div className="w-full flex items-start bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800">
       <div
         id="profile"
-        className="w-full flex flex-col min-h-[calc(100vh-67px)] p-8 sm:gap-8 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
+        className="w-full flex flex-col min-h-[calc(100vh-67px)] p-3 sm:gap-8 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
         style={{ display: "flex" }}
       >
         <ProfileHeader
@@ -185,7 +185,7 @@ function ProfileInner() {
           onSaveBio={isOwnProfile ? handleSaveBio : undefined}
           isOwnProfile={isOwnProfile}
         />
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col flex-grow gap-6 sm:gap-0">
           <AIAssistantCard isOwnProfile={isOwnProfile} />
           <ProfileVehiclesSection
             uid={profileUid}
