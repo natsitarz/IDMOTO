@@ -147,25 +147,24 @@ export function ProfileHeader({
 
   return (
     <section className="w-full relative mx-auto">
-      <div
-        className="relative h-45 sm:h-84 w-full rounded-3xl shadow-lg flex items-end px-6 pb-6 overflow-hidden"
-        style={{
-          backgroundImage: bgUrl
-            ? `url(${bgUrl})`
-            : "linear-gradient(135deg, #1e3a8a 0%, #2563eb 30%, #334155 100%)",
-          backgroundPosition: `center ${bgAlign}%`,
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-        }}
-      >
-        {/* Gradient overlay for clarity */}
-        <div
-          className="absolute inset-0 rounded-3xl pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(20,20,30,1) 0%, rgba(20,20,30,0.7) 40%, rgba(20,20,30,0.0) 100%)",
-          }}
-        />
+      <div className="relative h-45 sm:h-84 w-full rounded-3xl shadow-lg flex items-end px-6 pb-6 overflow-hidden">
+        {/* Background image layer */}
+        <div className="absolute inset-0 overflow-hidden z-0">
+          <img
+            src={bgUrl || "/background-car-placeholder.png"}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ objectPosition: `center ${bgAlign}%` }}
+            draggable={false}
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(20,20,30,1) 0%, rgba(20,20,30,0.7) 40%, rgba(20,20,30,0.0) 100%)",
+            }}
+          />
+        </div>
         {isOwnProfile && (
           <button
             ref={editButtonRef}
@@ -467,7 +466,7 @@ export function ProfileHeader({
               Align background photo
             </h2>
             <div
-              className="relative w-full h-40 rounded-xl mb-4 overflow-hidden bg-cover bg-center cursor-grab active:cursor-grabbing"
+              className="relative w-full h-25 rounded-xl mb-4 overflow-hidden bg-cover bg-center cursor-grab active:cursor-grabbing"
               style={{
                 backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
                 backgroundPosition: `center ${bgAlign}%`,
@@ -498,11 +497,7 @@ export function ProfileHeader({
                 window.addEventListener("mousemove", onMouseMove);
                 window.addEventListener("mouseup", onMouseUp);
               }}
-            >
-              {/* Deadzone overlays */}
-              <div className="absolute left-0 top-0 w-full h-5 bg-black/60 pointer-events-none rounded-t-xl" />
-              <div className="absolute left-0 bottom-0 w-full h-10 bg-black/60 pointer-events-none rounded-b-xl" />
-            </div>
+            ></div>
             <input
               type="range"
               min={0}
