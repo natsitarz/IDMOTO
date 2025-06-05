@@ -43,7 +43,7 @@ export default function CarActions({
       {open && (
         <div className="mt-2 w-48 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 absolute right-0 animate-fade-in-up">
           <button
-            className="cursor-pointer w-full flex items-center gap-2 px-5 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-t-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest"
+            className="cursor-pointer w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-t-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
             onClick={() => {
               window.location.href = `/car/edit?id=${car.id}`;
               setOpen(false);
@@ -52,7 +52,7 @@ export default function CarActions({
             <FiEdit2 className="text-blue-600 group-hover:scale-110 transition-transform" />
             Edit car
           </button>
-          <label className="w-full flex items-center gap-2 px-5 py-3 hover:bg-green-50 dark:hover:bg-zinc-800 transition rounded-b-2xl cursor-pointer text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest">
+          <label className="cursor-pointer w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-t-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left">
             <FiImage className="text-green-600 group-hover:scale-110 transition-transform" />
             Edit photo
             <input

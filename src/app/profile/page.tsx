@@ -103,6 +103,17 @@ function ProfileInner() {
   const [email, setEmail] = useState<string>("Loading…");
   const [notFound, setNotFound] = useState(false);
 
+  // Show warning if user is on their own profile and email is not verified
+  useEffect(() => {
+    if (user && isOwnProfile && !user.emailVerified) {
+      window.dispatchEvent(
+        new CustomEvent("show-global-warning", {
+          detail: 'Verify your email in "Edit profile"',
+        })
+      );
+    }
+  }, [user, isOwnProfile]);
+
   useEffect(() => {
     // If no uid in searchParams and user is not logged in, show "Profile not found"
     if (!searchParams.get("uid") && !user) {

@@ -64,7 +64,7 @@ export function ProfileHeader({
     if (uid) {
       getDownloadURL(ref(storage, `users/${uid}/backgroundpic`))
         .then(setBgUrl)
-        .catch(() => setBgUrl(undefined));
+        .catch(() => setBgUrl("/background-car-placeholder.png")); // Fallback if no photo
     }
   }, [uid]);
 
@@ -311,7 +311,10 @@ export function ProfileHeader({
         </div>
         {/* Edit button with menu */}
         {isOwnProfile && (
-          <div className="absolute top-6 right-6 z-30 sm:z-25" ref={menuRef}>
+          <div
+            className="absolute top-6 right-6 z-30 sm:z-25 flex"
+            ref={menuRef}
+          >
             {menuOpen && (
               <>
                 {/* Overlay for mobile */}
@@ -323,162 +326,135 @@ export function ProfileHeader({
                 )}
                 <div
                   className={`
-                  h-full
-                  rounded-2xl shadow-2xl flex-col animate-fade-in z-60
-                  sm:static
-                  fixed inset-0 m-0
-                  sm:flex-col
-                  sm:justify-start
-                  sm:items-start
-                  sm:py-2
-                  sm:z-30
-                  sm:bg-gradient-to-br
-                  sm:from-zinc-900 sm:via-zinc-800 sm:to-zinc-900
-                  sm:border sm:border-zinc-700
-                  sm:shadow-2xl
-                  sm:backdrop-blur-md
-                  sm:rounded-2xl
-                  flex items-center justify-center
-                `}
+            absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800
+            animate-fade-in-up z-60
+            flex flex-col gap-0
+          `}
                   ref={menuRef}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    className="absolute top-4 right-4 sm:hidden p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 z-50"
-                    onClick={() => setMenuOpen(false)}
-                    aria-label="Close menu"
-                    type="button"
+                    className="cursor-pointer w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-t-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onEdit && onEdit();
+                    }}
                   >
+                    {/* User icon */}
                     <svg
-                      className="w-6 h-6"
+                      className="w-5 h-5 text-blue-400"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
                       viewBox="0 0 24 24"
                     >
+                      <circle cx="12" cy="12" r="3" />
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 8.6a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 15z"
                       />
                     </svg>
+                    Edit profile
                   </button>
-                  <div className="flex flex-col gap-3 w-full max-w-xs mx-auto sm:max-w-none sm:gap-0">
-                    <button
-                      className="cursor-pointer flex items-center gap-3 px-5 py-3 text-base text-zinc-100 hover:bg-blue-700/80 hover:text-white rounded-2xl sm:rounded-t-2xl transition font-semibold tracking-wide w-full"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onEdit && onEdit();
-                      }}
+                  <button
+                    className="cursor-pointer w-full flex items-center gap-2 px-5 py-3 hover:bg-green-50 dark:hover:bg-zinc-800 transition text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
+                    disabled={uploading}
+                  >
+                    {/* Image icon */}
+                    <svg
+                      className="w-5 h-5 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
                     >
-                      {/* User icon */}
-                      <svg
-                        className="w-5 h-5 text-blue-400"
-                        fill="none"
+                      <rect
+                        x="3"
+                        y="5"
+                        width="18"
+                        height="14"
+                        rx="2"
                         stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5.121 17.804A9 9 0 1112 21a9 9 0 01-6.879-3.196z"
-                        />
-                        <circle
-                          cx="12"
-                          cy="11"
-                          r="4"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="none"
-                        />
-                      </svg>
-                      Edit profile
-                    </button>
-                    <button
-                      className="cursor-pointer flex items-center gap-3 px-5 py-3 text-base text-zinc-100 hover:bg-blue-700/80 hover:text-white transition font-semibold tracking-wide w-full"
-                      onClick={() => {
-                        fileInputRef.current?.click();
-                      }}
-                      disabled={uploading}
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <circle
+                        cx="8.5"
+                        cy="10.5"
+                        r="1.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21 19l-5.5-7-4.5 6-3-4-4 5"
+                      />
+                    </svg>
+                    {uploading ? "Uploading..." : "Edit background photo"}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      await handleBgPhotoChange(e);
+                      setMenuOpen(false);
+                    }}
+                    disabled={uploading}
+                  />
+                  <button
+                    className="cursor-pointer w-full flex items-center gap-2 px-5 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-b-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
+                    onClick={() => setShowAlignModal(true)}
+                  >
+                    {/* Align icon */}
+                    <svg
+                      className="w-5 h-5 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
                     >
-                      {/* Image icon */}
-                      <svg
-                        className="w-5 h-5 text-blue-400"
-                        fill="none"
+                      <rect
+                        x="4"
+                        y="10"
+                        width="16"
+                        height="4"
+                        rx="2"
                         stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <rect
-                          x="3"
-                          y="5"
-                          width="18"
-                          height="14"
-                          rx="2"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="none"
-                        />
-                        <circle
-                          cx="8.5"
-                          cy="10.5"
-                          r="1.5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="none"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 19l-5.5-7-4.5 6-3-4-4 5"
-                        />
-                      </svg>
-                      {uploading ? "Uploading..." : "Edit background photo"}
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={async (e) => {
-                        await handleBgPhotoChange(e);
-                        setMenuOpen(false);
-                      }}
-                      disabled={uploading}
-                    />
-                    <button
-                      className="cursor-pointer flex items-center gap-3 px-5 py-3 text-base text-zinc-100 hover:bg-blue-700/80 hover:text-white rounded-2xl sm:rounded-b-2xl transition font-semibold tracking-wide w-full"
-                      onClick={() => setShowAlignModal(true)}
-                    >
-                      {/* Align icon */}
-                      <svg
-                        className="w-5 h-5 text-blue-400"
+                        strokeWidth="2"
                         fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <rect
-                          x="4"
-                          y="10"
-                          width="16"
-                          height="4"
-                          rx="2"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          fill="none"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4v16"
-                        />
-                      </svg>
-                      Align background photo
-                    </button>
-                  </div>
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4v16"
+                      />
+                    </svg>
+                    Align background photo
+                  </button>
                 </div>
+                <style jsx>{`
+                  .animate-fade-in-up {
+                    animation: fadeInUp 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+                  }
+                  @keyframes fadeInUp {
+                    from {
+                      opacity: 0;
+                      transform: translateY(12px);
+                    }
+                    to {
+                      opacity: 1;
+                      transform: translateY(0);
+                    }
+                  }
+                `}</style>
               </>
             )}
           </div>

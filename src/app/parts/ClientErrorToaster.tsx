@@ -4,7 +4,7 @@ import ErrorWrapper from "./ErrorWrapper";
 
 export default function ClientErrorToaster() {
   const [message, setMessage] = useState<string | null>(null);
-  const [type, setType] = useState<"error" | "success">("error");
+  const [type, setType] = useState<"error" | "success" | "warning">("error");
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -18,10 +18,19 @@ export default function ClientErrorToaster() {
       setType("success");
       setVisible(true);
     };
+    const warningHandler = (e: CustomEvent) => {
+      setMessage(e.detail);
+      setType("warning");
+      setVisible(true);
+    };
     window.addEventListener("show-global-error", errorHandler as EventListener);
     window.addEventListener(
       "show-global-success",
       successHandler as EventListener
+    );
+    window.addEventListener(
+      "show-global-warning",
+      warningHandler as EventListener
     );
     return () => {
       window.removeEventListener(
@@ -31,6 +40,10 @@ export default function ClientErrorToaster() {
       window.removeEventListener(
         "show-global-success",
         successHandler as EventListener
+      );
+      window.removeEventListener(
+        "show-global-warning",
+        warningHandler as EventListener
       );
     };
   }, []);

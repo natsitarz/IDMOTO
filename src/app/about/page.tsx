@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"; // Import the useRouter hook
 export default function About() {
   const router = useRouter(); // Initialize the router
   return (
-    <div className="flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 min-h-screen">
+    <div className="flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 min-h-screen font-[family-name:var(--font-geist-sans)]">
       <main className="animate-fade-in-scale flex flex-col gap-[32px] row-start-2 items-center text-center sm:justify-center">
         <Image
           className=""

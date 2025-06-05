@@ -35,7 +35,7 @@ export default function Profile() {
   return (
     <div
       id="addCar"
-      className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 p-4"
+      className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 p-4 font-[family-name:var(--font-geist-sans)]"
     >
       <div className="bg-white/10 dark:bg-zinc-900/80 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-md p-8 flex flex-col items-center gap-8 animate-fade-in-scale">
         <div className="flex flex-col items-center gap-2">

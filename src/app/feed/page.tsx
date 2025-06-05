@@ -2,7 +2,7 @@
 
 export default function FeedUnderMaintenance() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]">
       <div className="flex flex-col items-center gap-6 bg-white/10 border border-blue-400/30 rounded-3xl px-10 py-12 shadow-2xl animate-fade-in-scale">
         <span className="inline-flex items-center justify-center rounded-full bg-blue-800/80 p-6 shadow-lg">
           <svg

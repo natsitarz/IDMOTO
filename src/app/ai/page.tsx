@@ -111,7 +111,7 @@ function AIPageInner() {
 
   return (
     <div
-      className="animate-fade-in-scale p-4 flex flex-col bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
+      className="animate-fade-in-scale p-4 flex flex-col bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]"
       style={{ minHeight: "calc(100vh - 67px)" }}
     >
       <header className="w-full max-w-2xl mx-auto pt-10 pb-4 flex flex-col items-center">

@@ -211,7 +211,7 @@ export default function CarPageInner() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-67px)] bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 flex flex-col items-center">
+    <div className="relative min-h-[calc(100vh-67px)] bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 flex flex-col items-center font-[family-name:var(--font-geist-sans)]">
       {/* Hero Section */}
       <div className="animate-fade-in-opacity relative w-full h-96 max-h-[420px] flex items-end justify-start overflow-hidden rounded-b-3xl shadow-xl mb-8">
         <Image
@@ -356,7 +356,6 @@ export default function CarPageInner() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="animate-fade-in-scale w-full px-4 grid gap-8 grid-cols-1 md:grid-cols-2">
         <div className="rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6">
           <CarInfo car={car} />

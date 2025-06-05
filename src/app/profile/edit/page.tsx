@@ -101,7 +101,7 @@ export default function EditProfilePage() {
 
   return (
     <div
-      className="flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
+      className="font-[family-name:var(--font-geist-sans)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
       style={{ minHeight: "calc(100vh - 67px)" }}
     >
       <form

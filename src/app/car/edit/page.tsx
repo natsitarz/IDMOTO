@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 function LoadingMessage() {
   return (
     <div
-      className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800"
+      className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]"
       style={{ minHeight: "calc(100vh - 67px)" }}
     >
       <div className="bg-white/10 border border-blue-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
