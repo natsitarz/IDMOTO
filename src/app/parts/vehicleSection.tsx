@@ -3,7 +3,7 @@ import { VehiclesListDiv } from "../parts/firebase-get-vehicles";
 
 interface ProfileVehiclesSectionProps {
   uid: string;
-  letsAdd?: () => void; // <-- make optional
+  letsAdd?: () => void;
 }
 
 function VehiclesMessage({ vehicleCount }: { vehicleCount: number | null }) {
@@ -38,7 +38,7 @@ function VehiclesAddButton({
 export function ProfileVehiclesSection({
   uid,
   letsAdd,
-  isOwnProfile, // <-- add this prop
+  isOwnProfile,
 }: ProfileVehiclesSectionProps & { isOwnProfile: boolean }) {
   const [vehicleCount, setVehicleCount] = useState<number | null>(null);
 
@@ -54,7 +54,7 @@ export function ProfileVehiclesSection({
           <VehiclesListDiv
             userId={uid}
             onVehicleCount={setVehicleCount}
-            isOwnProfile={isOwnProfile} // <-- pass down
+            isOwnProfile={isOwnProfile}
           />
         ) : null}
       </div>
