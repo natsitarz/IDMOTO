@@ -44,10 +44,7 @@ export default function Signup() {
             height={38}
             priority
           />
-          <span className="font-black">ALPHA 0.3.2</span>
-          <p className="mb-2 tracking-[-.01em] text-white text-lg">
-            Let's show the world your dream car!
-          </p>
+          <span className="font-black">Show off your ride</span>
           <button
             id="google-sign-in"
             onClick={handleGoogleSignIn}
