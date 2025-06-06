@@ -195,7 +195,10 @@ function ProfileInner() {
           onSaveBio={isOwnProfile ? handleSaveBio : undefined}
           isOwnProfile={isOwnProfile}
         />
-        <div className="flex flex-col flex-grow gap-6 sm:gap-0">
+        <div
+          className="flex flex-col flex-grow gap-6 sm:gap-0 "
+          style={{ marginTop: !user ? "50px" : "0" }}
+        >
           <AIAssistantCard isOwnProfile={isOwnProfile} />
           <ProfileVehiclesSection
             uid={profileUid}
