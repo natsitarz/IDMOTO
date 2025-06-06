@@ -49,7 +49,7 @@ export function ProfileVehiclesSection({
       </p>
       {letsAdd && <VehiclesMessage vehicleCount={vehicleCount} />}
       <VehiclesAddButton vehicleCount={vehicleCount} letsAdd={letsAdd} />
-      <div className="flex flex-wrap items-start justify-start flex-col sm:flex-row text-sm h-max sm:h-max px-4 sm:px-5 w-max sm:w-auto p-2 gap-2 slide-up-fade">
+      <div className="flex flex-wrap items-start justify-start flex-col sm:flex-row text-sm h-max sm:h-max px-4 sm:px-5 w-max sm:w-auto p-2 gap-4 slide-up-fade">
         {uid ? (
           <VehiclesListDiv
             userId={uid}
