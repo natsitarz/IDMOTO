@@ -14,6 +14,9 @@ export default function Signup() {
   const router = useRouter();
   const [user, setUser] = useState(auth.currentUser);
 
+  // Detect mobile for background video
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     redirectResults();
   }, []);
@@ -29,6 +32,15 @@ export default function Signup() {
     return () => unsubscribe();
   }, [router]);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const handleGoogleSignIn = () => {
     googleSignIn();
   };
@@ -42,9 +54,12 @@ export default function Signup() {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0"
-        poster="/login-bg-poster.jpg"
+        key={isMobile ? "mobile" : "desktop"}
       >
-        <source src="/login-bg.mp4" type="video/mp4" />
+        <source
+          src={isMobile ? "/mobile-bg.mp4" : "/login-bg.mp4"}
+          type="video/mp4"
+        />
         {/* fallback for browsers that don't support video */}
       </video>
       <div className="absolute inset-0 bg-black/50 z-10" />
@@ -70,8 +85,6 @@ export default function Signup() {
             minHeight: "100vh",
             maxWidth: "100vw",
             boxSizing: "border-box",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
           }}
         >
           {/* Top */}
