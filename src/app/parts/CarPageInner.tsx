@@ -236,7 +236,7 @@ export default function CarPageInner() {
             {car.manufacturer} <span className="font-black">{car.model}</span>
           </h1>
           <p className="block text-xs uppercase font-bold text-zinc-400 tracking-widest mb-1">
-            {car.year} • {car.engine} • {car.horsepower}
+            {car.year} • {car.engine} • {car.horsepower + "HP"}
           </p>
           {editingDesc ? (
             <>
