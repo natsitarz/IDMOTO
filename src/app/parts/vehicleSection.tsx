@@ -43,7 +43,7 @@ export function ProfileVehiclesSection({
   const [vehicleCount, setVehicleCount] = useState<number | null>(null);
 
   return (
-    <section className="flex flex-col gap-3 sm:justify-start sm:items-start justify-start items-center">
+    <section className="sm:mt-6 flex flex-col gap-3 sm:justify-start sm:items-start justify-start items-center">
       <p className="block text-xl uppercase text-zinc-100 tracking-widest font-bold">
         {isOwnProfile ? "// My Vehicles" : "// User's Vehicles"}
       </p>

@@ -54,18 +54,12 @@ function AIAssistantCard({ isOwnProfile }: { isOwnProfile: boolean }) {
           onSubmit={handleAsk}
           className="w-full max-w-sm sm:max-w-xl mx-auto my-4 flex items-center rounded-2xl shadow-lg px-2 py-2 sm:px-4 sm:py-2 gap-2"
           style={{
-            background:
-              "linear-gradient(120deg, #1e3a8a 0%, #2563eb 22%, #273c75 48%, #334155 75%, #1e3a8a 100%)",
-            backgroundSize: "200% 200%",
-            animation: "aiCardBgMove 18s ease-in-out infinite",
+            background: "linear-gradient(120deg, #23272f 0%, #23272f 100%)",
+            border: "1px solid #333843",
+            boxShadow: "0 4px 24px 0 rgba(0,0,0,0.18)",
           }}
         >
-          <span className="bg-blue-300 animate-pulse rounded-full p-1 flex items-center justify-center">
-            {/* ...SVG... */}
-            <span className="bg-blue-700 rounded-full p-1 flex items-center justify-center">
-              {/* ...SVG... */}
-            </span>
-          </span>
+          <span className="bg-zinc-800 rounded-full p-1 flex items-center justify-center border border-zinc-700"></span>
           <input
             type="text"
             value={input}
@@ -75,13 +69,32 @@ function AIAssistantCard({ isOwnProfile }: { isOwnProfile: boolean }) {
                 ? "Ask IDMOTO AI about your car…"
                 : "Ask IDMOTO AI about this user's cars"
             }
-            className="flex-1 bg-transparent outline-none text-white placeholder-zinc-300 px-2 text-sm sm:text-base"
+            className="flex-1 bg-transparent outline-none text-white placeholder-zinc-400 px-2 text-sm sm:text-base"
           />
           <button
             type="submit"
-            className="cursor-pointer ml-1 sm:ml-3 px-3 py-2 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 rounded-lg block text-xs sm:text-xs uppercase text-zinc-100 tracking-widest font-semibold transition"
+            className="group cursor-pointer ml-1 sm:ml-3 px-3 py-1.5 rounded-full flex items-center gap-1 text-xs font-semibold uppercase tracking-widest bg-zinc-900/80 border border-zinc-700 shadow transition-all duration-150 hover:bg-zinc-800 hover:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/40"
+            style={{
+              boxShadow: "0 2px 8px 0 rgba(0,0,0,0.12)",
+              letterSpacing: "0.08em",
+            }}
           >
-            Ask
+            <span className="flex items-center justify-center w-4 h-4 rounded-full bg-zinc-800 group-hover:bg-zinc-700 transition">
+              <svg
+                className="w-3 h-3 text-zinc-300 group-hover:text-white transition"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 12h8m0 0l-3-3m3 3l-3 3"
+                />
+              </svg>
+            </span>
+            <span className="tracking-widest">Ask</span>
           </button>
         </form>
       </>
@@ -195,10 +208,7 @@ function ProfileInner() {
           onSaveBio={isOwnProfile ? handleSaveBio : undefined}
           isOwnProfile={isOwnProfile}
         />
-        <div
-          className="flex flex-col flex-grow gap-6 sm:gap-0 "
-          style={{ marginTop: !user ? "50px" : "0" }}
-        >
+        <div className="flex flex-col flex-grow items-center justify-start sm:justify-start sm:items-start w-full mx-auto">
           <AIAssistantCard isOwnProfile={isOwnProfile} />
           <ProfileVehiclesSection
             uid={profileUid}

@@ -43,7 +43,7 @@ export default function RootLayout({
         <meta property="og:type" content="website" />
       </Head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-950 via-zinc-900 to-zinc-800`}
       >
         <PageLoaderWrapper />
         <ClientErrorToaster />

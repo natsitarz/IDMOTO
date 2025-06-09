@@ -88,6 +88,18 @@ export function ProfileHeader({
     };
   }, [menuOpen]);
 
+  // Block scroll when editing bio (mobile/desktop)
+  useEffect(() => {
+    if (editingBio) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [editingBio]);
+
   const handleSave = async () => {
     if (!onSaveBio) return;
     if (bioValue.length > 25) {
@@ -221,125 +233,58 @@ export function ProfileHeader({
             <span className="text-xs text-zinc-400 font-semibold mb-1 block">
               Bio
             </span>
-            {isOwnProfile && editingBio ? (
-              <div className="relative w-max">
-                <input
-                  type="text"
-                  className="rounded-xl px-2 py-1 sm:px-3 sm:py-2 pr-16 bg-zinc-900/80 text-white border-2 border-blue-500/30 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 placeholder:text-zinc-400 font-medium text-xs shadow-inner transition sm:w-60"
-                  value={bioValue}
-                  onChange={(e) => setBioValue(e.target.value)}
-                  maxLength={40}
-                  disabled={savingBio}
-                  autoFocus
-                  placeholder="Add a short bio"
-                />
-                <div className="absolute inset-y-0 right-2 flex items-center gap-1">
-                  <button
-                    type="button"
-                    className={`cursor-pointer p-1 rounded hover:bg-blue-700 transition ${
-                      savingBio ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    disabled={savingBio}
-                    onClick={handleSave}
-                    tabIndex={savingBio ? -1 : 0}
-                    aria-label="Save"
-                  >
-                    {/* Checkmark icon */}
-                    <svg
-                      className="w-4 h-4 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    className={`cursor-pointer p-1 rounded hover:bg-zinc-700 transition ${
-                      savingBio ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    disabled={savingBio}
-                    onClick={() => {
-                      setEditingBio(false);
-                      setBioValue(bio || "");
-                    }}
-                    tabIndex={savingBio ? -1 : 0}
-                    aria-label="Cancel"
-                  >
-                    {/* X icon */}
-                    <svg
-                      className="w-4 h-4 text-zinc-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 w-full">
-                <span className="text-zinc-200 text-xs truncate flex-1">
-                  {bio || (
-                    <span className="italic text-zinc-500">No bio set</span>
-                  )}
-                </span>
-                {isOwnProfile && (
-                  <button
-                    className="cursor-pointer text-blue-400 hover:text-white text-xs underline"
-                    onClick={() => setEditingBio(true)}
-                  >
-                    Edit
-                  </button>
+            <div className="flex items-center gap-2 w-full">
+              <span className="text-zinc-200 text-xs truncate flex-1">
+                {bio || (
+                  <span className="italic text-zinc-500">No bio set</span>
                 )}
-              </div>
-            )}
+              </span>
+              {isOwnProfile && (
+                <button
+                  className="cursor-pointer text-blue-400 hover:text-white text-xs underline"
+                  onClick={() => setEditingBio(true)}
+                >
+                  Edit
+                </button>
+              )}
+            </div>
           </div>
         </div>
         {/* Edit button with menu */}
         {isOwnProfile && (
-          <div
-            className="absolute top-6 right-6 z-30 sm:z-25 flex"
-            ref={menuRef}
-          >
+          <>
             {menuOpen && (
               <>
                 {/* Overlay for mobile */}
-                {showAlignModal ? null : (
+                {!showAlignModal && (
                   <div
-                    className="fixed inset-0 z-40 bg-black/40 sm:hidden backdrop-blur-md"
+                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-md"
                     onClick={() => setMenuOpen(false)}
                   />
                 )}
                 <div
                   className={`
-            absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800
-            animate-fade-in-up z-60
-            flex flex-col gap-0
-          `}
+                    fixed left-1/2 top-1/2 z-50
+                    -translate-x-1/2 -translate-y-1/2
+                    w-[320px] max-w-[90vw]
+                    bg-zinc-900/95
+                    rounded-2xl
+                    border border-zinc-800
+                    flex flex-col
+                    overflow-hidden
+                    shadow-xl
+                    animate-fade-in-up
+                  `}
                   ref={menuRef}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    className="cursor-pointer w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-t-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
+                    className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide border-b border-zinc-800"
                     onClick={() => {
                       setMenuOpen(false);
                       onEdit && onEdit();
                     }}
                   >
-                    {/* User icon */}
                     <svg
                       className="w-5 h-5 text-blue-400"
                       fill="none"
@@ -347,25 +292,20 @@ export function ProfileHeader({
                       strokeWidth={2}
                       viewBox="0 0 24 24"
                     >
-                      <circle cx="12" cy="12" r="3" />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 8.6a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 15z"
-                      />
+                      <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 8.6a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 15z" />
                     </svg>
                     Edit profile
                   </button>
                   <button
-                    className="cursor-pointer w-full flex items-center gap-2 px-5 py-3 hover:bg-green-50 dark:hover:bg-zinc-800 transition text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
+                    className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide border-b border-zinc-800"
                     onClick={() => {
                       fileInputRef.current?.click();
                     }}
                     disabled={uploading}
                   >
-                    {/* Image icon */}
                     <svg
-                      className="w-5 h-5 text-green-600"
+                      className="w-5 h-5 text-green-400"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
@@ -409,10 +349,12 @@ export function ProfileHeader({
                     disabled={uploading}
                   />
                   <button
-                    className="cursor-pointer w-full flex items-center gap-2 px-5 py-3 hover:bg-blue-50 dark:hover:bg-zinc-800 transition rounded-b-2xl text-zinc-800 dark:text-zinc-100 font-medium group uppercase text-xs tracking-widest text-left"
-                    onClick={() => setShowAlignModal(true)}
+                    className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setShowAlignModal(true);
+                    }}
                   >
-                    {/* Align icon */}
                     <svg
                       className="w-5 h-5 text-blue-400"
                       fill="none"
@@ -456,7 +398,110 @@ export function ProfileHeader({
                 `}</style>
               </>
             )}
-          </div>
+          </>
+        )}
+        {/* Bio edit modal */}
+        {isOwnProfile && editingBio && (
+          <>
+            {/* Overlay with blur and scroll block */}
+            <div
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-md"
+              style={{ touchAction: "none" }}
+              onClick={() => {
+                setEditingBio(false);
+                setBioValue(bio || "");
+              }}
+            />
+            <div
+              className={`
+                fixed left-1/2 top-1/2 z-50
+                -translate-x-1/2 -translate-y-1/2
+                w-[340px] max-w-[95vw]
+                bg-zinc-900/95
+                rounded-2xl
+                border border-zinc-800
+                flex flex-col
+                overflow-hidden
+                shadow-xl
+                animate-fade-in-up
+              `}
+              style={{
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col gap-4 p-6">
+                <span className="text-base font-semibold text-white flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 20h9"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.5 3.5a2.121 2.121 0 1 1-3 3L7 13v4h4l6.5-6.5a2.121 2.121 0 0 0-3-3z"
+                    />
+                  </svg>
+                  Edit your bio
+                </span>
+                <input
+                  type="text"
+                  className="rounded-xl px-4 py-3 bg-zinc-800 text-white border border-zinc-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 placeholder:text-zinc-400 font-medium text-base shadow-inner transition"
+                  value={bioValue}
+                  onChange={(e) => setBioValue(e.target.value)}
+                  maxLength={40}
+                  disabled={savingBio}
+                  autoFocus
+                  placeholder="Add a short bio (max 40 chars)"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    className="cursor-pointer px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white transition flex items-center justify-center disabled:opacity-50"
+                    disabled={savingBio}
+                    onClick={() => {
+                      setEditingBio(false);
+                      setBioValue(bio || "");
+                    }}
+                    aria-label="Cancel"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition flex items-center justify-center disabled:opacity-50"
+                    disabled={savingBio}
+                    onClick={handleSave}
+                    aria-label="Save"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
       {showAlignModal && (
