@@ -1,6 +1,5 @@
 import ClientErrorToaster from "@/app/parts/ClientErrorToaster";
 import PageLoaderWrapper from "@/app/parts/PageLoaderWrapper";
-import { Watermark } from "@/app/parts/watermark";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Head from "next/head";
@@ -48,7 +47,6 @@ export default function RootLayout({
         <PageLoaderWrapper />
         <ClientErrorToaster />
         {children}
-        <Watermark />
       </body>
     </html>
   );

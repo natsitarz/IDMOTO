@@ -159,7 +159,7 @@ export function ProfileHeader({
 
   return (
     <section className="w-full relative mx-auto">
-      <div className="relative h-45 sm:h-84 w-full rounded-3xl shadow-lg flex items-end px-6 pb-6 overflow-hidden">
+      <div className="relative h-45 sm:h-84 w-full shadow-lg flex items-end px-6 pb-6 overflow-hidden">
         {/* Background image layer */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <img
@@ -241,10 +241,11 @@ export function ProfileHeader({
               </span>
               {isOwnProfile && (
                 <button
-                  className="cursor-pointer text-blue-400 hover:text-white text-xs underline"
+                  className="cursor-pointer flex items-center gap-1 rounded-full text-white-700 font-semibold text-[11px] shadow  transition-all duration-150 focus:outline-none  active:scale-[0.98]"
                   onClick={() => setEditingBio(true)}
+                  type="button"
                 >
-                  Edit
+                  <span>Edit</span>
                 </button>
               )}
             </div>
@@ -381,21 +382,6 @@ export function ProfileHeader({
                     Align background photo
                   </button>
                 </div>
-                <style jsx>{`
-                  .animate-fade-in-up {
-                    animation: fadeInUp 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-                  }
-                  @keyframes fadeInUp {
-                    from {
-                      opacity: 0;
-                      transform: translateY(12px);
-                    }
-                    to {
-                      opacity: 1;
-                      transform: translateY(0);
-                    }
-                  }
-                `}</style>
               </>
             )}
           </>
@@ -461,7 +447,7 @@ export function ProfileHeader({
                   maxLength={40}
                   disabled={savingBio}
                   autoFocus
-                  placeholder="Add a short bio (max 40 chars)"
+                  placeholder="Add a short bio (max 25 chars)"
                 />
                 <div className="flex justify-end gap-2">
                   <button

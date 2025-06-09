@@ -47,6 +47,7 @@ export default function Signup() {
         <source src="/login-bg.mp4" type="video/mp4" />
         {/* fallback for browsers that don't support video */}
       </video>
+      <div className="absolute inset-0 bg-black/50 z-10" />
       {/* Content */}
       <div className="relative z-20 flex flex-1 items-center justify-center sm:justify-start w-full">
         <aside
@@ -78,12 +79,12 @@ export default function Signup() {
             <Image
               src="/logo.png"
               alt="IDMOTO logo"
-              width={180}
+              width={340}
               height={38}
               priority
               className="mb-2"
             />
-            <h1 className="text-3xl font-extrabold text-white tracking-tight text-center">
+            <h1 className="text-xl font-extrabold text-white tracking-tight text-center">
               Show off your ride!
             </h1>
           </div>
@@ -117,21 +118,22 @@ export default function Signup() {
               <Image src="/globe.svg" alt="Globe icon" width={16} height={16} />
               About
             </a>
+            <span className="">|</span>
             <a
               className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-              href="https://trello.com/invite/b/656277cfd965ba8603417a98/ATTI7564ed4eb22d52d71ffa754f87b1679e5EBFC037/idmoto"
+              href="https://discord.gg/3bh6wuQxNY"
               rel="noopener noreferrer"
             >
               <Image
                 className="invert"
-                src="/trello.png"
-                alt="Trello icon"
+                src="/discord.png"
+                alt="Discord icon"
                 width={16}
                 height={16}
               />
-              Trello
+              Discord
             </a>
-            <span className="hidden sm:inline">|</span>
+            <span className="inline sm:hidden">|</span>
             <span>IDMOTO 2025©</span>
           </footer>
         </aside>

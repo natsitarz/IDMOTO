@@ -194,7 +194,7 @@ function ProfileInner() {
     <div className="w-full flex items-start bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800">
       <div
         id="profile"
-        className="w-full !flex flex-col min-h-[calc(100vh-67px)] p-3 sm:p-8 font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
+        className="w-full !flex flex-col min-h-[calc(100vh-67px)] font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
       >
         <ProfileHeader
           displayName={displayName}
@@ -208,7 +208,7 @@ function ProfileInner() {
           onSaveBio={isOwnProfile ? handleSaveBio : undefined}
           isOwnProfile={isOwnProfile}
         />
-        <div className="flex flex-col flex-grow items-center justify-start sm:justify-start sm:items-start w-full mx-auto">
+        <div className="gap-4 sm:gap-0 flex flex-col sm:pl-8 sm:pr-8 flex-grow items-center justify-start sm:justify-start sm:items-start w-full mx-auto">
           <AIAssistantCard isOwnProfile={isOwnProfile} />
           <ProfileVehiclesSection
             uid={profileUid}
@@ -216,7 +216,7 @@ function ProfileInner() {
             isOwnProfile={isOwnProfile}
           />
         </div>
-        <footer className="flex gap-[24px] flex-wrap items-center justify-center mt-8">
+        <footer className="flex gap-[24px] flex-wrap items-center justify-center">
           <p>IDMOTO 2025©</p>
         </footer>
       </div>

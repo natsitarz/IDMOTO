@@ -28,6 +28,7 @@ function processCarSnapshot(
       model: carData.model || "",
       year: carData.year || "",
       engine: carData.engine || "",
+      horsepower: carData.horsepower || "",
       transmission: carData.transmission || "",
     });
   } else {
@@ -44,6 +45,7 @@ export function useCarData(user: User | null, carId: string) {
     model: "",
     year: "",
     engine: "",
+    horsepower: "",
     transmission: "",
   });
 

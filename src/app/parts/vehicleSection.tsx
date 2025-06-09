@@ -27,9 +27,19 @@ function VehiclesAddButton({
   if (vehicleCount === null || !letsAdd) return null;
   return (
     <button
-      className="animate-slide-up-fade cursor-pointer rounded-full border border-white/30 hover:bg-white/10 transition-colors flex items-center justify-center font-medium h-10 sm:h-12 px-4 sm:px-5 w-max sm:w-max text-xs uppercase text-zinc-200 tracking-widest mb-1"
+      className="cursor-pointer flex items-center gap-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white-200 hover:text-white font-semibold h-9 px-4 text-xs uppercase shadow-sm border border-zinc-800 transition"
       onClick={letsAdd}
+      type="button"
     >
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
       {vehicleCount === 0 ? "Add first vehicle" : "Add another car"}
     </button>
   );
@@ -43,7 +53,7 @@ export function ProfileVehiclesSection({
   const [vehicleCount, setVehicleCount] = useState<number | null>(null);
 
   return (
-    <section className="sm:mt-6 flex flex-col gap-3 sm:justify-start sm:items-start justify-start items-center">
+    <section className="flex flex-col gap-4 sm:justify-start sm:items-start justify-start items-center sm:mt-6">
       <p className="block text-xl uppercase text-zinc-100 tracking-widest font-bold">
         {isOwnProfile ? "// My Vehicles" : "// User's Vehicles"}
       </p>

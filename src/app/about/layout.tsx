@@ -1,4 +1,3 @@
-import { Watermark } from "@/app/parts/watermark";
 import type { Metadata } from "next";
 import "../globals.css";
 
@@ -12,10 +11,5 @@ export default function AboutLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      {children}
-      <Watermark />
-    </>
-  );
+  return <>{children}</>;
 }

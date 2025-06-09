@@ -143,6 +143,7 @@ function useCarEditPageLogic() {
         model: form.model,
         year: form.year,
         engine: form.engine,
+        horsepower: form.horsepower,
         transmission: form.transmission,
       });
       window.dispatchEvent(
@@ -274,8 +275,7 @@ export default function CarEditPage() {
 
   return (
     <div
-      className="flex items-center justify-center bg-gradient-to-br 
-      from-gray-900 via-zinc-900 to-zinc-800"
+      className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]"
       style={{ minHeight: "calc(100vh - 67px)" }}
     >
       {renderCarEditPageContent({

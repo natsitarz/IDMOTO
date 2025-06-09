@@ -6,6 +6,7 @@ type CarFormProps = {
     model: string;
     year: string;
     engine: string;
+    horsepower: string;
     transmission: string;
   };
   setForm: React.Dispatch<React.SetStateAction<any>>;
@@ -30,78 +31,176 @@ export default function CarForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-6 bg-white/10 dark:bg-zinc-900/80 p-8 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-md"
+      className="flex flex-col items-center justify-center gap-5 w-full z-10 max-w-lg bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 animate-fade-in-scale relative overflow-hidden"
     >
-      <div className="flex flex-col items-center mb-4">
-        <h1 className="block text-xl uppercase text-zinc-100 tracking-widest font-bold">
+      {/* Decorative gradient circle */}
+      <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="flex flex-col items-center gap-2 z-10">
+        <h1 className="block text-2xl uppercase text-white tracking-widest font-extrabold drop-shadow">
           Edit Car Details
         </h1>
-        <p className="block text-xs uppercase text-zinc-400 tracking-widest">
+        <p className="block text-xs uppercase text-zinc-400 tracking-widest font-medium">
           Update your car information below
         </p>
       </div>
-      <div>
-        <label className="block text-xs uppercase text-zinc-400 tracking-widest mb-1">
+      <div></div>
+      <div className="w-full flex flex-col gap-2">
+        <label
+          className="text-xs font-semibold text-zinc-300 ml-1"
+          htmlFor="manufacturer"
+        >
           Manufacturer
         </label>
         <input
+          type="text"
           name="manufacturer"
+          id="manufacturer"
+          placeholder="Manufacturer"
           value={form.manufacturer}
           onChange={handleChange}
-          className="w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2 rounded-lg bg-white/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           required
+          className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
         />
       </div>
-      <div>
-        <label className="block text-xs uppercase text-zinc-400 tracking-widest mb-1">
+      <div className="w-full flex flex-col gap-2">
+        <label
+          className="text-xs font-semibold text-zinc-300 ml-1"
+          htmlFor="model"
+        >
           Model
         </label>
         <input
+          type="text"
           name="model"
+          id="model"
+          placeholder="Model"
           value={form.model}
           onChange={handleChange}
-          className="w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2 rounded-lg bg-white/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           required
+          className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
         />
       </div>
-      <div>
-        <label className="block text-xs uppercase text-zinc-400 tracking-widest mb-1">
-          Year
-        </label>
-        <input
-          name="year"
-          value={form.year}
-          onChange={handleChange}
-          className="w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2 rounded-lg bg-white/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          required
-        />
+      <div className="w-full flex flex-col gap-2 md:flex-row md:gap-4">
+        <div className="flex-1 flex flex-col gap-2">
+          <label
+            className="text-xs font-semibold text-zinc-300 ml-1"
+            htmlFor="year"
+          >
+            Year
+          </label>
+          <input
+            type="number"
+            name="year"
+            id="year"
+            placeholder="Year"
+            value={form.year}
+            onChange={handleChange}
+            required
+            min="1866"
+            max="2100"
+            step="1"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            onKeyDown={(e) => {
+              if (
+                !/[0-9]/.test(e.key) &&
+                ![
+                  "Backspace",
+                  "Delete",
+                  "Tab",
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "Home",
+                  "End",
+                ].includes(e.key)
+              ) {
+                e.preventDefault();
+              }
+            }}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
+            style={{ MozAppearance: "textfield" }}
+          />
+        </div>
+        <div className="flex-1 flex flex-col gap-2">
+          <label
+            className="text-xs font-semibold text-zinc-300 ml-1"
+            htmlFor="engine"
+          >
+            Engine
+          </label>
+          <input
+            type="text"
+            name="engine"
+            id="engine"
+            placeholder="Engine"
+            value={form.engine}
+            onChange={handleChange}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
+          />
+        </div>
       </div>
-      <div>
-        <label className="block text-xs uppercase text-zinc-400 tracking-widest mb-1">
-          Engine
-        </label>
-        <input
-          name="engine"
-          value={form.engine}
-          onChange={handleChange}
-          className="w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2 rounded-lg bg-white/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-        />
-      </div>
-      <div>
-        <label className="block text-xs uppercase text-zinc-400 tracking-widest mb-1">
-          Transmission
-        </label>
-        <input
-          name="transmission"
-          value={form.transmission}
-          onChange={handleChange}
-          className="w-full border border-zinc-300 dark:border-zinc-700 px-4 py-2 rounded-lg bg-white/70 dark:bg-zinc-800/70 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-        />
+      <div className="w-full flex flex-col gap-2 md:flex-row md:gap-4">
+        <div className="flex-1 flex flex-col gap-2">
+          <label
+            className="text-xs font-semibold text-zinc-300 ml-1"
+            htmlFor="horsepower"
+          >
+            Horsepower
+          </label>
+          <input
+            type="number"
+            name="horsepower"
+            id="horsepower"
+            placeholder="Horsepower"
+            value={form.horsepower}
+            onChange={handleChange}
+            required
+            min="0"
+            step="1"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            style={{ MozAppearance: "textfield" }}
+            onKeyDown={(e) => {
+              if (
+                !/[0-9]/.test(e.key) &&
+                ![
+                  "Backspace",
+                  "Delete",
+                  "Tab",
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "Home",
+                  "End",
+                ].includes(e.key)
+              ) {
+                e.preventDefault();
+              }
+            }}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
+          />
+        </div>
+        <div className="flex-1 flex flex-col gap-2">
+          <label
+            className="text-xs font-semibold text-zinc-300 ml-1"
+            htmlFor="transmission"
+          >
+            Transmission
+          </label>
+          <input
+            type="text"
+            name="transmission"
+            id="transmission"
+            placeholder="Transmission"
+            value={form.transmission}
+            onChange={handleChange}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
+          />
+        </div>
       </div>
       <button
         type="submit"
         disabled={saving}
-        className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-xs uppercase block text-zinc-100 font-bold tracking-widest mb-1 shadow transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
+        className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
       >
         {saving ? "Saving..." : "Save Changes"}
       </button>

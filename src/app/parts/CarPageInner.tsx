@@ -128,6 +128,11 @@ export default function CarPageInner() {
         })
       );
     }
+    window.dispatchEvent(
+      new CustomEvent("show-global-success", {
+        detail: "Description updated successfully!",
+      })
+    );
     setSavingDesc(false);
   };
 
@@ -223,39 +228,50 @@ export default function CarPageInner() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent" />
         {/* Edit button in top-right */}
-        <div className="absolute top-4 right-6 z-20">
+        <div className="absolute top-4 right-6">
           <CarActions car={car} user={user} handleUpload={handleUpload} />
         </div>
-        <div className="relative z-10 p-8">
+        <div className="relative p-8">
           <h1 className="text-3xl font-black text-white drop-shadow">
             {car.manufacturer} <span className="font-black">{car.model}</span>
           </h1>
           <p className="block text-xs uppercase font-bold text-zinc-400 tracking-widest mb-1">
-            {car.year} • {car.engine}
+            {car.year} • {car.engine} • {car.horsepower}
           </p>
           {editingDesc ? (
-            <div className="mt-4 w-full max-w-lg flex flex-col gap-2 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0 transition-all duration-300">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full">
-                {/* Input */}
-                <input
-                  type="text"
-                  className="flex-1 min-w-0 h-11 rounded-xl px-4 py-2 bg-zinc-900/80 text-white border-2 border-blue-500/30 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 placeholder:text-zinc-400 font-medium text-base shadow-inner transition"
-                  value={descValue}
-                  onChange={(e) => setDescValue(e.target.value)}
-                  disabled={savingDesc}
-                  maxLength={120}
-                  placeholder="Add a short description…"
-                  autoFocus
-                />
-                {/* Buttons */}
-                <div className="flex sm:flex-row flex-col gap-2 mt-2 sm:mt-0 sm:ml-2">
-                  <button
-                    className="cursor-pointer flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-400 text-white px-4 py-2 rounded-xl shadow-md hover:from-blue-700 hover:to-blue-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-60"
-                    onClick={handleSaveDescription}
-                    disabled={savingDesc}
-                  >
+            <>
+              {/* Overlay with blur and scroll block */}
+              <div
+                className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md"
+                style={{ touchAction: "none" }}
+                onClick={() => {
+                  setEditingDesc(false);
+                  setDescValue(car.description || "");
+                }}
+              />
+              <div
+                className={`
+        fixed left-1/2 top-1/2 z-50
+        -translate-x-1/2 -translate-y-1/2
+        w-[340px] max-w-[95vw]
+        bg-zinc-900/95
+        rounded-2xl
+        border border-zinc-800
+        flex flex-col
+        overflow-hidden
+        shadow-xl
+        animate-fade-in-up
+      `}
+                style={{
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex flex-col gap-4 p-6">
+                  <span className="text-base font-semibold text-white flex items-center gap-2">
                     <svg
-                      className="w-5 h-5"
+                      className="w-5 h-5 text-blue-400"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
@@ -264,41 +280,82 @@ export default function CarPageInner() {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
+                        d="M12 20h9"
                       />
-                    </svg>
-                    {savingDesc ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    className="cursor-pointer flex items-center justify-center gap-2 text-sm font-semibold bg-zinc-800/90 text-zinc-200 px-4 py-2 rounded-xl shadow-md hover:bg-zinc-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 disabled:opacity-60"
-                    onClick={() => {
-                      setEditingDesc(false);
-                      setDescValue(car.description || "");
-                    }}
-                    disabled={savingDesc}
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
+                        d="M16.5 3.5a2.121 2.121 0 1 1-3 3L7 13v4h4l6.5-6.5a2.121 2.121 0 0 0-3-3z"
                       />
                     </svg>
-                    Cancel
-                  </button>
+                    Edit car description
+                  </span>
+                  <input
+                    type="text"
+                    className="rounded-xl px-4 py-3 bg-zinc-800 text-white border border-zinc-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 placeholder:text-zinc-400 font-medium text-base shadow-inner transition"
+                    value={descValue}
+                    onChange={(e) => setDescValue(e.target.value)}
+                    maxLength={120}
+                    disabled={savingDesc}
+                    autoFocus
+                    placeholder="Add a short description…"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      className="cursor-pointer px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white transition flex items-center justify-center disabled:opacity-50"
+                      disabled={savingDesc}
+                      onClick={() => {
+                        setEditingDesc(false);
+                        setDescValue(car.description || "");
+                      }}
+                      aria-label="Cancel"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition flex items-center justify-center disabled:opacity-50"
+                      disabled={savingDesc}
+                      onClick={handleSaveDescription}
+                      aria-label="Save"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {savingDesc ? "Saving..." : "Save"}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+              {/* Show description box even while editing */}
+              {car.description && (
+                <div className="mt-4 w-full max-w-lg flex items-center gap-3 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="uppercase text-xs text-zinc-400 font-semibold tracking-widest leading-tight mb-0.5">
+                      Description
+                    </div>
+                    <span className="block text-zinc-100 text-base font-medium tracking-tight leading-snug truncate">
+                      {car.description}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <>
               {car.description && (
-                <div className="mt-4 w-full max-w-lg flex items-center gap-3 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0 transition-all duration-300">
+                <div className="mt-4 w-full max-w-lg flex items-center gap-3 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0">
                   <div className="flex-1 min-w-0">
                     <div className="uppercase text-xs text-zinc-400 font-semibold tracking-widest leading-tight mb-0.5">
                       Description
@@ -330,28 +387,28 @@ export default function CarPageInner() {
                   )}
                 </div>
               )}
-              {!car.description && user?.uid === car.userID && (
-                <button
-                  className="cursor-pointer mt-2 flex items-center gap-2 text-xs font-semibold text-blue-400 hover:text-white hover:bg-blue-500/70 px-4 py-2 rounded-xl transition shadow"
-                  onClick={() => setEditingDesc(true)}
-                >
-                  <svg
-                    className="w-5 h-5 text-blue-400 shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M7 8h10M7 12h4m1 8H6a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  Add description
-                </button>
-              )}
             </>
+          )}
+          {!car.description && user?.uid === car.userID && (
+            <button
+              className="cursor-pointer mt-2 flex items-center gap-2 text-xs font-semibold text-blue-400 hover:text-white hover:bg-blue-500/70 px-4 py-2 rounded-xl transition shadow"
+              onClick={() => setEditingDesc(true)}
+            >
+              <svg
+                className="w-5 h-5 text-blue-400 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 8h10M7 12h4m1 8H6a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"
+                />
+              </svg>
+              Add description
+            </button>
           )}
         </div>
       </div>
