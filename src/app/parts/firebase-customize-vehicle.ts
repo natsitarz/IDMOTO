@@ -1,6 +1,7 @@
 import { User } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytesResumable, UploadTaskSnapshot } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
+import ClientErrorToaster from "./ClientErrorToaster"; // Import toaster
 import { storage } from "./firebase";
 
 /**
@@ -24,13 +25,19 @@ export const uploadPhoto = async (file: File, user: User, carid: string): Promis
             },
             (error) => {
                 console.error("Upload failed", error);
+                window.dispatchEvent(
+                  new CustomEvent("show-global-error", { detail: "Upload failed: " + error.message })
+                );
                 reject(error);
             },
             async () => {
                 try {
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                     resolve(downloadURL);
-                } catch (error) {
+                } catch (error: any) {
+                    window.dispatchEvent(
+                      new CustomEvent("show-global-error", { detail: "Failed to get download URL: " + error.message })
+                    );
                     reject(error);
                 }
             }
@@ -48,8 +55,9 @@ export const letsAddPhoto = async (file: File, user: User, carid: string): Promi
     validatePhotoUploadInputs(file, user, carid);
 
     const timestamp = Date.now();
-    const ext = file.name.split('.').pop()?.toLowerCase() || "jpg";
-    const fileName = `${timestamp}-${uuidv4()}.${ext}`;
+    // Allow all file extensions, not just jpg
+    const ext = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : "";
+    const fileName = ext ? `${timestamp}-${uuidv4()}.${ext}` : `${timestamp}-${uuidv4()}`;
     const storageRef = ref(storage, `vehicles/${carid}/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -57,10 +65,25 @@ export const letsAddPhoto = async (file: File, user: User, carid: string): Promi
         uploadTask.on(
             "state_changed",
             undefined,
-            (error) => reject(error),
+            (error) => {
+                window.dispatchEvent(
+                  new CustomEvent("show-global-error", { detail: "Upload failed: " + error.message })
+                );
+                reject(error);
+            },
             () => resolve()
         );
     });
 
-    return getDownloadURL(storageRef);
+    try {
+        return await getDownloadURL(storageRef);
+    } catch (error: any) {
+        window.dispatchEvent(
+          new CustomEvent("show-global-error", { detail: "Failed to get download URL: " + error.message })
+        );
+        throw error;
+    }
 };
+
+// Export toaster for use in your app layout if needed
+export { ClientErrorToaster };
