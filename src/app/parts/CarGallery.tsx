@@ -2,6 +2,13 @@ import SeePhoto from "@/app/parts/see-photo";
 import { useState } from "react";
 import { FiMoreVertical, FiPlus } from "react-icons/fi";
 
+function isMobileDevice() {
+  if (typeof window === "undefined") return false;
+  return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(
+    navigator.userAgent
+  );
+}
+
 function GalleryList({
   gallery,
   userId,
@@ -28,6 +35,23 @@ function GalleryList({
   const sortedGallery = [...gallery]
     .sort((a, b) => getTimestamp(b) - getTimestamp(a))
     .reverse();
+
+  // --- MOBILE LONG PRESS LOGIC ---
+  let longPressTimer: NodeJS.Timeout | null = null;
+
+  const handleTouchStart = (idx: number) => {
+    if (!isMobileDevice()) return;
+    longPressTimer = setTimeout(() => {
+      setShowDeleteIdx(idx);
+    }, 500); // 500ms for long press
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobileDevice()) return;
+    if (longPressTimer) clearTimeout(longPressTimer);
+  };
+  // --- END MOBILE LONG PRESS LOGIC ---
+
   if (!gallery || gallery.length === 0)
     return (
       <div className="col-span-3 text-center text-gray-400 py-8">
@@ -40,6 +64,9 @@ function GalleryList({
         <div
           key={idx}
           className="group relative aspect-square rounded-xl overflow-hidden shadow-lg flex flex-col items-center transition-transform hover:scale-105"
+          onTouchStart={() => handleTouchStart(idx)}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
         >
           <div className="w-full h-full flex items-center justify-center">
             <SeePhoto
@@ -51,7 +78,14 @@ function GalleryList({
             />
           </div>
           {userId === carUserId && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-row items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div
+              className={`absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-row items-center gap-2
+              ${
+                isMobileDevice()
+                  ? ""
+                  : "opacity-0 group-hover:opacity-100 transition-opacity"
+              }`}
+            >
               <button
                 className="cursor-pointer bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-full shadow border border-zinc-700/40 backdrop-blur-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-zinc-500/40"
                 style={{
