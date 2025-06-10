@@ -30,17 +30,19 @@ export default function SeePhoto({
 
   const modal = open
     ? createPortal(
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80"
-          onClick={() => setOpen(false)} // <-- This closes modal when clicking outside
-        >
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80">
           <div
             className="relative flex items-center justify-center"
             style={{
               minHeight: "100vh",
               minWidth: "100vw",
             }}
-            onClick={(e) => e.stopPropagation()} // <-- This prevents closing when clicking on photo/modal content
+            onClick={() => setOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setOpen(false);
+              }
+            }}
           >
             <button
               className="cursor-pointer absolute top-4 right-4 text-white text-3xl bg-black/60 rounded-full w-12 h-12 flex items-center justify-center hover:bg-black/80 z-50"
@@ -58,6 +60,7 @@ export default function SeePhoto({
               className="rounded max-w-[90vw] max-h-[80vh] object-contain shadow-2xl"
               priority
               draggable={false}
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
         </div>,
