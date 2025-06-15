@@ -151,18 +151,6 @@ function VehicleCard({
         {/* Delete button - only for owner */}
         {isOwnProfile && showDelete && (
           <div className="absolute top-4 right-16 z-20 flex flex-row gap-2">
-            <button
-              type="button"
-              aria-label="Delete vehicle"
-              title="Delete vehicle"
-              className="animate-pulse cursor-pointer flex items-center justify-center bg-gradient-to-r from-red-600 via-red-500 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-2 rounded-full shadow-lg border border-red-400/30 transition-all duration-200 w-[40px] h-[40px]"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteVehicle(vehicle.id, onDeleteSuccess);
-              }}
-            >
-              <span className="text-lg font-bold leading-none">×</span>
-            </button>
             {/* --- ALIGN BUTTON --- */}
             <button
               type="button"

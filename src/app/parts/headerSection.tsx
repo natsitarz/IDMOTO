@@ -28,9 +28,6 @@ export function ProfileHeader({
   onSaveBio,
   isOwnProfile,
 }: ProfileHeaderProps) {
-  const [editingBio, setEditingBio] = useState(false);
-  const [bioValue, setBioValue] = useState(bio || "");
-  const [savingBio, setSavingBio] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showAlignModal, setShowAlignModal] = useState(false);
@@ -45,10 +42,6 @@ export function ProfileHeader({
     displayName && displayName !== "Loading…" ? displayName : "No name";
   const safePhotoURL =
     photoURL && photoURL !== "/logo.png" ? photoURL : "/logo.png";
-
-  useEffect(() => {
-    setBioValue(bio || "");
-  }, [bio]);
 
   useEffect(() => {
     if (!uid) return;
@@ -87,47 +80,6 @@ export function ProfileHeader({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuOpen]);
-
-  // Block scroll when editing bio (mobile/desktop)
-  useEffect(() => {
-    if (editingBio) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [editingBio]);
-
-  const handleSave = async () => {
-    if (!onSaveBio) return;
-    if (bioValue.length > 25) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-error", {
-          detail: "Bio must be 25 characters or less.",
-        })
-      );
-      return;
-    }
-    setSavingBio(true);
-    try {
-      await onSaveBio(bioValue);
-      window.dispatchEvent(
-        new CustomEvent("show-global-success", {
-          detail: "Bio saved successfully!",
-        })
-      );
-      setEditingBio(false);
-    } catch (err) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-error", {
-          detail: "Failed to save bio. Please try again.",
-        })
-      );
-    }
-    setSavingBio(false);
-  };
 
   // Handle background photo upload
   const handleBgPhotoChange = async (
@@ -239,15 +191,6 @@ export function ProfileHeader({
                   <span className="italic text-zinc-500">No bio set</span>
                 )}
               </span>
-              {isOwnProfile && (
-                <button
-                  className="cursor-pointer flex items-center gap-1 rounded-full text-white-700 font-semibold text-[11px] shadow  transition-all duration-150 focus:outline-none  active:scale-[0.98]"
-                  onClick={() => setEditingBio(true)}
-                  type="button"
-                >
-                  <span>Edit</span>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -384,109 +327,6 @@ export function ProfileHeader({
                 </div>
               </>
             )}
-          </>
-        )}
-        {/* Bio edit modal */}
-        {isOwnProfile && editingBio && (
-          <>
-            {/* Overlay with blur and scroll block */}
-            <div
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-md"
-              style={{ touchAction: "none" }}
-              onClick={() => {
-                setEditingBio(false);
-                setBioValue(bio || "");
-              }}
-            />
-            <div
-              className={`
-                fixed left-1/2 top-1/2 z-50
-                -translate-x-1/2 -translate-y-1/2
-                w-[340px] max-w-[95vw]
-                bg-zinc-900/95
-                rounded-2xl
-                border border-zinc-800
-                flex flex-col
-                overflow-hidden
-                shadow-xl
-                animate-fade-in-up
-              `}
-              style={{
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-col gap-4 p-6">
-                <span className="text-base font-semibold text-white flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5 text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 20h9"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.5 3.5a2.121 2.121 0 1 1-3 3L7 13v4h4l6.5-6.5a2.121 2.121 0 0 0-3-3z"
-                    />
-                  </svg>
-                  Edit your bio
-                </span>
-                <input
-                  type="text"
-                  className="rounded-xl px-4 py-3 bg-zinc-800 text-white border border-zinc-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 placeholder:text-zinc-400 font-medium text-base shadow-inner transition"
-                  value={bioValue}
-                  onChange={(e) => setBioValue(e.target.value)}
-                  maxLength={40}
-                  disabled={savingBio}
-                  autoFocus
-                  placeholder="Add a short bio (max 25 chars)"
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    className="cursor-pointer px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white transition flex items-center justify-center disabled:opacity-50"
-                    disabled={savingBio}
-                    onClick={() => {
-                      setEditingBio(false);
-                      setBioValue(bio || "");
-                    }}
-                    aria-label="Cancel"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition flex items-center justify-center disabled:opacity-50"
-                    disabled={savingBio}
-                    onClick={handleSave}
-                    aria-label="Save"
-                  >
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
           </>
         )}
       </div>

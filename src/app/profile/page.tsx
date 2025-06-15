@@ -52,7 +52,7 @@ function AIAssistantCard({ isOwnProfile }: { isOwnProfile: boolean }) {
         {aiCardBgAnimation}
         <form
           onSubmit={handleAsk}
-          className="w-full max-w-sm sm:max-w-xl mx-auto my-4 flex items-center rounded-2xl shadow-lg px-2 py-2 sm:px-4 sm:py-2 gap-2"
+          className="hidden w-full max-w-sm sm:max-w-xl mx-auto my-4 flex items-center rounded-2xl shadow-lg px-2 py-2 sm:px-4 sm:py-2 gap-2"
           style={{
             background: "linear-gradient(120deg, #23272f 0%, #23272f 100%)",
             border: "1px solid #333843",

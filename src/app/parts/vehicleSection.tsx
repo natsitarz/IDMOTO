@@ -55,7 +55,7 @@ export function ProfileVehiclesSection({
   return (
     <section className="flex flex-col gap-4 sm:justify-start sm:items-start justify-start items-center sm:mt-6">
       <p className="block text-xl uppercase text-zinc-100 tracking-widest font-bold">
-        {isOwnProfile ? "// My Vehicles" : "// User's Vehicles"}
+        {isOwnProfile ? "My Vehicles" : "User's Vehicles"}
       </p>
       {letsAdd && <VehiclesMessage vehicleCount={vehicleCount} />}
       <VehiclesAddButton vehicleCount={vehicleCount} letsAdd={letsAdd} />

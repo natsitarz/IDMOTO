@@ -1,6 +1,9 @@
 "use client";
 
-import CarForm from "@/app/parts/CarForm";
+import CarFormHistory from "@/app/car/edit/parts/CarFormHistory";
+import CarFormMain from "@/app/car/edit/parts/CarFormMain";
+import CarFormSettings from "@/app/car/edit/parts/CarFormSettings";
+import CarFormSpecs from "@/app/car/edit/parts/CarFormSpecs";
 import { db } from "@/app/parts/firebase";
 import { useAuthUser, useCarData } from "@/app/parts/useCarEditHooks";
 import { doc, updateDoc } from "firebase/firestore";
@@ -82,34 +85,54 @@ function ErrorMessage({ error }: { error: string }) {
   return <div className="p-8 text-red-500">{error}</div>;
 }
 
-function CarEditContent({
-  form,
-  setForm,
-  handleSubmit,
-  saving,
-  error,
-}: {
-  form: any;
-  setForm: any;
-  handleSubmit: (e: React.FormEvent) => void;
-  saving: boolean;
-  error: string | null;
-}) {
+function NoEditPermissionMessage() {
   return (
-    <div className="animate-fade-in-scale p-8">
-      <CarForm
-        form={form}
-        setForm={setForm}
-        onSubmit={handleSubmit}
-        saving={saving}
-        error={error}
-      />
+    <div
+      className="bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 flex flex-col items-center justify-center"
+      style={{ minHeight: "calc(100vh - 67px)" }}
+    >
+      <div className="bg-white/10 border border-red-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
+        <svg
+          className="w-10 h-10 text-red-400"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 8v4m0 4h.01"
+          />
+        </svg>
+        <span className="text-lg font-semibold text-red-400">
+          You do not have permission to edit this car.
+        </span>
+        <span className="text-sm text-zinc-400 text-center">
+          Please check if you are logged in with the correct account or if the
+          car belongs to you.
+        </span>
+      </div>
     </div>
   );
 }
 
-function useCarEditPageLogic() {
-  const [authTimeout, setAuthTimeout] = useState(false);
+const MENU = [
+  { key: "main", label: "Car Details" },
+  { key: "history", label: "History" },
+  { key: "specs", label: "Specs" },
+  { key: "settings", label: "Settings" },
+];
+
+export default function CarEditPage() {
+  // Get carId from query params (or use router if you prefer)
   const searchParams =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
@@ -117,23 +140,41 @@ function useCarEditPageLogic() {
   const carId = searchParams?.get("id") || "";
 
   const user = useAuthUser();
-  useEffect(() => {
-    if (user) {
-      setAuthTimeout(false);
-      return;
-    }
-    const timeout = setTimeout(() => setAuthTimeout(true), 4000);
-    return () => clearTimeout(timeout);
-  }, [user]);
+  const {
+    car,
+    loading,
+    error,
+    form,
+    setForm,
+    setError,
+    // visibility,
+    // setVisibility,
+    // canEdit,
+    // deleteCar,
+  } = useCarData(user, carId);
 
-  const { car, loading, error, form, setForm, setError } = useCarData(
-    user,
-    carId
-  );
+  // Temporary local state for missing properties (remove if useCarData is updated)
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [canEdit, setCanEdit] = useState(true);
+  const deleteCar = async () => {
+    // Implement delete logic or update useCarData to provide this
+    throw new Error("deleteCar not implemented");
+  };
+
   const [saving, setSaving] = useState(false);
+  const [selected, setSelected] = useState("main");
 
+  // Save car details (main section)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.description.length > 25) {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Bio must be 25 characters or less.",
+        })
+      );
+      return;
+    }
     if (!user || !carId) return;
     setSaving(true);
     setError(null);
@@ -145,11 +186,12 @@ function useCarEditPageLogic() {
         engine: form.engine,
         horsepower: form.horsepower,
         transmission: form.transmission,
+        description: form.description,
       });
       window.dispatchEvent(
         new CustomEvent("show-global-success", { detail: "Car info updated!" })
       );
-      setError(null); // Optionally clear local error
+      setError(null);
     } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
@@ -160,135 +202,99 @@ function useCarEditPageLogic() {
     setSaving(false);
   };
 
-  return {
-    user,
-    car,
-    loading,
-    error,
-    form,
-    setForm,
-    setError,
-    saving,
-    handleSubmit,
-    authTimeout,
+  // Change car visibility
+  const handleVisibilityChange = async (v: "public" | "private") => {
+    setVisibility(v);
+    try {
+      await updateDoc(doc(db, "vehicles", carId), { visibility: v });
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Visibility updated!",
+        })
+      );
+    } catch {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to update visibility.",
+        })
+      );
+    }
   };
-}
 
-function NoEditPermissionMessage() {
-  return (
-    <div className="bg-white/10 border border-red-400/30 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-3 animate-fade-in-scale">
-      <svg
-        className="w-10 h-10 text-red-400"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
-      >
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 8v4m0 4h.01"
-        />
-      </svg>
-      <span className="text-lg font-semibold text-red-400">
-        You do not have permission to edit this car.
-      </span>
-      <span className="text-sm text-zinc-400 text-center">
-        Please check if you are logged in with the correct account or if the car
-        belongs to you.
-      </span>
-    </div>
-  );
-}
+  // Delete car
+  const handleDeleteCar = async () => {
+    try {
+      await deleteCar();
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", { detail: "Car deleted!" })
+      );
+      // Optionally redirect user after deletion
+    } catch {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to delete car.",
+        })
+      );
+    }
+  };
 
-function shouldShowNotLoggedIn(
-  loading: boolean,
-  user: any,
-  authTimeout: boolean
-) {
-  return (loading && !user && authTimeout) || (!user && !loading);
-}
-
-function shouldShowLoading(loading: boolean, user: any, authTimeout: boolean) {
-  return loading && (!authTimeout || !!user);
-}
-
-function shouldShowError(error: string | null, car: any) {
-  return error && !car;
-}
-
-function shouldShowNoEditPermission(car: any, user: any) {
-  return !car || car.userID !== user?.uid;
-}
-
-function renderCarEditPageContent({
-  user,
-  car,
-  loading,
-  error,
-  form,
-  setForm,
-  saving,
-  handleSubmit,
-  authTimeout,
-}: {
-  user: any;
-  car: any;
-  loading: boolean;
-  error: string | null;
-  form: any;
-  setForm: any;
-  saving: boolean;
-  handleSubmit: (e: React.FormEvent) => void;
-  authTimeout: boolean;
-}) {
-  if (shouldShowNotLoggedIn(loading, user, authTimeout))
-    return <NotLoggedInMessage />;
-  if (shouldShowLoading(loading, user, authTimeout)) return <LoadingMessage />;
-  if (shouldShowError(error, car)) return <ErrorMessage error={error!} />;
-  if (shouldShowNoEditPermission(car, user)) return <NoEditPermissionMessage />;
-  return (
-    <CarEditContent
-      form={form}
-      setForm={setForm}
-      handleSubmit={handleSubmit}
-      saving={saving}
-      error={error}
-    />
-  );
-}
-
-export default function CarEditPage() {
-  const {
-    user,
-    car,
-    loading,
-    error,
-    form,
-    setForm,
-    setError,
-    saving,
-    handleSubmit,
-    authTimeout,
-  } = useCarEditPageLogic();
+  if (loading) return <LoadingMessage />;
+  if (!user) return <NotLoggedInMessage />;
+  if (error && !car) return <ErrorMessage error={error} />;
+  // Sprawdzenie uprawnień: tylko właściciel może edytować
+  if (car.userID !== user.uid) {
+    return <NoEditPermissionMessage />;
+  }
+  if (!form) return <LoadingMessage />;
 
   return (
-    <div
-      className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]"
-      style={{ minHeight: "calc(100vh - 67px)" }}
-    >
-      {renderCarEditPageContent({
-        user,
-        car,
-        loading,
-        error,
-        form,
-        setForm,
-        saving,
-        handleSubmit,
-        authTimeout,
-      })}
+    <div className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]">
+      <div className="w-full max-w-4xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-0 flex flex-row items-stretch gap-0 animate-fade-in-scale relative overflow-hidden">
+        {/* Decorative gradient circle */}
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+        {/* Sidebar */}
+        <aside className="flex flex-col gap-2 bg-zinc-900/80 border-r border-zinc-800/60 min-w-[160px] max-w-[180px] py-10 px-4 z-10">
+          <h2 className="text-xs uppercase text-zinc-400 font-bold mb-2 tracking-widest pl-1">
+            Car Menu
+          </h2>
+          {MENU.map((item) => (
+            <button
+              key={item.key}
+              className={`cursor-pointer text-left px-3 py-2 rounded-lg font-semibold transition-all text-sm ${
+                selected === item.key
+                  ? "bg-blue-600/80 text-white shadow"
+                  : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
+              }`}
+              onClick={() => setSelected(item.key)}
+              type="button"
+            >
+              {item.label}
+            </button>
+          ))}
+        </aside>
+        {/* Main content */}
+        <main className="flex-1 flex flex-col items-center justify-center p-10">
+          {selected === "main" && (
+            <CarFormMain
+              form={form}
+              setForm={setForm}
+              onSubmit={handleSubmit}
+              saving={saving}
+              error={error}
+            />
+          )}
+          {selected === "history" && <CarFormHistory />}
+          {selected === "specs" && <CarFormSpecs />}
+          {selected === "settings" && (
+            <CarFormSettings
+              carId={carId}
+              visibility={visibility}
+              onVisibilityChange={handleVisibilityChange}
+              onDeleteCar={handleDeleteCar}
+            />
+          )}
+        </main>
+      </div>
     </div>
   );
 }

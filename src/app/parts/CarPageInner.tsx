@@ -238,177 +238,18 @@ export default function CarPageInner() {
           <p className="block text-xs uppercase font-bold text-zinc-400 tracking-widest mb-1">
             {car.year} • {car.engine} • {car.horsepower + "HP"}
           </p>
-          {editingDesc ? (
-            <>
-              {/* Overlay with blur and scroll block */}
-              <div
-                className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md"
-                style={{ touchAction: "none" }}
-                onClick={() => {
-                  setEditingDesc(false);
-                  setDescValue(car.description || "");
-                }}
-              />
-              <div
-                className={`
-        fixed left-1/2 top-1/2 z-50
-        -translate-x-1/2 -translate-y-1/2
-        w-[340px] max-w-[95vw]
-        bg-zinc-900/95
-        rounded-2xl
-        border border-zinc-800
-        flex flex-col
-        overflow-hidden
-        shadow-xl
-        animate-fade-in-up
-      `}
-                style={{
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex flex-col gap-4 p-6">
-                  <span className="text-base font-semibold text-white flex items-center gap-2">
-                    <svg
-                      className="w-5 h-5 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 20h9"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.5 3.5a2.121 2.121 0 1 1-3 3L7 13v4h4l6.5-6.5a2.121 2.121 0 0 0-3-3z"
-                      />
-                    </svg>
-                    Edit car description
-                  </span>
-                  <input
-                    type="text"
-                    className="rounded-xl px-4 py-3 bg-zinc-800 text-white border border-zinc-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 placeholder:text-zinc-400 font-medium text-base shadow-inner transition"
-                    value={descValue}
-                    onChange={(e) => setDescValue(e.target.value)}
-                    maxLength={120}
-                    disabled={savingDesc}
-                    autoFocus
-                    placeholder="Add a short description…"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      className="cursor-pointer px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white transition flex items-center justify-center disabled:opacity-50"
-                      disabled={savingDesc}
-                      onClick={() => {
-                        setEditingDesc(false);
-                        setDescValue(car.description || "");
-                      }}
-                      aria-label="Cancel"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition flex items-center justify-center disabled:opacity-50"
-                      disabled={savingDesc}
-                      onClick={handleSaveDescription}
-                      aria-label="Save"
-                    >
-                      <svg
-                        className="w-4 h-4 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      {savingDesc ? "Saving..." : "Save"}
-                    </button>
-                  </div>
+          {/* Tylko wyświetlanie opisu */}
+          {car.description && (
+            <div className="mt-4 w-full max-w-lg flex items-center gap-3 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0">
+              <div className="flex-1 min-w-0">
+                <div className="uppercase text-xs text-zinc-400 font-semibold tracking-widest leading-tight mb-0.5">
+                  Description
                 </div>
+                <span className="block text-zinc-100 text-base font-medium tracking-tight leading-snug truncate">
+                  {car.description}
+                </span>
               </div>
-              {/* Show description box even while editing */}
-              {car.description && (
-                <div className="mt-4 w-full max-w-lg flex items-center gap-3 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0">
-                  <div className="flex-1 min-w-0">
-                    <div className="uppercase text-xs text-zinc-400 font-semibold tracking-widest leading-tight mb-0.5">
-                      Description
-                    </div>
-                    <span className="block text-zinc-100 text-base font-medium tracking-tight leading-snug truncate">
-                      {car.description}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {car.description && (
-                <div className="mt-4 w-full max-w-lg flex items-center gap-3 bg-gradient-to-r from-gray-900/30 via-blue-800/10 to-zinc-900/30 border-l-4 border-gray-500/70 rounded-2xl px-3 sm:px-6 py-3 shadow-xl backdrop-blur-md min-w-0">
-                  <div className="flex-1 min-w-0">
-                    <div className="uppercase text-xs text-zinc-400 font-semibold tracking-widest leading-tight mb-0.5">
-                      Description
-                    </div>
-                    <span className="block text-zinc-100 text-base font-medium tracking-tight leading-snug truncate">
-                      {car.description}
-                    </span>
-                  </div>
-                  {user?.uid === car.userID && (
-                    <button
-                      className="cursor-pointer flex items-center gap-2 text-xs font-semibold text-blue-400 hover:text-white px-4 py-2 rounded-xl transition"
-                      onClick={() => setEditingDesc(true)}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-2.828 0L9 13z"
-                        />
-                      </svg>
-                      Edit
-                    </button>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-          {!car.description && user?.uid === car.userID && (
-            <button
-              className="cursor-pointer mt-2 flex items-center gap-2 text-xs font-semibold text-blue-400 hover:text-white hover:bg-blue-500/70 px-4 py-2 rounded-xl transition shadow"
-              onClick={() => setEditingDesc(true)}
-            >
-              <svg
-                className="w-5 h-5 text-blue-400 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7 8h10M7 12h4m1 8H6a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"
-                />
-              </svg>
-              Add description
-            </button>
+            </div>
           )}
         </div>
       </div>

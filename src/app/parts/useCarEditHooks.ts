@@ -30,6 +30,7 @@ function processCarSnapshot(
       engine: carData.engine || "",
       horsepower: carData.horsepower || "",
       transmission: carData.transmission || "",
+      description: carData.description || "",
     });
   } else {
     setError("Car not found.");
@@ -47,6 +48,7 @@ export function useCarData(user: User | null, carId: string) {
     engine: "",
     horsepower: "",
     transmission: "",
+    description: "",
   });
 
   useEffect(() => {
