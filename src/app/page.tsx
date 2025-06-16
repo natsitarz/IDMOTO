@@ -26,7 +26,7 @@ export default function Signup() {
       setUser(firebaseUser);
       if (firebaseUser) {
         await addUserToDB(firebaseUser);
-        router.replace(`/profile?uid=${firebaseUser.uid}`);
+        router.replace(`/feed`);
       }
     });
     return () => unsubscribe();

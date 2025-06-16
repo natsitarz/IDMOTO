@@ -1,70 +1,468 @@
 "use client";
 
-export default function FeedUnderMaintenance() {
+import { db, storage } from "@/app/parts/firebase";
+import SeePhoto from "@/app/parts/see-photo";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref as storageRef,
+  uploadBytes,
+} from "firebase/storage";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
+
+function useCurrentUser() {
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const auth = getAuth();
+    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    return unsub;
+  }, []);
+  return user;
+}
+
+function AcceptModal({
+  open,
+  onAccept,
+  onCancel,
+  title,
+  description,
+}: {
+  open: boolean;
+  onAccept: () => void;
+  onCancel: () => void;
+  title: string;
+  description?: string;
+}) {
+  if (!open) return null;
   return (
-    <div
-      className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]"
-      style={{ minHeight: "calc(100vh - 67px)" }}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-zinc-900 rounded-2xl shadow-xl p-6 w-[90vw] max-w-xs relative border border-zinc-700">
+        <h2 className="text-lg font-bold mb-2 text-white">{title}</h2>
+        {description && (
+          <p className="text-zinc-300 mb-4 text-sm">{description}</p>
+        )}
+        <div className="flex justify-end gap-2 mt-2">
+          <button
+            className="px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+            onClick={onAccept}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PostForm({
+  onPost,
+  currentUser,
+}: {
+  onPost: () => void;
+  currentUser: User;
+}) {
+  const [text, setText] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!text.trim() && !image) return;
+    setUploading(true);
+
+    // 1. Add post to Firestore (get id)
+    const postRef = await addDoc(collection(db, "posts"), {
+      text,
+      userId: currentUser.uid,
+      userName: currentUser.displayName || "User",
+      userPhoto: currentUser.photoURL || "/logo.png",
+      createdAt: serverTimestamp(),
+      imageUrl: "",
+      likes: [],
+    });
+
+    let imageUrl = "";
+    // 2. Upload image to Storage (if any)
+    if (image) {
+      const imgRef = storageRef(storage, `posts/${postRef.id}/image`);
+      await uploadBytes(imgRef, image);
+      imageUrl = await getDownloadURL(imgRef);
+      // 3. Update Firestore post with imageUrl
+      await updateDoc(postRef, { imageUrl });
+    }
+
+    setText("");
+    setImage(null);
+    setUploading(false);
+    onPost();
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 px-4 py-4 flex flex-col gap-3 mb-8"
     >
-      <div className="flex flex-col items-center gap-6 bg-white/10 border border-blue-400/30 rounded-3xl px-10 py-12 shadow-2xl animate-fade-in-scale">
-        <span className="animate-pulse inline-flex items-center justify-center rounded-full bg-blue-800/80 p-6 shadow-lg">
+      <div className="flex items-center gap-3">
+        <Image
+          src={currentUser.photoURL || "/logo.png"}
+          alt={currentUser.displayName || "User"}
+          width={40}
+          height={40}
+          className="rounded-full object-cover"
+        />
+        <textarea
+          className="flex-1 bg-transparent text-zinc-200 resize-none outline-none border-0 px-2 py-2 text-base placeholder-zinc-400"
+          rows={2}
+          placeholder="What's on your mind?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          maxLength={500}
+        />
+      </div>
+      {image && (
+        <div className="relative w-32 h-32">
+          <Image
+            src={URL.createObjectURL(image)}
+            alt="Preview"
+            fill
+            className="object-cover rounded-xl"
+          />
+          <button
+            type="button"
+            className="absolute top-1 right-1 bg-zinc-800/80 rounded-full p-1 text-white"
+            onClick={() => setImage(null)}
+            aria-label="Remove image"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <div className="flex items-center justify-between gap-2">
+        <button
+          type="button"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium"
+          onClick={() => fileInputRef.current?.click()}
+        >
           <svg
-            className="w-20 h-20 text-blue-300 drop-shadow-lg"
+            className="w-5 h-5"
             fill="none"
-            viewBox="0 0 64 64"
             stroke="currentColor"
             strokeWidth={2}
+            viewBox="0 0 24 24"
           >
-            <circle
-              cx="32"
-              cy="32"
-              r="28"
-              className="opacity-30"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
             <path
-              d="M32 18v16"
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={4}
-              stroke="currentColor"
+              d="M15.172 7l-6.586 6.586a2 2 0 002.828 2.828L18 9.828M7 7h.01"
             />
-            <circle cx="32" cy="44" r="2.5" fill="currentColor" />
           </svg>
-        </span>
-        <h1 className="text-4xl font-extrabold text-blue-300 drop-shadow text-center">
-          Under Maintenance
-        </h1>
-        <p className="text-lg text-zinc-200 text-center max-w-md">
-          The feed is currently being upgraded for a better experience.
-          <br />
-          Please check back soon!
-        </p>
-        <div className="flex gap-3 mt-4">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-700/80 text-white font-semibold shadow">
-            <svg
-              className="w-5 h-5 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-30"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-80"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              />
-            </svg>
-            We'll be back soon!
+          Add Photo
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files?.[0]) setImage(e.target.files[0]);
+          }}
+        />
+        <button
+          type="submit"
+          className="ml-auto px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition"
+          disabled={uploading || (!text.trim() && !image)}
+        >
+          {uploading ? "Posting..." : "Post"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function PostCard({
+  post,
+  onLike,
+  onDelete,
+  onEdit,
+  isOwn,
+  currentUser,
+  showLike,
+}: {
+  post: any;
+  onLike: () => void;
+  onDelete: () => void;
+  onEdit: () => void;
+  isOwn: boolean;
+  currentUser: User | null;
+  showLike: boolean;
+}) {
+  const router = useRouter();
+  const [showMenu, setShowMenu] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState(post.text);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [seePhotoOpen, setSeePhotoOpen] = useState(false);
+
+  const handleEdit = async () => {
+    await updateDoc(doc(db, "posts", post.id), { text: editText });
+    setEditing(false);
+    window.dispatchEvent(
+      new CustomEvent("show-global-success", { detail: "Post edited!" })
+    );
+    onEdit();
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 mb-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <div
+          className="cursor-pointer"
+          onClick={() => router.push(`/profile?uid=${post.userId}`)}
+        >
+          <Image
+            src={post.userPhoto || "/logo.png"}
+            alt={post.userName}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col flex-1 min-w-0">
+          <span
+            className="font-semibold text-zinc-100 cursor-pointer hover:underline truncate"
+            onClick={() => router.push(`/profile?uid=${post.userId}`)}
+          >
+            {post.userName}
+          </span>
+          <span className="text-xs text-zinc-400">
+            {post.createdAt?.toDate
+              ? post.createdAt.toDate().toLocaleString()
+              : ""}
           </span>
         </div>
+        {isOwn && showLike && (
+          <div className="relative">
+            <button
+              className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400"
+              onClick={() => setShowMenu((v) => !v)}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="6" r="1.5" />
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="12" cy="18" r="1.5" />
+              </svg>
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 mt-2 bg-zinc-800 border border-zinc-700 rounded-xl shadow-lg z-20 min-w-[120px]">
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 rounded-t-xl"
+                  onClick={() => {
+                    setEditing(true);
+                    setShowMenu(false);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700 rounded-b-xl"
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowDeleteModal(true);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* Content */}
+      <div className="px-4 pb-4">
+        {editing ? (
+          <div className="flex flex-col gap-2">
+            <textarea
+              className="w-full bg-zinc-800 text-zinc-100 rounded-lg p-2"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              rows={3}
+            />
+            <div className="flex gap-2">
+              <button
+                className="px-4 py-1 rounded bg-blue-600 text-white font-semibold"
+                onClick={handleEdit}
+              >
+                Save
+              </button>
+              <button
+                className="px-4 py-1 rounded bg-zinc-700 text-zinc-200"
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-zinc-100 text-base mb-2 whitespace-pre-line break-words">
+            {post.text}
+          </p>
+        )}
+        {post.imageUrl && (
+          <>
+            <SeePhoto src={post.imageUrl} alt="Post image" />
+          </>
+        )}
+        {/* Like button */}
+        {showLike && (
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold transition ${
+                post.likes?.includes(currentUser?.uid)
+                  ? "bg-blue-600 text-white"
+                  : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
+              }`}
+              onClick={onLike}
+            >
+              <svg
+                className="w-5 h-5"
+                fill={
+                  post.likes?.includes(currentUser?.uid)
+                    ? "currentColor"
+                    : "none"
+                }
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14 9V5a3 3 0 00-6 0v4M5 12h14l-1.34 8.03A2 2 0 0115.7 22H8.3a2 2 0 01-1.96-1.97L5 12z"
+                />
+              </svg>
+              Like
+              <span className="ml-1">{post.likes?.length || 0}</span>
+            </button>
+          </div>
+        )}
+      </div>
+      {/* AcceptModal for delete */}
+      {showLike && (
+        <AcceptModal
+          open={showDeleteModal}
+          title="Delete post"
+          description="Are you sure you want to delete this post? This action cannot be undone."
+          onAccept={async () => {
+            setShowDeleteModal(false);
+            // Delete image from storage if exists
+            if (post.imageUrl) {
+              try {
+                const imgRef = storageRef(storage, `posts/${post.id}/image`);
+                await deleteObject(imgRef);
+              } catch {}
+            }
+            await deleteDoc(doc(db, "posts", post.id));
+            window.dispatchEvent(
+              new CustomEvent("show-global-success", {
+                detail: "Post deleted!",
+              })
+            );
+            onDelete();
+          }}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+export default function FeedPage() {
+  const currentUser = useCurrentUser();
+  const [posts, setPosts] = useState<any[]>([]);
+
+  // Real-time posts listener
+  useEffect(() => {
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    const unsub = onSnapshot(q, (snap) => {
+      setPosts(
+        snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      );
+    });
+    return unsub;
+  }, []);
+
+  // Like post
+  const handleLike = async (post: any) => {
+    if (!currentUser) return;
+    const ref = doc(db, "posts", post.id);
+    let likes: string[] = Array.isArray(post.likes) ? post.likes : [];
+    if (likes.includes(currentUser.uid)) {
+      likes = likes.filter((id) => id !== currentUser.uid);
+    } else {
+      likes = [...likes, currentUser.uid];
+    }
+    await updateDoc(ref, { likes });
+  };
+
+  // Delete post (no-op, handled in PostCard)
+  const handleDelete = async (_post: any) => {};
+
+  // Edit post (no-op, handled in PostCard)
+  const handleEdit = () => {};
+
+  return (
+    <div className="flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 min-h-[calc(100vh-67px)]  py-8">
+      {/* Show PostForm only if user is logged in */}
+      {currentUser && (
+        <PostForm
+          onPost={() => {}} // no refresh needed, real-time updates
+          currentUser={currentUser}
+        />
+      )}
+      <div className="w-full max-w-2xl flex flex-col gap-4">
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onLike={() => handleLike(post)}
+            onDelete={() => {}} // no refresh needed
+            onEdit={handleEdit}
+            isOwn={currentUser ? post.userId === currentUser.uid : false}
+            currentUser={currentUser}
+            showLike={!!currentUser}
+          />
+        ))}
       </div>
     </div>
   );
