@@ -2,7 +2,6 @@ import ClientErrorToaster from "@/app/parts/ClientErrorToaster";
 import PageLoaderWrapper from "@/app/parts/PageLoaderWrapper";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({

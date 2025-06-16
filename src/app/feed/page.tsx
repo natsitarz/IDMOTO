@@ -35,7 +35,7 @@ function AdSenseFeedCard() {
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXX" // <-- your AdSense client ID
+        data-ad-client="ca-pub-1346635526682080" // <-- your AdSense client ID
         data-ad-slot="XXXXXXXXXX" // <-- your AdSense slot ID
         data-ad-format="auto"
         data-full-width-responsive="true"
