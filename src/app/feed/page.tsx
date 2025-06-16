@@ -121,15 +121,15 @@ function PostForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 px-4 py-4 flex flex-col gap-3 mb-8"
+      className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 px-2 py-3 sm:px-4 sm:py-4 flex flex-col gap-3 mb-6 sm:mb-8"
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <Image
           src={currentUser.photoURL || "/logo.png"}
           alt={currentUser.displayName || "User"}
-          width={40}
-          height={40}
-          className="rounded-full object-cover"
+          width={36}
+          height={36}
+          className="rounded-full object-cover min-w-[36px] min-h-[36px] sm:w-10 sm:h-10"
         />
         <textarea
           className="flex-1 bg-transparent text-zinc-200 resize-none outline-none border-0 px-2 py-2 text-base placeholder-zinc-400"
@@ -138,10 +138,11 @@ function PostForm({
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={500}
+          style={{ fontSize: "15px" }}
         />
       </div>
       {image && (
-        <div className="relative w-32 h-32">
+        <div className="relative w-24 h-24 sm:w-32 sm:h-32">
           <Image
             src={URL.createObjectURL(image)}
             alt="Preview"
@@ -161,7 +162,7 @@ function PostForm({
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium"
+          className="flex items-center gap-2 px-2 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium"
           onClick={() => fileInputRef.current?.click()}
         >
           <svg
@@ -177,7 +178,7 @@ function PostForm({
               d="M15.172 7l-6.586 6.586a2 2 0 002.828 2.828L18 9.828M7 7h.01"
             />
           </svg>
-          Add Photo
+          <span className="hidden xs:inline">Add Photo</span>
         </button>
         <input
           ref={fileInputRef}
@@ -190,7 +191,7 @@ function PostForm({
         />
         <button
           type="submit"
-          className="ml-auto px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition"
+          className="ml-auto px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition"
           disabled={uploading || (!text.trim() && !image)}
         >
           {uploading ? "Posting..." : "Post"}
@@ -222,7 +223,6 @@ function PostCard({
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(post.text);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [seePhotoOpen, setSeePhotoOpen] = useState(false);
 
   const handleEdit = async () => {
     await updateDoc(doc(db, "posts", post.id), { text: editText });
@@ -234,9 +234,9 @@ function PostCard({
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 mb-6">
+    <div className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+      <div className="flex items-center gap-2 sm:gap-3 px-0 sm:px-2 pt-1 pb-2">
         <div
           className="cursor-pointer"
           onClick={() => router.push(`/profile?uid=${post.userId}`)}
@@ -244,15 +244,16 @@ function PostCard({
           <Image
             src={post.userPhoto || "/logo.png"}
             alt={post.userName}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
+            width={36}
+            height={36}
+            className="rounded-full object-cover min-w-[36px] min-h-[36px] sm:w-10 sm:h-10"
           />
         </div>
         <div className="flex flex-col flex-1 min-w-0">
           <span
             className="font-semibold text-zinc-100 cursor-pointer hover:underline truncate"
             onClick={() => router.push(`/profile?uid=${post.userId}`)}
+            style={{ fontSize: "15px" }}
           >
             {post.userName}
           </span>
@@ -306,7 +307,7 @@ function PostCard({
         )}
       </div>
       {/* Content */}
-      <div className="px-4 pb-4">
+      <div className="px-2 sm:px-2 pb-2">
         {editing ? (
           <div className="flex flex-col gap-2">
             <textarea
@@ -314,6 +315,7 @@ function PostCard({
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               rows={3}
+              style={{ fontSize: "15px" }}
             />
             <div className="flex gap-2">
               <button
@@ -331,25 +333,29 @@ function PostCard({
             </div>
           </div>
         ) : (
-          <p className="text-zinc-100 text-base mb-2 whitespace-pre-line break-words">
+          <p
+            className="text-zinc-100 text-base mb-2 whitespace-pre-line break-words"
+            style={{ fontSize: "15px" }}
+          >
             {post.text}
           </p>
         )}
         {post.imageUrl && (
-          <>
+          <div className="w-full rounded-xl overflow-hidden mb-2">
             <SeePhoto src={post.imageUrl} alt="Post image" />
-          </>
+          </div>
         )}
         {/* Like button */}
         {showLike && (
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-2 mt-2">
             <button
-              className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold transition ${
+              className={`flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold transition ${
                 post.likes?.includes(currentUser?.uid)
                   ? "bg-blue-600 text-white"
                   : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
               }`}
               onClick={onLike}
+              style={{ fontSize: "15px" }}
             >
               <svg
                 className="w-5 h-5"
@@ -382,7 +388,6 @@ function PostCard({
           description="Are you sure you want to delete this post? This action cannot be undone."
           onAccept={async () => {
             setShowDeleteModal(false);
-            // Delete image from storage if exists
             if (post.imageUrl) {
               try {
                 const imgRef = storageRef(storage, `posts/${post.id}/image`);
@@ -408,7 +413,6 @@ export default function FeedPage() {
   const currentUser = useCurrentUser();
   const [posts, setPosts] = useState<any[]>([]);
 
-  // Real-time posts listener
   useEffect(() => {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
     const unsub = onSnapshot(q, (snap) => {
@@ -422,7 +426,6 @@ export default function FeedPage() {
     return unsub;
   }, []);
 
-  // Like post
   const handleLike = async (post: any) => {
     if (!currentUser) return;
     const ref = doc(db, "posts", post.id);
@@ -435,28 +438,19 @@ export default function FeedPage() {
     await updateDoc(ref, { likes });
   };
 
-  // Delete post (no-op, handled in PostCard)
   const handleDelete = async (_post: any) => {};
-
-  // Edit post (no-op, handled in PostCard)
   const handleEdit = () => {};
 
   return (
-    <div className="flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 min-h-[calc(100vh-67px)]  py-8">
-      {/* Show PostForm only if user is logged in */}
-      {currentUser && (
-        <PostForm
-          onPost={() => {}} // no refresh needed, real-time updates
-          currentUser={currentUser}
-        />
-      )}
-      <div className="w-full max-w-2xl flex flex-col gap-4">
+    <div className="flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 min-h-screen px-4 py-4 sm:py-8">
+      {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
+      <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
         {posts.map((post) => (
           <PostCard
             key={post.id}
             post={post}
             onLike={() => handleLike(post)}
-            onDelete={() => {}} // no refresh needed
+            onDelete={() => {}}
             onEdit={handleEdit}
             isOwn={currentUser ? post.userId === currentUser.uid : false}
             currentUser={currentUser}
