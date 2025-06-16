@@ -192,9 +192,6 @@ function ProfileInner() {
 
   return (
     <div className="relative w-full mx-auto flex flex-col gap-8 bg-gradient-to-br from-zinc-950/95 via-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/70 items-center overflow-hidden">
-      {/* Dekoracyjny blur-circle */}
-      <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
       <div
         id="profile"
         className="w-full !flex flex-col min-h-[calc(100vh-67px)] font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
@@ -219,7 +216,7 @@ function ProfileInner() {
             isOwnProfile={isOwnProfile}
           />
         </div>
-        <footer className="flex gap-[24px] flex-wrap items-center justify-center">
+        <footer className="flex gap-[24px] flex-wrap items-start justify-center w-full px-6 py-4 sm:px-12 sm:py-6">
           <p>IDMOTO 2025©</p>
         </footer>
       </div>

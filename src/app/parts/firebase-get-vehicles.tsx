@@ -123,7 +123,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="animate-slide-up-fade relative group rounded-3xl overflow-hidden shadow-2xl cursor-pointer h-72 w-54 flex items-end transition-transform hover:scale-105 border border-zinc-200 dark:border-zinc-800"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer h-72 w-54 flex items-end transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -132,7 +132,10 @@ function VehicleCard({
         onClick={() => router.push(`/car?id=${vehicle.id}`)}
       >
         {/* Overlay for readability */}
-        <div className="absolute inset-0 group-hover:bg-gradient-to-t group-hover:from-black/80 group-hover:via-black/40 group-hover:to-transparent z-0 transition" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-zinc-900/20 to-transparent pointer-events-none transition" />
+
+        {/* Subtle glass reflection */}
+        <div className="absolute left-0 top-0 w-full h-1/3 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
         {/* Gear button - only for owner */}
         {isOwnProfile && (
@@ -178,19 +181,22 @@ function VehicleCard({
         )}
 
         {/* Brand & model */}
-        <div className="relative z-10 p-6 pb-5">
-          <div className="flex flex-col items-start">
-            <span className="text-white text-2xl font-black drop-shadow-lg">
-              {vehicle.manufacturer || "Brand"}
-            </span>
-            <span className="text-white text-xl font-semibold drop-shadow-lg opacity-90">
-              {vehicle.model || "Model"}
-            </span>
-            <span className="block text-xs uppercase text-zinc-200/[.8] tracking-widest">
-              {vehicle.year || "Year"} | {vehicle.engine || "Engine"}
-            </span>
+        <div className="relative z-10 w-full px-5 pb-5 pt-8 flex flex-col">
+          <h3 className="text-white text-lg font-extrabold drop-shadow mb-0.5 truncate">
+            {vehicle.manufacturer || "Brand"}
+          </h3>
+          <div className="text-zinc-200 text-base font-semibold truncate">
+            {vehicle.model || "Model"}
+          </div>
+          <div className="text-zinc-400 text-xs mt-1 truncate">
+            {vehicle.year || "Year"} | {vehicle.engine || "Engine"}
           </div>
         </div>
+
+        {/* Fancy border accent on hover */}
+        <div className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-500/60 transition-all duration-200" />
+        {/* Soft shadow glow on hover */}
+        <div className="pointer-events-none absolute inset-0 rounded-2xl group-hover:shadow-[0_0_32px_0_rgba(59,130,246,0.15)] transition-all duration-200" />
       </div>
       {/* ALIGN MODAL */}
       {showAlignModal && (

@@ -45,7 +45,7 @@ export default function Navbar() {
           <>
             <a
               href="/feed"
-              className="hidden hover:text-gray-400 cursor-pointer animate-fade-in-opacity uppercase text-zinc-100 tracking-widest font-bold"
+              className=" hover:text-gray-400 cursor-pointer animate-fade-in-opacity uppercase text-zinc-100 tracking-widest font-bold"
             >
               Feed
             </a>
@@ -84,6 +84,13 @@ export default function Navbar() {
                 ×
               </button>
               <div className="flex flex-col gap-4 w-full h-full mt-4">
+                <a
+                  href="/feed"
+                  className="block text-xl uppercase text-zinc-100 tracking-widest font-bold hover:text-gray-400 transition"
+                  onClick={() => setMobileMenu(false)}
+                >
+                  Feed
+                </a>
                 {user && (
                   <a
                     href={`/profile?uid=${user.uid}`}
