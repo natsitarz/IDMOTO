@@ -23,6 +23,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import AdSenseFeedCard from "./parts/adSenseFeedCard";
 
 function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -441,11 +442,19 @@ export default function FeedPage() {
   const handleDelete = async (_post: any) => {};
   const handleEdit = () => {};
 
+  const postsWithAd = [...posts];
+  if (postsWithAd.length > 2) {
+    // Insert ad after a random post (not first or last)
+    const adIndex = Math.floor(Math.random() * (postsWithAd.length - 2)) + 1;
+    postsWithAd.splice(adIndex, 0, { isAd: true });
+  }
+
   return (
-    <div className="flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 min-h-screen px-4 py-4 sm:py-8">
-      {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
-      <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
-        {posts.map((post) => (
+    <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
+      {postsWithAd.map((post, idx) =>
+        post.isAd ? (
+          <AdSenseFeedCard key={`ad-${idx}`} />
+        ) : (
           <PostCard
             key={post.id}
             post={post}
@@ -456,8 +465,8 @@ export default function FeedPage() {
             currentUser={currentUser}
             showLike={!!currentUser}
           />
-        ))}
-      </div>
+        )
+      )}
     </div>
   );
 }
