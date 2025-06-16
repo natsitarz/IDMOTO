@@ -23,7 +23,26 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import AdSenseFeedCard from "./parts/adSenseFeedCard";
+
+// --- AdSenseFeedCard component ---
+function AdSenseFeedCard() {
+  useEffect(() => {
+    // @ts-ignore
+    if (window.adsbygoogle) window.adsbygoogle.push({});
+  }, []);
+  return (
+    <div className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 flex justify-center items-center min-h-[120px]">
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block" }}
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXX" // <-- your AdSense client ID
+        data-ad-slot="XXXXXXXXXX" // <-- your AdSense slot ID
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+    </div>
+  );
+}
 
 function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -442,31 +461,34 @@ export default function FeedPage() {
   const handleDelete = async (_post: any) => {};
   const handleEdit = () => {};
 
+  // --- Insert AdSenseFeedCard randomly in the feed ---
   const postsWithAd = [...posts];
   if (postsWithAd.length > 2) {
-    // Insert ad after a random post (not first or last)
     const adIndex = Math.floor(Math.random() * (postsWithAd.length - 2)) + 1;
     postsWithAd.splice(adIndex, 0, { isAd: true });
   }
 
   return (
-    <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
-      {postsWithAd.map((post, idx) =>
-        post.isAd ? (
-          <AdSenseFeedCard key={`ad-${idx}`} />
-        ) : (
-          <PostCard
-            key={post.id}
-            post={post}
-            onLike={() => handleLike(post)}
-            onDelete={() => {}}
-            onEdit={handleEdit}
-            isOwn={currentUser ? post.userId === currentUser.uid : false}
-            currentUser={currentUser}
-            showLike={!!currentUser}
-          />
-        )
-      )}
+    <div className="flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 min-h-screen px-4 py-4 sm:py-8">
+      {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
+      <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
+        {postsWithAd.map((post, idx) =>
+          post.isAd ? (
+            <AdSenseFeedCard key={`ad-${idx}`} />
+          ) : (
+            <PostCard
+              key={post.id}
+              post={post}
+              onLike={() => handleLike(post)}
+              onDelete={() => {}}
+              onEdit={handleEdit}
+              isOwn={currentUser ? post.userId === currentUser.uid : false}
+              currentUser={currentUser}
+              showLike={!!currentUser}
+            />
+          )
+        )}
+      </div>
     </div>
   );
 }
