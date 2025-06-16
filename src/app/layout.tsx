@@ -2,7 +2,6 @@ import ClientErrorToaster from "@/app/parts/ClientErrorToaster";
 import PageLoaderWrapper from "@/app/parts/PageLoaderWrapper";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Head from "next/head";
 import Script from "next/script";
 import "./globals.css";
 
@@ -28,14 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <Script
-          id="adsense-script"
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
+      <head>
         <meta
           name="keywords"
           content="car profile, car social network, vehicle history, automotive, car community, your car profile, car enthusiasts, car management, car sharing, vehicle profile, car lovers, automotive enthusiasts, car showcase, car collection"
@@ -48,8 +40,15 @@ export default function RootLayout({
         />
         <meta property="og:image" content="/logo.png" />
         <meta property="og:type" content="website" />
-        <meta name="google-adsense-account" content="ca-pub-1346635526682080" />
-      </Head>
+        {/* AdSense script here */}
+        <Script
+          id="adsense-script"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-950 via-zinc-900 to-zinc-800`}
       >
