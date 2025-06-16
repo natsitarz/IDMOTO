@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const VISIBILITY_OPTIONS = [
   { value: "public", label: "Public" },
@@ -20,7 +20,7 @@ export default function CarFormSettings({
   const [open, setOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
+  // Zamykaj dropdown po kliknięciu poza selecta
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (selectRef.current && !selectRef.current.contains(e.target as Node)) {
@@ -34,20 +34,27 @@ export default function CarFormSettings({
   }, [open]);
 
   return (
-    <div className="w-full flex flex-col items-center gap-8">
-      <h2 className="text-xl font-bold text-white">Settings</h2>
-      <div className="w-full max-w-xs flex flex-col gap-4">
-        <div>
-          <label className="block text-xs font-semibold text-zinc-300 mb-2">
+    <div className="flex flex-col items-center justify-between w-full z-10 max-w-lg relative h-full">
+      {/* Tytuł na samej górze */}
+      <div className="flex flex-col items-center gap-2 z-10 w-full">
+        <h1 className="block text-2xl uppercase text-white tracking-widest font-extrabold drop-shadow">
+          Car Settings
+        </h1>
+        <p className="block text-xs uppercase text-zinc-400 tracking-widest font-medium">
+          Manage your car settings below
+        </p>
+      </div>
+      {/* Środek: ustawienia */}
+      <div className="flex-1 flex flex-col justify-center w-full gap-6">
+        <div className="w-full flex flex-col gap-2">
+          <label
+            className="text-xs font-semibold text-zinc-300 ml-1"
+            htmlFor="visibility"
+          >
             Visibility
           </label>
           {/* Custom select */}
-          <div
-            ref={selectRef}
-            className="relative"
-            tabIndex={0}
-            // USUŃ onBlur, bo to powoduje problem z klikaniem
-          >
+          <div ref={selectRef} className="relative" tabIndex={0}>
             <button
               type="button"
               className={`w-full flex items-center justify-between rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base shadow-inner cursor-pointer ${
@@ -102,16 +109,20 @@ export default function CarFormSettings({
             )}
           </div>
         </div>
-        <div>
+        <div className="w-full flex flex-col gap-2">
+          <label className="text-xs font-semibold text-zinc-300 ml-1">
+            Danger Zone
+          </label>
           <button
             type="button"
-            className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition"
+            className="cursor-pointer w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition"
             onClick={() => setShowConfirm(true)}
           >
             Delete this car
           </button>
         </div>
       </div>
+      {/* Potwierdzenie usunięcia */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-zinc-900 rounded-2xl shadow-xl p-6 w-[90vw] max-w-xs relative flex flex-col items-center">

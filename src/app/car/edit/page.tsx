@@ -126,13 +126,10 @@ function NoEditPermissionMessage() {
 
 const MENU = [
   { key: "main", label: "Car Details" },
-  { key: "history", label: "History" },
-  { key: "specs", label: "Specs" },
   { key: "settings", label: "Settings" },
 ];
 
 export default function CarEditPage() {
-  // Get carId from query params (or use router if you prefer)
   const searchParams =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
@@ -140,41 +137,28 @@ export default function CarEditPage() {
   const carId = searchParams?.get("id") || "";
 
   const user = useAuthUser();
-  const {
-    car,
-    loading,
-    error,
-    form,
-    setForm,
-    setError,
-    // visibility,
-    // setVisibility,
-    // canEdit,
-    // deleteCar,
-  } = useCarData(user, carId);
+  const { car, loading, error, form, setForm, setError } = useCarData(
+    user,
+    carId
+  );
 
-  // Temporary local state for missing properties (remove if useCarData is updated)
-  const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [canEdit, setCanEdit] = useState(true);
+  // If you need visibility, setVisibility, and deleteCar, you must implement and return them from useCarData.
+  // For now, you can manage them locally as shown below:
+
+  const [visibility, setVisibility] = useState<"public" | "private">("private");
+
   const deleteCar = async () => {
-    // Implement delete logic or update useCarData to provide this
+    // Implement car deletion logic here or import from elsewhere
+    // For now, just a placeholder
     throw new Error("deleteCar not implemented");
   };
 
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState("main");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Save car details (main section)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.description.length > 25) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-error", {
-          detail: "Bio must be 25 characters or less.",
-        })
-      );
-      return;
-    }
     if (!user || !carId) return;
     setSaving(true);
     setError(null);
@@ -202,7 +186,6 @@ export default function CarEditPage() {
     setSaving(false);
   };
 
-  // Change car visibility
   const handleVisibilityChange = async (v: "public" | "private") => {
     setVisibility(v);
     try {
@@ -221,7 +204,6 @@ export default function CarEditPage() {
     }
   };
 
-  // Delete car
   const handleDeleteCar = async () => {
     try {
       await deleteCar();
@@ -249,22 +231,86 @@ export default function CarEditPage() {
 
   return (
     <div className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]">
-      <div className="w-full max-w-4xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-0 flex flex-row items-stretch gap-0 animate-fade-in-scale relative overflow-hidden">
+      <div className="w-full max-w-3xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-0 flex flex-col md:flex-row items-stretch gap-0 animate-fade-in-scale relative overflow-hidden min-h-[860px]">
         {/* Decorative gradient circle */}
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-        {/* Sidebar */}
-        <aside className="flex flex-col gap-2 bg-zinc-900/80 border-r border-zinc-800/60 min-w-[160px] max-w-[180px] py-10 px-4 z-10">
+        {/* Mobile menu */}
+        <div className="md:hidden w-full border-b border-zinc-800/60 bg-zinc-900/80 z-30 relative">
+          <button
+            className="cursor-pointer w-full flex items-center justify-between px-4 py-3 text-white font-semibold text-base focus:outline-none"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            type="button"
+          >
+            {MENU.find((m) => m.key === selected)?.label}
+            <svg
+              className={`ml-2 w-5 h-5 transition-transform ${
+                mobileMenuOpen ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M19 9l-7 7-7-7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          {mobileMenuOpen && (
+            <div
+              className="fixed inset-0 z-50 flex items-start justify-center"
+              style={{ pointerEvents: "auto" }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {/* Overlay */}
+              <div
+                className="absolute inset-0 bg-black/40"
+                aria-hidden="true"
+              />
+              {/* Dropdown */}
+              <div
+                className="relative w-full mx-auto bg-zinc-900/95 border border-zinc-800/60 shadow-xl flex flex-col overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {MENU.map((item) => (
+                  <button
+                    key={item.key}
+                    className={`w-full text-left px-4 py-3 font-semibold transition cursor-pointer
+              ${
+                selected === item.key
+                  ? "bg-blue-600/80 text-white"
+                  : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
+              }`}
+                    onClick={() => {
+                      setSelected(item.key);
+                      setMobileMenuOpen(false);
+                    }}
+                    type="button"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Sidebar/Menu */}
+        <aside className="hidden md:flex flex-col gap-2 bg-zinc-900/80 border-r border-zinc-800/60 min-w-[160px] max-w-[180px] py-10 px-4 z-10">
           <h2 className="text-xs uppercase text-zinc-400 font-bold mb-2 tracking-widest pl-1">
             Car Menu
           </h2>
           {MENU.map((item) => (
             <button
               key={item.key}
-              className={`cursor-pointer text-left px-3 py-2 rounded-lg font-semibold transition-all text-sm ${
-                selected === item.key
-                  ? "bg-blue-600/80 text-white shadow"
-                  : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
-              }`}
+              className={`cursor-pointer w-full text-left px-3 py-2 rounded-lg font-semibold transition-all text-sm
+        ${
+          selected === item.key
+            ? "bg-blue-600/80 text-white shadow"
+            : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
+        }`}
+              style={{ minWidth: 0 }} // Zapobiega rozszerzaniu przez długi tekst
               onClick={() => setSelected(item.key)}
               type="button"
             >
@@ -273,7 +319,7 @@ export default function CarEditPage() {
           ))}
         </aside>
         {/* Main content */}
-        <main className="flex-1 flex flex-col items-center justify-center p-10">
+        <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-10">
           {selected === "main" && (
             <CarFormMain
               form={form}

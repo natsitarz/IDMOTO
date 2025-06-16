@@ -1,7 +1,8 @@
 import { auth, db } from "@/app/parts/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+
 
 export function useAuthUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -50,6 +51,8 @@ export function useCarData(user: User | null, carId: string) {
     transmission: "",
     description: "",
   });
+  const [visibility, setVisibility] = useState<"public" | "private">("private");
+  const [canEdit, setCanEdit] = useState(false);
 
   useEffect(() => {
     if (!user || !carId) return;
@@ -58,10 +61,31 @@ export function useCarData(user: User | null, carId: string) {
     getDoc(doc(db, "vehicles", carId))
       .then((carSnap) => {
         processCarSnapshot(carSnap, setCar, setForm, setError);
+        const carData = carSnap.data();
+        if (carData) {
+          setVisibility(carData.visibility || "private");
+          setCanEdit(user && carData.ownerId === user.uid);
+        }
       })
       .catch(() => setError("Failed to fetch car data."))
       .finally(() => setLoading(false));
   }, [user, carId]);
 
-  return { car, loading, error, form, setForm, setError };
+  const deleteCar = async () => {
+    if (!carId) throw new Error("No carId");
+    await deleteDoc(doc(db, "vehicles", carId));
+  };
+
+  return {
+    car,
+    loading,
+    error,
+    form,
+    setForm,
+    setError,
+    visibility,
+    setVisibility,
+    canEdit,
+    deleteCar,
+  };
 }

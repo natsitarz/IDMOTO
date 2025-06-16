@@ -52,7 +52,7 @@ function AIAssistantCard({ isOwnProfile }: { isOwnProfile: boolean }) {
         {aiCardBgAnimation}
         <form
           onSubmit={handleAsk}
-          className="hidden w-full max-w-sm sm:max-w-xl mx-auto my-4 flex items-center rounded-2xl shadow-lg px-2 py-2 sm:px-4 sm:py-2 gap-2"
+          className="hidden w-full max-w-sm sm:max-w-xl mx-auto my-4 items-center rounded-2xl shadow-lg px-2 py-2 sm:px-4 sm:py-2 gap-2"
           style={{
             background: "linear-gradient(120deg, #23272f 0%, #23272f 100%)",
             border: "1px solid #333843",
@@ -191,7 +191,10 @@ function ProfileInner() {
   }
 
   return (
-    <div className="w-full flex items-start bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800">
+    <div className="relative w-full mx-auto flex flex-col gap-8 bg-gradient-to-br from-zinc-950/95 via-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/70 items-center overflow-hidden">
+      {/* Dekoracyjny blur-circle */}
+      <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
+      <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
       <div
         id="profile"
         className="w-full !flex flex-col min-h-[calc(100vh-67px)] font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"
@@ -208,7 +211,7 @@ function ProfileInner() {
           onSaveBio={isOwnProfile ? handleSaveBio : undefined}
           isOwnProfile={isOwnProfile}
         />
-        <div className="gap-4 sm:gap-0 flex flex-col sm:pl-8 sm:pr-8 flex-grow items-center justify-start sm:justify-start sm:items-start w-full mx-auto">
+        <div className="gap-4 sm:gap-0 flex flex-col flex-grow items-center justify-start sm:justify-start sm:items-start w-full mx-auto">
           <AIAssistantCard isOwnProfile={isOwnProfile} />
           <ProfileVehiclesSection
             uid={profileUid}
