@@ -40,11 +40,10 @@ export default function RootLayout({
         />
         <meta property="og:image" content="/logo.png" />
         <meta property="og:type" content="website" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080"
-          crossOrigin="anonymous"
-        ></script>
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-1346635526682080"
+        ></meta>
       </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-950 via-zinc-900 to-zinc-800`}
