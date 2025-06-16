@@ -29,6 +29,10 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta
+          name="google-adsense-account"
+          content="ca-pub-1346635526682080"
+        ></meta>
+        <meta
           name="keywords"
           content="car profile, car social network, vehicle history, automotive, car community, your car profile, car enthusiasts, car management, car sharing, vehicle profile, car lovers, automotive enthusiasts, car showcase, car collection"
         />
@@ -41,13 +45,11 @@ export default function RootLayout({
         <meta property="og:image" content="/logo.png" />
         <meta property="og:type" content="website" />
         {/* AdSense script here */}
-        <Script
-          id="adsense-script"
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080"
-          strategy="afterInteractive"
           crossOrigin="anonymous"
-        />
+        ></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-950 via-zinc-900 to-zinc-800`}
