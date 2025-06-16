@@ -14,8 +14,8 @@ export default function SeePhoto({
   src,
   alt = "",
   className = "",
-  thumbWidth = 140,
-  thumbHeight = 140,
+  thumbWidth = 840,
+  thumbHeight = 840,
 }: SeePhotoProps) {
   const [open, setOpen] = useState(false);
 

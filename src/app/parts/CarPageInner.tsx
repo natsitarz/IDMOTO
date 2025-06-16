@@ -215,6 +215,17 @@ export default function CarPageInner() {
     );
   }
 
+  if (
+    !user ||
+    (user && user.uid !== car.userID && car.visibility === "private")
+  ) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-67px)]">
+        This car is private. You can't view it.
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-[calc(100vh-67px)] bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 flex flex-col items-center font-[family-name:var(--font-geist-sans)]">
       {/* Hero Section */}

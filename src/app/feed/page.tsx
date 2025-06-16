@@ -77,13 +77,13 @@ function AcceptModal({
         )}
         <div className="flex justify-end gap-2 mt-2">
           <button
-            className="px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
+            className="cursor-pointer px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
             onClick={onCancel}
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+            className="cursor-pointer px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
             onClick={onAccept}
           >
             Delete
@@ -171,7 +171,7 @@ function PostForm({
           />
           <button
             type="button"
-            className="absolute top-1 right-1 bg-zinc-800/80 rounded-full p-1 text-white"
+            className="cursor-pointer absolute top-1 right-1 bg-zinc-800/80 rounded-full p-1 text-white"
             onClick={() => setImage(null)}
             aria-label="Remove image"
           >
@@ -182,7 +182,7 @@ function PostForm({
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
-          className="flex items-center gap-2 px-2 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium"
+          className="cursor-pointer flex items-center gap-2 px-2 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium"
           onClick={() => fileInputRef.current?.click()}
         >
           <svg
@@ -211,7 +211,7 @@ function PostForm({
         />
         <button
           type="submit"
-          className="ml-auto px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition"
+          className="cursor-pointer ml-auto px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition"
           disabled={uploading || (!text.trim() && !image)}
         >
           {uploading ? "Posting..." : "Post"}
@@ -286,7 +286,7 @@ function PostCard({
         {isOwn && showLike && (
           <div className="relative">
             <button
-              className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400"
+              className="cursor-pointer p-2 rounded-full hover:bg-zinc-800 text-zinc-400"
               onClick={() => setShowMenu((v) => !v)}
             >
               <svg
@@ -304,7 +304,7 @@ function PostCard({
             {showMenu && (
               <div className="absolute right-0 mt-2 bg-zinc-800 border border-zinc-700 rounded-xl shadow-lg z-20 min-w-[120px]">
                 <button
-                  className="block w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 rounded-t-xl"
+                  className="cursor-pointer block w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 rounded-t-xl"
                   onClick={() => {
                     setEditing(true);
                     setShowMenu(false);
@@ -313,7 +313,7 @@ function PostCard({
                   Edit
                 </button>
                 <button
-                  className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700 rounded-b-xl"
+                  className="cursor-pointer block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700 rounded-b-xl"
                   onClick={() => {
                     setShowMenu(false);
                     setShowDeleteModal(true);
@@ -329,26 +329,58 @@ function PostCard({
       {/* Content */}
       <div className="px-2 sm:px-2 pb-2">
         {editing ? (
-          <div className="flex flex-col gap-2">
-            <textarea
-              className="w-full bg-zinc-800 text-zinc-100 rounded-lg p-2"
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              rows={3}
-              style={{ fontSize: "15px" }}
-            />
-            <div className="flex gap-2">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-700 p-6 w-[90vw] max-w-md relative flex flex-col gap-4 animate-fade-in">
+              <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                <svg
+                  className="w-5 h-5 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6"
+                  />
+                </svg>
+                Edit your post
+              </h2>
+              <textarea
+                className="w-full bg-zinc-800 text-zinc-100 rounded-xl p-3 border border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none text-base resize-none transition"
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                rows={5}
+                maxLength={500}
+                autoFocus
+                style={{ fontSize: "15px" }}
+                placeholder="Edit your post..."
+              />
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  className="cursor-pointer px-4 py-2 rounded-xl bg-zinc-700 text-white hover:bg-zinc-600 transition"
+                  onClick={() => setEditing(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold shadow transition cursor-pointer"
+                  onClick={handleEdit}
+                  type="button"
+                  disabled={editText.trim().length === 0}
+                >
+                  Save
+                </button>
+              </div>
               <button
-                className="px-4 py-1 rounded bg-blue-600 text-white font-semibold"
-                onClick={handleEdit}
-              >
-                Save
-              </button>
-              <button
-                className="px-4 py-1 rounded bg-zinc-700 text-zinc-200"
+                className="cursor-pointer absolute top-3 right-3 text-zinc-400 hover:text-zinc-200 text-xl"
                 onClick={() => setEditing(false)}
+                type="button"
+                aria-label="Close edit modal"
               >
-                Cancel
+                ×
               </button>
             </div>
           </div>
@@ -369,7 +401,7 @@ function PostCard({
         {showLike && (
           <div className="flex items-center gap-2 mt-2">
             <button
-              className={`flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold transition ${
+              className={`cursor-pointer flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold transition ${
                 post.likes?.includes(currentUser?.uid)
                   ? "bg-blue-600 text-white"
                   : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
@@ -469,7 +501,7 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 min-h-screen px-4 py-4 sm:py-8">
+    <div className="min-h-[calc(100vh-67px)] flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 px-4 py-4 sm:py-8">
       {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
       <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
         {postsWithAd.map((post, idx) =>

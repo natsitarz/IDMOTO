@@ -19,13 +19,27 @@ import React, { useEffect, useState } from "react";
 import { FiMoreVertical } from "react-icons/fi";
 import { db, storage } from "./firebase";
 
-export const firebaseGetVehicles = async (userId: string) => {
+// Zmieniona funkcja: przyjmuje isOwnProfile i filtruje visibility
+export const firebaseGetVehicles = async (
+  userId: string,
+  isOwnProfile: boolean
+) => {
   const vehiclesRef = collection(db, "vehicles");
-  const q = query(
-    vehiclesRef,
-    where("userID", "==", userId),
-    orderBy("createdAt", "desc")
-  );
+  let q;
+  if (isOwnProfile) {
+    q = query(
+      vehiclesRef,
+      where("userID", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+  } else {
+    q = query(
+      vehiclesRef,
+      where("userID", "==", userId),
+      where("visibility", "==", "Public"),
+      orderBy("createdAt", "desc")
+    );
+  }
   const vehiclesSnapshot = await getDocs(q);
   const vehiclesList = vehiclesSnapshot.docs.map((doc) => ({
     id: doc.id,
@@ -34,54 +48,30 @@ export const firebaseGetVehicles = async (userId: string) => {
   return vehiclesList;
 };
 
-async function fetchVehiclesForUser(userId: string) {
+// Zmieniona funkcja: przyjmuje isOwnProfile i filtruje visibility
+async function fetchVehiclesForUser(userId: string, isOwnProfile: boolean) {
   const vehiclesRef = collection(db, "vehicles");
-  const q = query(
-    vehiclesRef,
-    where("userID", "==", userId),
-    orderBy("createdAt", "desc")
-  );
+  let q;
+  if (isOwnProfile) {
+    q = query(
+      vehiclesRef,
+      where("userID", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+  } else {
+    q = query(
+      vehiclesRef,
+      where("userID", "==", userId),
+      where("visibility", "==", "public"),
+      orderBy("createdAt", "desc")
+    );
+  }
   const vehiclesSnapshot = await getDocs(q);
   return vehiclesSnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   }));
 }
-
-const deleteVehicle = async (vehicleId: string, onSuccess?: () => void) => {
-  try {
-    // Delete all files in the vehicle's storage folder FIRST
-    const folderRef = storageRef(storage, `vehicles/${vehicleId}`);
-    try {
-      const listResult = await listAll(folderRef);
-      await Promise.all(
-        listResult.items.map((itemRef) => deleteObject(itemRef))
-      );
-    } catch (storageError) {
-      if ((storageError as any).code !== "storage/object-not-found") {
-        console.error("Error deleting storage files:", storageError);
-        // Optionally, you can return here if you want to abort on storage error
-      }
-    }
-
-    // THEN delete the Firestore document
-    await deleteDoc(doc(db, "vehicles", vehicleId));
-    if (onSuccess) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-success", {
-          detail: "Vehicle deleted successfully!",
-        })
-      );
-      onSuccess();
-    }
-  } catch (error) {
-    window.dispatchEvent(
-      new CustomEvent("show-global-error", {
-        detail: "Failed to remove vehicle.",
-      })
-    );
-  }
-};
 
 // Render a single vehicle card
 function VehicleCard({
@@ -286,7 +276,7 @@ export const VehiclesListDiv: React.FC<{
   userId: string;
   onVehicleCount?: (count: number) => void;
   isOwnProfile?: boolean; // <-- add this prop
-}> = ({ userId, onVehicleCount, isOwnProfile }) => {
+}> = ({ userId, onVehicleCount, isOwnProfile = false }) => {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [fadeLoader, setFadeLoader] = useState(false);
@@ -294,7 +284,7 @@ export const VehiclesListDiv: React.FC<{
   useEffect(() => {
     let isMounted = true;
     async function load() {
-      const data = await fetchVehiclesForUser(userId);
+      const data = await fetchVehiclesForUser(userId, isOwnProfile);
       if (isMounted) {
         setVehicles(data);
         if (onVehicleCount) onVehicleCount(data.length); // <-- call immediately after fetch
@@ -306,7 +296,7 @@ export const VehiclesListDiv: React.FC<{
     return () => {
       isMounted = false;
     };
-  }, [userId, onVehicleCount]);
+  }, [userId, onVehicleCount, isOwnProfile]);
 
   if (loading)
     return <div className={fadeLoader ? "fade-out" : ""}>Loading...</div>;

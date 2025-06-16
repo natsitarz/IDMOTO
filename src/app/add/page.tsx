@@ -6,9 +6,15 @@ import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
+const VISIBILITY_OPTIONS = [
+  { value: "public", label: "Public" },
+  { value: "private", label: "Private" },
+];
+
 export default function Profile() {
   const [user, setUser] = useState(auth.currentUser);
   const [hasCar, setHasCar] = useState<boolean | null>(null);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
 
   useEffect(() => {
     onAuthStateChanged(auth, setUser);
@@ -31,6 +37,14 @@ export default function Profile() {
       checkUserCars();
     }
   }, [user]);
+
+  // Wrap the submit handler to include visibility
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    formData.append("visibility", visibility);
+    await firebaseAddVehiclePublic(formData); // <-- przekazujesz FormData
+  };
 
   return (
     <div
@@ -55,7 +69,7 @@ export default function Profile() {
         <form
           className="flex flex-col items-center justify-center gap-5 w-full z-10"
           method="post"
-          onSubmit={firebaseAddVehiclePublic}
+          onSubmit={handleSubmit}
         >
           <div className="w-full flex flex-col gap-2">
             <label
@@ -200,8 +214,41 @@ export default function Profile() {
               />
             </div>
           </div>
+          {/* --- Visibility Section --- */}
+          <div className="w-full flex flex-col gap-2">
+            <label
+              className="text-xs font-semibold text-zinc-300 ml-1"
+              htmlFor="visibility"
+            >
+              Visibility
+            </label>
+            <div className="flex gap-4">
+              {VISIBILITY_OPTIONS.map((option) => (
+                <label
+                  key={option.value}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition border ${
+                    visibility === option.value
+                      ? "bg-blue-600/80 border-blue-500 text-white"
+                      : "bg-zinc-900/80 border-zinc-700 text-zinc-200"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="visibility"
+                    value={option.value}
+                    checked={visibility === option.value}
+                    onChange={() =>
+                      setVisibility(option.value as "public" | "private")
+                    }
+                    className="accent-blue-600"
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </div>
           <button
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
+            className="cursor-pointer w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
             type="submit"
           >
             Add it!

@@ -1,3 +1,5 @@
+import { db } from "@/app/parts/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
 
 const VISIBILITY_OPTIONS = [
@@ -7,7 +9,7 @@ const VISIBILITY_OPTIONS = [
 
 export default function CarFormSettings({
   carId,
-  visibility,
+  visibility: initialVisibility,
   onVisibilityChange,
   onDeleteCar,
 }: {
@@ -19,6 +21,43 @@ export default function CarFormSettings({
   const [showConfirm, setShowConfirm] = useState(false);
   const [open, setOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
+  const [visibility, setVisibility] = useState<"public" | "private" | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  // Fetch visibility from Firestore before showing UI
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchVisibility() {
+      if (!carId) return;
+      const carDoc = await getDoc(doc(db, "vehicles", carId));
+      if (carDoc.exists()) {
+        const firestoreVisibility = carDoc.data().visibility;
+        if (
+          firestoreVisibility === "public" ||
+          firestoreVisibility === "private"
+        ) {
+          if (isMounted) {
+            setVisibility(firestoreVisibility);
+            setLoading(false);
+            // Do NOT call onVisibilityChange here, only when user changes select
+          }
+          return;
+        }
+      }
+      // fallback to initialVisibility if not found
+      if (isMounted) {
+        setVisibility(initialVisibility);
+        setLoading(false);
+      }
+    }
+    fetchVisibility();
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carId]);
 
   // Zamykaj dropdown po kliknięciu poza selecta
   useEffect(() => {
@@ -32,6 +71,14 @@ export default function CarFormSettings({
     }
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
+
+  if (loading || visibility === null) {
+    return (
+      <div className="flex items-center justify-center w-full h-40 text-zinc-400">
+        Loading settings...
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-between w-full z-10 max-w-lg relative h-full">
@@ -96,6 +143,7 @@ export default function CarFormSettings({
                         : "text-zinc-200 hover:bg-zinc-800/80"
                     }`}
                     onClick={() => {
+                      setVisibility(option.value as "public" | "private");
                       onVisibilityChange(option.value as "public" | "private");
                       setOpen(false);
                     }}
