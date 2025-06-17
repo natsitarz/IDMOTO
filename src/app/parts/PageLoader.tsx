@@ -17,7 +17,7 @@ export default function PageLoader({ loading }: { loading: boolean }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-900 transition-opacity duration-400 ${
         loading
           ? "opacity-100 pointer-events-auto"
           : "opacity-0 pointer-events-none"

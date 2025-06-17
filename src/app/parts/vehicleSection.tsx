@@ -65,7 +65,7 @@ function VehiclesAddButton({
   // Desktop: regular button
   return (
     <button
-      className="flex items-center justify-center gap-3 bg-zinc-900/80 hover:bg-zinc-700/90 text-white font-semibold rounded-lg px-4 py-2 shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/70 cursor-pointer"
+      className="flex items-center justify-center gap-3 bg-zinc-800/80 hover:bg-zinc-700/90 text-white font-semibold rounded-lg px-4 py-2 shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/70 cursor-pointer"
       onClick={letsAdd}
       type="button"
       style={{ maxWidth: 260 }}
@@ -91,10 +91,7 @@ export function ProfileVehiclesSection({
   const [vehicleCount, setVehicleCount] = useState<number | null>(null);
 
   return (
-    <section className="relative w-full mx-auto flex flex-col gap-8 bg-gradient-to-br from-zinc-950/95 via-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/70 px-6 py-10 sm:px-12 sm:py-14 items-center overflow-hidden">
-      {/* Dekoracyjny blur-circle */}
-      <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
+    <section className="relative w-full mx-auto flex flex-col gap-8 bg-zinc-90 shadow-2xl border border-zinc-800/70 px-6 py-10 sm:px-12 sm:py-14 items-center overflow-hidden">
       <div className="animate-fade-in-up w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 z-10">
         <div>
           <h2 className="text-3xl font-black text-white tracking-tight drop-shadow flex items-center gap-2">

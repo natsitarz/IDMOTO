@@ -8,6 +8,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -89,6 +90,25 @@ function PostForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 1. Check if user can post (one per minute)
+    const userRef = doc(db, "users", currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    const now = Date.now();
+    let lastPost = 0;
+    if (userSnap.exists() && userSnap.data().postCreatedAt) {
+      lastPost = userSnap.data().postCreatedAt;
+    }
+    const diff = now - lastPost;
+    if (diff < 60 * 1000) {
+      const secondsLeft = Math.ceil((60 * 1000 - diff) / 1000);
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: `Post delay: ${secondsLeft}s`,
+        })
+      );
+      return;
+    }
     if (!text.trim() && !image) return;
     setUploading(true);
 
@@ -113,19 +133,23 @@ function PostForm({
     }
 
     // 4. Update user's postCreatedAt timestamp
-    const userRef = doc(db, "users", currentUser.uid);
     await setDoc(userRef, { postCreatedAt: Date.now() }, { merge: true });
 
     setText("");
     setImage(null);
     setUploading(false);
     onPost();
+    window.dispatchEvent(
+      new CustomEvent("show-global-success", {
+        detail: `Post added!`,
+      })
+    );
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 px-2 py-3 sm:px-4 sm:py-4 flex flex-col gap-3 mb-6 sm:mb-8"
+      className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 px-2 py-3 sm:px-4 sm:py-4 flex flex-col gap-3 mb-6 sm:mb-8"
     >
       <div className="flex items-center gap-2 sm:gap-3">
         <Image
@@ -140,7 +164,7 @@ function PostForm({
             value={text}
             onChange={(e) => setText(e.target.value)}
             maxLength={200}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner resize-none"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-700/80 text-white px-4 py-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner resize-none"
             rows={3}
             placeholder="What's on your mind?"
           />
@@ -159,7 +183,7 @@ function PostForm({
           />
           <button
             type="button"
-            className="cursor-pointer absolute top-1 right-1 bg-zinc-800/80 rounded-full p-1 text-white"
+            className="flex items-center justify-center w-6 h-6 cursor-pointer absolute top-1 right-1 bg-zinc-800/80 hover:bg-zinc-700/80 rounded-full p-1 text-white"
             onClick={() => setImage(null)}
             aria-label="Remove image"
           >
@@ -170,7 +194,7 @@ function PostForm({
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
-          className="cursor-pointer flex items-center gap-2 px-2 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium"
+          className="cursor-pointer flex items-center gap-2 px-2 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-200 text-sm font-medium"
           onClick={() => fileInputRef.current?.click()}
         >
           <svg
@@ -199,7 +223,7 @@ function PostForm({
         />
         <button
           type="submit"
-          className="cursor-pointer ml-auto px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition"
+          className="cursor-pointer ml-auto px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white font-bold text-sm shadow transition"
           disabled={uploading || (!text.trim() && !image)}
         >
           {uploading ? "Posting..." : "Post"}
@@ -242,7 +266,7 @@ function PostCard({
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4">
+    <div className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4">
       {/* Header */}
       <div className="flex items-center gap-2 sm:gap-3 px-0 sm:px-2 pt-1 pb-2">
         <div
@@ -397,13 +421,14 @@ function PostCard({
               className={`cursor-pointer flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold transition ${
                 post.likes?.includes(currentUser?.uid)
                   ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
+                  : "bg-zinc-700 text-zinc-200 hover:bg-zinc-600"
               }`}
               onClick={onLike}
               style={{ fontSize: "15px" }}
             >
+              {/* Heart icon */}
               <svg
-                className="w-5 h-5"
+                className="w-5 h-4 mr-1"
                 fill={
                   post.likes?.includes(currentUser?.uid)
                     ? "currentColor"
@@ -416,7 +441,7 @@ function PostCard({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M14 9V5a3 3 0 00-6 0v4M5 12h14l-1.34 8.03A2 2 0 0115.7 22H8.3a2 2 0 01-1.96-1.97L5 12z"
+                  d="M12 21C12 21 4 13.5 4 8.5C4 5.42 6.42 3 9.5 3C11.24 3 12.91 3.81 14 5.08C15.09 3.81 16.76 3 18.5 3C21.58 3 24 5.42 24 8.5C24 13.5 16 21 16 21H12Z"
                 />
               </svg>
               Like
@@ -490,7 +515,7 @@ export default function FeedPage() {
   const postsWithAd = posts;
 
   return (
-    <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 px-4 py-4 sm:py-8">
+    <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-zinc-900 px-4 py-4 sm:py-8">
       {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
       <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
         {postsWithAd.map((post, idx) => (

@@ -191,7 +191,7 @@ function ProfileInner() {
   }
 
   return (
-    <div className="min-h-[calc(100dvh-67px)] relative w-full mx-auto flex flex-col gap-8 bg-gradient-to-br from-zinc-950/95 via-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/70 items-center overflow-hidden">
+    <div className="min-h-[calc(100dvh-67px)] relative w-full mx-auto flex flex-col gap-8 bg-zinc-900 shadow-2xl border border-zinc-800/70 items-center overflow-hidden">
       <div
         id="profile"
         className="w-full !flex flex-col font-[family-name:var(--font-geist-sans)] animate-fade-in-scale"

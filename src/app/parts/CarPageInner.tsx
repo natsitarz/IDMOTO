@@ -227,9 +227,9 @@ export default function CarPageInner() {
   }
 
   return (
-    <div className="relative min-h-[calc(100dvh-67px)] bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 flex flex-col items-center font-[family-name:var(--font-geist-sans)]">
+    <div className="relative min-h-[calc(100dvh-67px)] bg-zinc-900 flex flex-col items-center font-[family-name:var(--font-geist-sans)]">
       {/* Hero Section */}
-      <div className="animate-fade-in-opacity relative w-full h-96 max-h-[420px] flex items-end justify-start overflow-hidden rounded-b-3xl shadow-xl mb-8">
+      <div className="animate-fade-in-opacity relative w-full h-96 max-h-[420px] flex items-end justify-start overflow-hidden rounded-b-3xl shadow-xl mb-4">
         <Image
           src={car.image}
           alt={`${car.manufacturer} ${car.model}`}

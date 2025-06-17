@@ -110,8 +110,8 @@ export function ProfileHeader({
   };
 
   return (
-    <section className="w-full relative mx-auto">
-      <div className="relative h-56 sm:h-84 w-full shadow-lg flex items-end px-6 pb-6 overflow-hidden">
+    <section className="w-full relative">
+      <div className="relative h-56 sm:h-84 w-full shadow-lg flex items-center justify-center px-2 sm:px-4 overflow-hidden">
         {/* Background image layer */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <img
@@ -157,40 +157,41 @@ export function ProfileHeader({
           </button>
         )}
         {/* Avatar */}
-        <div className="relative z-10">
-          <Image
-            className="rounded-full border-4 border-white shadow-xl bg-white"
-            src={safePhotoURL}
-            alt="Profile photo"
-            width={96}
-            height={96}
-            priority
-          />
-          <span className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow"></span>
-        </div>
-        {/* Info next to avatar */}
-        <div className="ml-5 flex flex-col justify-end z-10">
-          <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
-            {safeDisplayName}
-          </span>
-          <span className="block text-xs uppercase text-zinc-400 tracking-widest">
-            {country ? (
-              <span className="text-zinc-200">{country}</span>
-            ) : (
-              <span className="italic text-zinc-500">No country set</span>
-            )}
-          </span>
-          {/* Bio */}
-          <div className="w-full max-w-xl mt-2">
-            <span className="text-xs text-zinc-400 font-semibold mb-1 block">
-              Bio
+        <div className="flex items-center z-10 relative">
+          <div className="relative z-10 mr-4">
+            <Image
+              className="rounded-full border-4 shadow-xl border-white bg-white"
+              src={safePhotoURL}
+              alt="Profile photo"
+              width={102}
+              height={102}
+              priority
+            />
+          </div>
+          {/* Info next to avatar */}
+          <div className="flex flex-col justify-end z-10">
+            <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
+              {safeDisplayName}
             </span>
-            <div className="flex items-center gap-2 w-full">
-              <span className="text-zinc-200 text-xs truncate flex-1">
-                {bio || (
-                  <span className="italic text-zinc-500">No bio set</span>
-                )}
+            <span className="block text-xs uppercase text-zinc-400 tracking-widest">
+              {country ? (
+                <span className="text-zinc-200">{country}</span>
+              ) : (
+                <span className="italic text-zinc-500">No country set</span>
+              )}
+            </span>
+            {/* Bio */}
+            <div className="w-full max-w-xl mt-2">
+              <span className="text-xs text-zinc-400 font-semibold mb-1 block">
+                Bio
               </span>
+              <div className="flex items-center gap-2 w-full">
+                <span className="text-zinc-200 text-xs truncate flex-1">
+                  {bio || (
+                    <span className="italic text-zinc-500">No bio set</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
         </div>
