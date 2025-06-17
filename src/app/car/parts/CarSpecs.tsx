@@ -12,7 +12,6 @@ export default function CarSpecs({ car }: { car: any }) {
         </p>
       </div>
       <div className="flex flex-col gap-4 items-center bg-white/5 rounded-xl p-4 shadow-inner w-full">
-        <p className="font-semibold text-zinc-200">Vehicle Specs</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 w-full max-w-lg">
           <SpecRow label="Nm" value={car.nm ? `${car.nm} Nm` : ""} />
           <SpecRow label="Version" value={car.version} />
