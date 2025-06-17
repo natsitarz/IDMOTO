@@ -238,6 +238,25 @@ function PostForm({
   );
 }
 
+function AdPostCard() {
+  return (
+    <div className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 flex flex-col items-center justify-center">
+      <span className="text-zinc-400 text-sm mb-2">Sponsored</span>
+      <div className="w-full flex justify-center">
+        {/* Przykładowy kod reklamy */}
+        <ins
+          className="adsbygoogle"
+          style={{ display: "block" }}
+          data-ad-client="ca-pub-1346635526682080"
+          data-ad-slot="8218195893"
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+      </div>
+    </div>
+  );
+}
+
 function PostCard({
   post,
   onLike,
@@ -533,9 +552,6 @@ export default function FeedPage() {
   const handleDelete = async (_post: any) => {};
   const handleEdit = () => {};
 
-  // --- No ads in the feed ---
-  const postsWithAd = posts;
-
   return (
     <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-zinc-900 px-4 py-4 sm:py-8">
       {userLoading ? (
@@ -548,21 +564,23 @@ export default function FeedPage() {
         </div>
       )}
       <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
+        {/* Sponsored ad at the top */}
+        <AdPostCard key="ad-top" />
         {postsLoading ? (
           <div className="text-zinc-400">Loading posts...</div>
         ) : postsError ? (
           <div className="text-red-400">{postsError}</div>
-        ) : postsWithAd.length === 0 ? (
+        ) : posts.length === 0 ? (
           <div className="text-zinc-400">No posts yet.</div>
         ) : (
-          postsWithAd.map((post, idx) => (
+          posts.map((item) => (
             <PostCard
-              key={post.id}
-              post={post}
-              onLike={() => handleLike(post)}
+              key={item.id}
+              post={item}
+              onLike={() => handleLike(item)}
               onDelete={() => {}}
               onEdit={handleEdit}
-              isOwn={currentUser ? post.userId === currentUser.uid : false}
+              isOwn={currentUser ? item.userId === currentUser.uid : false}
               currentUser={currentUser}
               showLike={!!currentUser}
             />
