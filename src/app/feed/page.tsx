@@ -248,7 +248,7 @@ function AdPostCard() {
           className="adsbygoogle"
           style={{ display: "block" }}
           data-ad-client="ca-pub-1346635526682080"
-          data-ad-slot="8218195893"
+          data-ad-slot="1287338924"
           data-ad-format="auto"
           data-full-width-responsive="true"
         ></ins>
