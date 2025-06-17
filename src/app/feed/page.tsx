@@ -239,19 +239,29 @@ function PostForm({
 }
 
 function AdPostCard() {
+  const adRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      // @ts-ignore
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   return (
     <div className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 flex flex-col items-center justify-center">
       <span className="text-zinc-400 text-sm mb-2">Sponsored</span>
       <div className="w-full flex justify-center">
-        {/* Przykładowy kod reklamy */}
         <ins
-          className="adsbygoogle block"
+          className="adsbygoogle"
+          style={{ display: "block" }}
           data-ad-client="ca-pub-1346635526682080"
           data-ad-slot="1287338924"
           data-ad-format="auto"
           data-full-width-responsive="true"
         ></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </div>
     </div>
   );
