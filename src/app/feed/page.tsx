@@ -12,6 +12,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import {
@@ -23,26 +24,6 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-
-// --- AdSenseFeedCard component ---
-function AdSenseFeedCard() {
-  useEffect(() => {
-    // @ts-ignore
-    if (window.adsbygoogle) window.adsbygoogle.push({});
-  }, []);
-  return (
-    <div className="w-full max-w-xl mx-auto bg-zinc-900/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 flex justify-center items-center min-h-[120px]">
-      <ins
-        className="adsbygoogle"
-        style={{ display: "block" }}
-        data-ad-client="ca-pub-1346635526682080" // <-- your AdSense client ID
-        data-ad-slot="XXXXXXXXXX" // <-- your AdSense slot ID
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      ></ins>
-    </div>
-  );
-}
 
 function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -128,9 +109,12 @@ function PostForm({
       const imgRef = storageRef(storage, `posts/${postRef.id}/image`);
       await uploadBytes(imgRef, image);
       imageUrl = await getDownloadURL(imgRef);
-      // 3. Update Firestore post with imageUrl
       await updateDoc(postRef, { imageUrl });
     }
+
+    // 4. Update user's postCreatedAt timestamp
+    const userRef = doc(db, "users", currentUser.uid);
+    await setDoc(userRef, { postCreatedAt: Date.now() }, { merge: true });
 
     setText("");
     setImage(null);
@@ -502,33 +486,25 @@ export default function FeedPage() {
   const handleDelete = async (_post: any) => {};
   const handleEdit = () => {};
 
-  // --- Insert AdSenseFeedCard randomly in the feed ---
-  const postsWithAd = [...posts];
-  if (postsWithAd.length > 2) {
-    const adIndex = Math.floor(Math.random() * (postsWithAd.length - 2)) + 1;
-    postsWithAd.splice(adIndex, 0, { isAd: true });
-  }
+  // --- No ads in the feed ---
+  const postsWithAd = posts;
 
   return (
     <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 px-4 py-4 sm:py-8">
       {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
       <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
-        {postsWithAd.map((post, idx) =>
-          post.isAd ? (
-            <AdSenseFeedCard key={`ad-${idx}`} />
-          ) : (
-            <PostCard
-              key={post.id}
-              post={post}
-              onLike={() => handleLike(post)}
-              onDelete={() => {}}
-              onEdit={handleEdit}
-              isOwn={currentUser ? post.userId === currentUser.uid : false}
-              currentUser={currentUser}
-              showLike={!!currentUser}
-            />
-          )
-        )}
+        {postsWithAd.map((post, idx) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onLike={() => handleLike(post)}
+            onDelete={() => {}}
+            onEdit={handleEdit}
+            isOwn={currentUser ? post.userId === currentUser.uid : false}
+            currentUser={currentUser}
+            showLike={!!currentUser}
+          />
+        ))}
       </div>
     </div>
   );

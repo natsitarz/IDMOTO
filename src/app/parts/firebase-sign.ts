@@ -42,7 +42,7 @@ export const addUserToDB = async (user: any) => {
 
     if (userSnap.exists()) {
       await updateDoc(userRef, {
-        // ...fields to update if needed
+        postCreatedAt: null,
       });
     } else {
       await setDoc(userRef, {
@@ -50,6 +50,7 @@ export const addUserToDB = async (user: any) => {
         displayName: user.displayName,
         email: user.email,
         photoURL: user.photoURL,
+        postCreatedAt: null,
       });
     }
     // REMOVE window.location.href from here!
