@@ -46,7 +46,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-[calc(100dvh-67px)] w-full flex items-center justify-center overflow-hidden">
       {/* Video background */}
       <video
         autoPlay

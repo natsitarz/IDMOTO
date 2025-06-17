@@ -40,7 +40,7 @@ function VehiclesAddButton({
   if (isMobile) {
     return (
       <button
-        className="absolute right-8 z-20 w-10 h-10 flex items-center justify-center transition-all duration-200"
+        className="absolute right-4 z-20 h-10 w-10 flex items-center justify-center transition-all duration-200 bg-zinc-900/80 hover:bg-zinc-700/90 text-white font-semibold rounded-lg shadow-lg focus:outline-none focus:ring-blue-500/70 cursor-pointer"
         onClick={letsAdd}
         type="button"
         aria-label="Add vehicle"
@@ -79,9 +79,6 @@ function VehiclesAddButton({
       >
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
       </svg>
-      <span className="font-medium tracking-wide">
-        {vehicleCount === 0 ? "Add first vehicle" : "Add another car"}
-      </span>
     </button>
   );
 }
@@ -98,7 +95,7 @@ export function ProfileVehiclesSection({
       {/* Dekoracyjny blur-circle */}
       <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
       <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
-      <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 z-10">
+      <div className="animate-fade-in-up w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 z-10">
         <div>
           <h2 className="text-3xl font-black text-white tracking-tight drop-shadow flex items-center gap-2">
             <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 bg-clip-text text-transparent">
@@ -112,7 +109,7 @@ export function ProfileVehiclesSection({
         </div>
         <VehiclesAddButton vehicleCount={vehicleCount} letsAdd={letsAdd} />
       </div>
-      <div className="w-full flex flex-wrap gap-6 justify-center sm:justify-start items-stretch min-h-[100px] z-10">
+      <div className="w-full flex flex-wrap gap-6 justify-center sm:justify-start items-stretch min-h-[200px] z-10">
         {uid ? (
           <VehiclesListDiv
             userId={uid}

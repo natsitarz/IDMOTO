@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export default function About() {
   const router = useRouter();
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#181c24] via-[#23272f] to-[#1a1d23] font-[family-name:var(--font-geist-sans)] relative overflow-hidden">
+    <div className="flex items-center justify-center min-h-[calc(100dvh)] bg-gradient-to-br from-[#181c24] via-[#23272f] to-[#1a1d23] font-[family-name:var(--font-geist-sans)] relative overflow-hidden">
       {/* Decorative blurred gradient blobs */}
       <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none z-0" />
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none z-0" />

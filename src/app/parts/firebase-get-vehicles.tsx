@@ -113,7 +113,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer h-72 w-54 flex items-end transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer h-72 w-54 flex items-end animate-fade-in-up transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -172,14 +172,16 @@ function VehicleCard({
 
         {/* Brand & model */}
         <div className="relative z-10 w-full px-5 pb-5 pt-8 flex flex-col">
-          <h3 className="text-white text-lg font-extrabold drop-shadow mb-0.5 truncate">
+          <h3 className="text-white text-2xl font-black drop-shadow mb-0.5 truncate">
             {vehicle.manufacturer || "Brand"}
           </h3>
-          <div className="text-zinc-200 text-base font-semibold truncate">
+          <div className="text-zinc-200 text-xl font-semibold truncate">
             {vehicle.model || "Model"}
           </div>
-          <div className="text-zinc-400 text-xs mt-1 truncate">
-            {vehicle.year || "Year"} | {vehicle.engine || "Engine"}
+          <div className="text-zinc-400 text-sm mt-1">
+            {vehicle.year || "Year"} |{" "}
+            {vehicle.horsepower + "HP" || "Horsepower"} |{" "}
+            {vehicle.engine || "Engine"}
           </div>
         </div>
 

@@ -151,15 +151,19 @@ function PostForm({
           height={36}
           className="rounded-full object-cover min-w-[36px] min-h-[36px] sm:w-10 sm:h-10"
         />
-        <textarea
-          className="flex-1 bg-transparent text-zinc-200 resize-none outline-none border-0 px-2 py-2 text-base placeholder-zinc-400"
-          rows={2}
-          placeholder="What's on your mind?"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          maxLength={500}
-          style={{ fontSize: "15px" }}
-        />
+        <div className="relative w-full">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={200}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner resize-none"
+            rows={3}
+            placeholder="What's on your mind?"
+          />
+          <span className="absolute bottom-2 right-4 text-xs text-zinc-400 select-none pointer-events-none">
+            {text.length}/200
+          </span>
+        </div>
       </div>
       {image && (
         <div className="relative w-24 h-24 sm:w-32 sm:h-32">
@@ -347,16 +351,21 @@ function PostCard({
                 </svg>
                 Edit your post
               </h2>
-              <textarea
-                className="w-full bg-zinc-800 text-zinc-100 rounded-xl p-3 border border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none text-base resize-none transition"
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                rows={5}
-                maxLength={500}
-                autoFocus
-                style={{ fontSize: "15px" }}
-                placeholder="Edit your post..."
-              />
+              <div className="relative w-full">
+                <textarea
+                  className="w-full bg-zinc-800 text-zinc-100 rounded-xl p-3 border border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none text-base resize-none transition"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  rows={5}
+                  maxLength={500}
+                  autoFocus
+                  style={{ fontSize: "15px" }}
+                  placeholder="Edit your post..."
+                />
+                <span className="absolute bottom-2 right-4 text-xs text-zinc-400 select-none pointer-events-none">
+                  {editText.length}/200
+                </span>
+              </div>
               <div className="flex justify-end gap-2 mt-2">
                 <button
                   className="cursor-pointer px-4 py-2 rounded-xl bg-zinc-700 text-white hover:bg-zinc-600 transition"
@@ -501,7 +510,7 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-67px)] flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 px-4 py-4 sm:py-8">
+    <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-gradient-to-br from-blue-900 via-zinc-900 to-zinc-800 px-4 py-4 sm:py-8">
       {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
       <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
         {postsWithAd.map((post, idx) =>

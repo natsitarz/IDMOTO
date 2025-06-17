@@ -111,7 +111,7 @@ export function ProfileHeader({
 
   return (
     <section className="w-full relative mx-auto">
-      <div className="relative h-45 sm:h-84 w-full shadow-lg flex items-end px-6 pb-6 overflow-hidden">
+      <div className="relative h-56 sm:h-84 w-full shadow-lg flex items-end px-6 pb-6 overflow-hidden">
         {/* Background image layer */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <img

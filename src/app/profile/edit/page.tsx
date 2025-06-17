@@ -13,7 +13,7 @@ export default function EditProfilePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-[calc(100vh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]">
       <div className="w-full max-w-4xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-0 flex flex-col md:flex-row items-stretch gap-0 animate-fade-in-scale relative overflow-hidden">
         {/* MOBILE MENU */}
         <div className="md:hidden w-full border-b border-zinc-800/60 bg-zinc-900/80 z-30 relative">
