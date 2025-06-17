@@ -157,7 +157,7 @@ export function ProfileHeader({
           </button>
         )}
         {/* Avatar */}
-        <div className="flex items-center z-10 relative">
+        <div className="flex items-center z-10 relative animate-fade-in-up">
           <div className="relative z-10 mr-4">
             <Image
               className="rounded-full border-4 shadow-xl border-white bg-white"
