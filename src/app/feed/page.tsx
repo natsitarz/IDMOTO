@@ -242,11 +242,14 @@ function AdPostCard() {
   const adRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    try {
-      // @ts-ignore
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (e) {
-      // ignore
+    // Inicjuj tylko jeśli <ins> jest w DOM
+    if (window && (window as any).adsbygoogle && adRef.current) {
+      try {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        // ignore
+      }
     }
   }, []);
 
@@ -255,6 +258,7 @@ function AdPostCard() {
       <span className="text-zinc-400 text-sm mb-2">Sponsored</span>
       <div className="w-full flex justify-center">
         <ins
+          ref={adRef as any}
           className="adsbygoogle"
           style={{ display: "block" }}
           data-ad-client="ca-pub-1346635526682080"
