@@ -8,6 +8,13 @@ export default function Head() {
       />
       <meta name="robots" content="index, follow" />
       <meta property="og:title" content="IDMOTO – Show off your ride!" />
+      <title>IDMOTO - Show off your ride!</title>
+      <meta
+        name="description"
+        content="Create and share your car profile with IDMOTO."
+      />
+      <meta property="og:site_name" content="IDMOTO" />
+      <meta property="og:title" content="IDMOTO – Show off your ride!" />
       <meta
         property="og:description"
         content="Create and share your car profile with IDMOTO."
