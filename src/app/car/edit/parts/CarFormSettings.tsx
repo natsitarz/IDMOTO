@@ -183,13 +183,13 @@ export default function CarFormSettings({
             </p>
             <div className="flex gap-3 w-full">
               <button
-                className="flex-1 px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
+                className="cursor-pointer flex-1 px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
                 onClick={() => setShowConfirm(false)}
               >
                 Cancel
               </button>
               <button
-                className="flex-1 px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+                className="cursor-pointer flex-1 px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
                 onClick={() => {
                   setShowConfirm(false);
                   onDeleteCar();
