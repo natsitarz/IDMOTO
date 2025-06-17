@@ -1,5 +1,7 @@
 "use client";
 
+import CarLogs from "@/app/car/parts/CarLog";
+import CarSpecs from "@/app/car/parts/CarSpecs";
 import CarActions from "@/app/parts/CarActions";
 import CarGallery from "@/app/parts/CarGallery";
 import CarInfo from "@/app/parts/CarInfo";
@@ -278,6 +280,15 @@ export default function CarPageInner() {
             handleUploadGallery={handleUploadGallery}
             handleRemovePhoto={handleRemovePhoto}
           />
+        </div>
+        {/* CarSpecs zajmuje dwie kolumny na desktopie */}
+        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 col-span-1 md:col-span-2">
+          <CarSpecs car={car} />
+        </div>
+        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 col-span-1 md:col-span-2 mb-4">
+          {carId && (
+            <CarLogs carId={carId} isOwner={user?.uid === car.userID} />
+          )}
         </div>
       </div>
     </div>

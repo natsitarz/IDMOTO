@@ -50,6 +50,10 @@ export function useCarData(user: User | null, carId: string) {
     horsepower: "",
     transmission: "",
     description: "",
+    version: "",
+    mileage: "",
+    color: "",
+    nm: "",
   });
   const [visibility, setVisibility] = useState<"public" | "private">("private");
   const [canEdit, setCanEdit] = useState(false);

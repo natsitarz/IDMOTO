@@ -7,7 +7,7 @@ import CarFormSpecs from "@/app/car/edit/parts/CarFormSpecs";
 import { db } from "@/app/parts/firebase";
 import { useAuthUser, useCarData } from "@/app/parts/useCarEditHooks";
 import { doc, updateDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function LoadingMessage() {
   return (
@@ -126,6 +126,8 @@ function NoEditPermissionMessage() {
 
 const MENU = [
   { key: "main", label: "Car Details" },
+  { key: "specs", label: "More Specs" },
+  { key: "history", label: "History" },
   { key: "settings", label: "Settings" },
 ];
 
@@ -171,6 +173,10 @@ export default function CarEditPage() {
         horsepower: form.horsepower,
         transmission: form.transmission,
         description: form.description,
+        version: form.version,
+        mileage: form.mileage,
+        color: form.color,
+        nm: form.nm,
       });
       window.dispatchEvent(
         new CustomEvent("show-global-success", { detail: "Car info updated!" })
@@ -330,7 +336,17 @@ export default function CarEditPage() {
             />
           )}
           {selected === "history" && <CarFormHistory />}
-          {selected === "specs" && <CarFormSpecs />}
+          {selected === "specs" && (
+            <CarFormSpecs
+              form={form}
+              setForm={setForm}
+              onSubmit={handleSubmit}
+              saving={saving}
+              error={error}
+              carId={carId}
+              userId={user?.uid}
+            />
+          )}
           {selected === "settings" && (
             <CarFormSettings
               carId={carId}
