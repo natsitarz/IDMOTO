@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://idmoto.vercel.app/sitemap.xml", // replace with your real domain
-    host: "https://idmoto.vercel.app", // optional, but recommended
+    sitemap: "https://idmoto.vercel.app/sitemap.xml",
+    host: "https://idmoto.vercel.app", 
   };
 }
