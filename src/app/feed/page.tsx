@@ -254,7 +254,7 @@ function AdPostCard() {
   }, []);
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 flex flex-col items-center justify-center">
+    <div className="hidden w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 flex-col items-center justify-center">
       <span className="text-zinc-400 text-sm mb-2">Sponsored</span>
       <div className="w-full flex justify-center">
         <ins
