@@ -80,6 +80,8 @@ export default function Signup() {
             sm:mr-0
             mx-auto
             sm:mx-0
+            relative
+            overflow-hidden
             "
           style={{
             minHeight: "100vh",
@@ -87,6 +89,8 @@ export default function Signup() {
             boxSizing: "border-box",
           }}
         >
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
+          <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
           {/* Top */}
           <div className="flex flex-col items-center w-full gap-8 mt-4">
             <Image

@@ -91,7 +91,7 @@ export function ProfileVehiclesSection({
   const [vehicleCount, setVehicleCount] = useState<number | null>(null);
 
   return (
-    <section className="relative w-full mx-auto flex flex-col gap-8 bg-zinc-90 shadow-2xl border border-zinc-800/70 px-6 py-10 sm:px-12 sm:py-14 items-center overflow-hidden">
+    <section className="relative w-full mx-auto flex flex-col gap-8 bg-zinc-900 shadow-2xl border border-zinc-800/70 px-6 py-10 sm:px-12 sm:py-14 items-center overflow-hidden">
       <div className="animate-fade-in-up w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 z-10">
         <div>
           <h2 className="text-3xl font-black text-white tracking-tight drop-shadow flex items-center gap-2">

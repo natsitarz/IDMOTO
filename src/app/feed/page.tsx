@@ -266,7 +266,7 @@ function PostCard({
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4">
+    <div className="w-full max-w-xl mx-auto bg-zinc-800/80 rounded-2xl shadow border border-zinc-800 mb-4 sm:mb-6 px-2 py-3 sm:px-4 sm:py-4 relative overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-2 sm:gap-3 px-0 sm:px-2 pt-1 pb-2">
         <div
