@@ -49,6 +49,13 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080"
           crossOrigin="anonymous"
         ></script>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="IDMOTO – Show off your ride!" />
+        <meta
+          name="twitter:description"
+          content="Create and share your car profile with IDMOTO."
+        />
+        <meta name="twitter:image" content="/logo.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-950 via-zinc-900 to-zinc-800`}
