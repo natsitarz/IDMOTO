@@ -245,13 +245,13 @@ function AdPostCard() {
       <div className="w-full flex justify-center">
         {/* Przykładowy kod reklamy */}
         <ins
-          className="adsbygoogle"
-          style={{ display: "block" }}
+          className="adsbygoogle block"
           data-ad-client="ca-pub-1346635526682080"
           data-ad-slot="1287338924"
           data-ad-format="auto"
           data-full-width-responsive="true"
         ></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </div>
     </div>
   );
@@ -552,6 +552,23 @@ export default function FeedPage() {
   const handleDelete = async (_post: any) => {};
   const handleEdit = () => {};
 
+  // --- Reklamy: jedna na górze jeśli <5 postów, co 5 postów jeśli >=5 ---
+  let feedItems: any[] = [];
+  if (posts.length < 5) {
+    // Jedna reklama na górze
+    feedItems = [{ isAd: true, id: "ad-top" }, ...posts];
+  } else {
+    // Reklama co 5 postów, zawsze na górze
+    feedItems = [];
+    for (let i = 0; i < posts.length; i++) {
+      // Dodaj reklamę na górze i po każdych 5 postach
+      if (i % 5 === 0) {
+        feedItems.push({ isAd: true, id: `ad-${i}` });
+      }
+      feedItems.push(posts[i]);
+    }
+  }
+
   return (
     <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-zinc-900 px-4 py-4 sm:py-8">
       {userLoading ? (
@@ -563,9 +580,7 @@ export default function FeedPage() {
           Log in to add a post. You can still read posts below!
         </div>
       )}
-      <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
-        {/* Sponsored ad at the top */}
-        <AdPostCard key="ad-top" />
+      <div className="w-full max-w-md sm:max-w-2xl flex flex-col items-center justify-center gap-3 sm:gap-4">
         {postsLoading ? (
           <div className="text-zinc-400">Loading posts...</div>
         ) : postsError ? (
@@ -573,18 +588,22 @@ export default function FeedPage() {
         ) : posts.length === 0 ? (
           <div className="text-zinc-400">No posts yet.</div>
         ) : (
-          posts.map((item) => (
-            <PostCard
-              key={item.id}
-              post={item}
-              onLike={() => handleLike(item)}
-              onDelete={() => {}}
-              onEdit={handleEdit}
-              isOwn={currentUser ? item.userId === currentUser.uid : false}
-              currentUser={currentUser}
-              showLike={!!currentUser}
-            />
-          ))
+          feedItems.map((item) =>
+            item.isAd ? (
+              <AdPostCard key={item.id} />
+            ) : (
+              <PostCard
+                key={item.id}
+                post={item}
+                onLike={() => handleLike(item)}
+                onDelete={() => {}}
+                onEdit={handleEdit}
+                isOwn={currentUser ? item.userId === currentUser.uid : false}
+                currentUser={currentUser}
+                showLike={!!currentUser}
+              />
+            )
+          )
         )}
       </div>
     </div>
