@@ -28,12 +28,17 @@ import React, { useEffect, useRef, useState } from "react";
 
 function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const auth = getAuth();
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
     return unsub;
   }, []);
-  return user;
+  return { user, loading };
 }
 
 function AcceptModal({
@@ -480,20 +485,37 @@ function PostCard({
 }
 
 export default function FeedPage() {
-  const currentUser = useCurrentUser();
+  const { user: currentUser, loading: userLoading } = useCurrentUser();
   const [posts, setPosts] = useState<any[]>([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState<string | null>(null);
 
   useEffect(() => {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setPosts(
-        snap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
+    setPostsLoading(true);
+    setPostsError(null);
+    try {
+      const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+      const unsub = onSnapshot(
+        q,
+        (snap) => {
+          setPosts(
+            snap.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+          );
+          setPostsLoading(false);
+        },
+        (error) => {
+          setPostsError("Failed to load posts.");
+          setPostsLoading(false);
+        }
       );
-    });
-    return unsub;
+      return unsub;
+    } catch (e) {
+      setPostsError("Failed to load posts.");
+      setPostsLoading(false);
+    }
   }, []);
 
   const handleLike = async (post: any) => {
@@ -516,20 +538,36 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-[calc(100dvh-67px)] flex flex-col items-center bg-zinc-900 px-4 py-4 sm:py-8">
-      {currentUser && <PostForm onPost={() => {}} currentUser={currentUser} />}
+      {userLoading ? (
+        <div className="text-zinc-400 mb-4">Loading user...</div>
+      ) : currentUser ? (
+        <PostForm onPost={() => {}} currentUser={currentUser} />
+      ) : (
+        <div className="text-zinc-400 mb-4">
+          Log in to add a post. You can still read posts below!
+        </div>
+      )}
       <div className="w-full max-w-md sm:max-w-2xl flex flex-col gap-3 sm:gap-4">
-        {postsWithAd.map((post, idx) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            onLike={() => handleLike(post)}
-            onDelete={() => {}}
-            onEdit={handleEdit}
-            isOwn={currentUser ? post.userId === currentUser.uid : false}
-            currentUser={currentUser}
-            showLike={!!currentUser}
-          />
-        ))}
+        {postsLoading ? (
+          <div className="text-zinc-400">Loading posts...</div>
+        ) : postsError ? (
+          <div className="text-red-400">{postsError}</div>
+        ) : postsWithAd.length === 0 ? (
+          <div className="text-zinc-400">No posts yet.</div>
+        ) : (
+          postsWithAd.map((post, idx) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onLike={() => handleLike(post)}
+              onDelete={() => {}}
+              onEdit={handleEdit}
+              isOwn={currentUser ? post.userId === currentUser.uid : false}
+              currentUser={currentUser}
+              showLike={!!currentUser}
+            />
+          ))
+        )}
       </div>
     </div>
   );
