@@ -3,7 +3,7 @@ import "../globals.css";
 import Navbar from "../parts/navbar";
 
 export const metadata: Metadata = {
-  title: "IDMOTO | Profile",
+  title: "Profile",
   description: "Show the world your dream car",
 };
 

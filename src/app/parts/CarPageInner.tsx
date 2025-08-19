@@ -67,7 +67,7 @@ export default function CarPageInner() {
         }
         carData.gallery = await fetchGallery(carId);
         setCar(carData);
-        document.title = `IDMOTO | ${carData.manufacturer} ${carData.model}`;
+        document.title = `${carData.manufacturer} ${carData.model} | IDMOTO`;
       } else {
         setError("Couldn't find car. Check ID");
       }

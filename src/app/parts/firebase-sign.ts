@@ -51,6 +51,14 @@ export const addUserToDB = async (user: any) => {
         email: user.email,
         photoURL: user.photoURL,
         postCreatedAt: null,
+        joinedAt:  new Date().toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    }),
+        createdAt: new Date().toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    }),
       });
     }
     // REMOVE window.location.href from here!

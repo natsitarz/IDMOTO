@@ -1,4 +1,5 @@
 "use client";
+
 import { auth } from "@/app/parts/firebase";
 import {
   addUserToDB,
@@ -8,152 +9,196 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export default function Signup() {
+export default function HomePage() {
   const router = useRouter();
   const [user, setUser] = useState(auth.currentUser);
-
-  // Detect mobile for background video
+  const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
+  // Handle redirect results on mount
   useEffect(() => {
-    redirectResults();
+    const handleRedirect = async () => {
+      try {
+        await redirectResults();
+      } catch (error) {
+        console.error("Redirect result error:", error);
+      }
+    };
+    handleRedirect();
   }, []);
 
+  // Auth state listener with proper cleanup
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        await addUserToDB(firebaseUser);
-        router.replace(`/feed`);
+        try {
+          await addUserToDB(firebaseUser);
+          router.replace("/feed");
+        } catch (error) {
+          console.error("Error adding user to DB:", error);
+        }
       }
     });
     return () => unsubscribe();
   }, [router]);
 
+  // Mobile detection with debounced resize
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth <= 768);
+      }, 100);
     };
+
+    // Initial check
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
-  const handleGoogleSignIn = () => {
-    googleSignIn();
-  };
+  const handleGoogleSignIn = useCallback(async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      await googleSignIn();
+    } catch (error) {
+      console.error("Sign in error:", error);
+      // You could add a toast notification here
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading]);
+
+  const handleVideoError = useCallback(() => {
+    setVideoError(true);
+  }, []);
 
   return (
-    <div className="relative min-h-[calc(100dvh-67px)] w-full flex items-center justify-center overflow-hidden">
-      {/* Video background */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        key={isMobile ? "mobile" : "desktop"}
-      >
-        <source
-          src={isMobile ? "/mobile-bg.mp4" : "/login-bg.mp4"}
-          type="video/mp4"
-        />
-        {/* fallback for browsers that don't support video */}
-      </video>
+    <div className="relative min-h-[calc(100dvh)] w-full flex items-center justify-center overflow-hidden bg-zinc-900">
+      {/* Video background with fallback */}
+      {!videoError ? (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          onError={handleVideoError}
+          preload="metadata"
+        >
+          <source
+            src={isMobile ? "/mobile-bg.mp4" : "/login-bg.mp4"}
+            type="video/mp4"
+          />
+        </video>
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-900 via-zinc-900 to-cyan-900 z-0" />
+      )}
+
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 z-10" />
+
       {/* Content */}
       <div className="relative z-20 flex flex-1 items-center justify-center sm:justify-start w-full">
-        <aside
-          className="
-            w-full sm:w-[400px] h-full sm:h-screen
-            flex flex-col
-            justify-between
-            items-center
-            sm:bg-zinc-900/80
-            bg-zinc-900/70
-            border-none
-            p-8 sm:p-12
-            shadow-none
-            transition-all
-            sm:mr-0
-            mx-auto
-            sm:mx-0
-            relative
-            overflow-hidden
-            "
-          style={{
-            minHeight: "100vh",
-            maxWidth: "100vw",
-            boxSizing: "border-box",
-          }}
-        >
-          <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
-          <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
-          {/* Top */}
-          <div className="flex flex-col items-center w-full gap-8 mt-4">
+        <main className="w-full sm:w-[400px] min-h-screen sm:h-screen flex flex-col justify-between items-center sm:bg-zinc-900/80 bg-zinc-900/70 p-8 sm:p-12 shadow-2xl transition-all mx-auto sm:mx-0 relative overflow-hidden backdrop-blur-sm">
+          {/* Decorative elements */}
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
+          <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none animate-pulse" />
+
+          {/* Header */}
+          <header className="flex flex-col items-center w-full gap-8 mt-4 relative z-10">
             <Image
               src="/logo.png"
-              alt="IDMOTO logo"
+              alt="IDMOTO - Car Social Network"
               width={340}
               height={38}
               priority
-              className="mb-2"
+              className="mb-2 transition-transform hover:scale-105"
             />
-            <h1 className="text-xl font-extrabold text-white tracking-tight text-center">
+            <h1 className="text-xl font-extrabold text-white tracking-tight text-center bg-gradient-to-r from-white to-zinc-300 bg-clip-text">
               Show off your ride!
             </h1>
-          </div>
-          {/* Center */}
-          <div className="flex flex-col items-center w-full gap-6 flex-1 justify-center">
+            <p className="text-zinc-400 text-center text-sm leading-relaxed">
+              Join the ultimate car community. Share your passion, connect with
+              enthusiasts, and showcase your automotive journey.
+            </p>
+          </header>
+
+          {/* Sign in section */}
+          <section className="flex flex-col items-center w-full gap-6 flex-1 justify-center relative z-10">
             <button
-              id="google-sign-in"
               onClick={handleGoogleSignIn}
-              className="cursor-pointer w-full flex items-center justify-center gap-3 rounded-full bg-white text-zinc-900 font-semibold text-base h-12 px-4 shadow transition
-    hover:bg-zinc-100 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/30 active:scale-100"
-              rel="noopener noreferrer"
+              disabled={isLoading}
+              className="cursor-pointer w-full flex items-center justify-center gap-3 rounded-full bg-white text-zinc-900 font-semibold text-base h-12 px-4 shadow-lg transition-all duration-200 hover:bg-zinc-100 hover:shadow-xl hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-blue-400/50 active:scale-100 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+              aria-label="Sign in with Google"
             >
-              <Image
-                aria-hidden
-                className="invert-0"
-                src="/google.png"
-                alt="Google icon"
-                width={22}
-                height={22}
-              />
-              <span>Login with Google</span>
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-zinc-400 border-t-zinc-600 rounded-full animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <Image
+                    src="/google.png"
+                    alt="Google"
+                    width={22}
+                    height={22}
+                    className="transition-transform group-hover:scale-110"
+                  />
+                  <span>Continue with Google</span>
+                </>
+              )}
             </button>
-          </div>
-          {/* Bottom */}
-          <footer className="w-full flex gap-6 flex-wrap items-center justify-center text-zinc-400 text-sm border-t border-white/10 pt-6 mt-4">
+
+            <div className="text-zinc-400 text-xs text-center">
+              By continuing, you agree to our Terms of Service and Privacy
+              Policy
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="w-full flex gap-6 flex-wrap items-center justify-center text-zinc-400 text-sm border-t border-white/10 pt-6 mt-4 relative z-10">
             <a
-              className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-              href="./about"
+              className="flex items-center gap-2 hover:underline hover:underline-offset-4 hover:text-white transition-colors"
+              href="/about"
               rel="noopener noreferrer"
             >
-              <Image src="/globe.svg" alt="Globe icon" width={16} height={16} />
+              <Image src="/globe.svg" alt="" width={16} height={16} />
               About
             </a>
-            <span className="">|</span>
+            <span className="text-zinc-600">|</span>
             <a
-              className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+              className="flex items-center gap-2 hover:underline hover:underline-offset-4 hover:text-white transition-colors"
               href="https://discord.gg/3bh6wuQxNY"
+              target="_blank"
               rel="noopener noreferrer"
             >
               <Image
                 className="invert"
                 src="/discord.png"
-                alt="Discord icon"
+                alt=""
                 width={16}
                 height={16}
               />
               Discord
             </a>
-            <span className="inline sm:hidden">|</span>
-            <span>IDMOTO 2025©</span>
+            <span className="text-zinc-600 inline sm:hidden">|</span>
+            <span className="text-zinc-500">IDMOTO 2025©</span>
           </footer>
-        </aside>
+        </main>
       </div>
     </div>
   );

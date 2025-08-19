@@ -16,7 +16,7 @@ import {
 } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { FiMoreVertical } from "react-icons/fi";
+import { FiMoreVertical, FiStar } from "react-icons/fi";
 import { db, storage } from "./firebase";
 
 // Zmieniona funkcja: przyjmuje isOwnProfile i filtruje visibility

@@ -111,7 +111,7 @@ export function ProfileHeader({
 
   return (
     <section className="w-full relative">
-      <div className="relative h-56 sm:h-84 w-full shadow-lg flex items-center justify-center px-2 sm:px-4 overflow-hidden">
+      <div className="relative h-56 sm:h-84 w-full shadow-lg flex items-center justify-center px-2 sm:px-4 overflow-hidden rounded-3xl">
         {/* Background image layer */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <img
@@ -173,13 +173,6 @@ export function ProfileHeader({
             <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
               {safeDisplayName}
             </span>
-            <span className="block text-xs uppercase text-zinc-400 tracking-widest">
-              {country ? (
-                <span className="text-zinc-200">{country}</span>
-              ) : (
-                <span className="italic text-zinc-500">No country set</span>
-              )}
-            </span>
             {/* Bio */}
             <div className="w-full max-w-xl mt-2">
               <span className="text-xs text-zinc-400 font-semibold mb-1 block">
@@ -223,25 +216,6 @@ export function ProfileHeader({
                   ref={menuRef}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button
-                    className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide border-b border-zinc-800"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      onEdit && onEdit();
-                    }}
-                  >
-                    <svg
-                      className="w-5 h-5 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" />
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 8.6a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 15z" />
-                    </svg>
-                    Edit profile
-                  </button>
                   <button
                     className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide border-b border-zinc-800"
                     onClick={() => {
