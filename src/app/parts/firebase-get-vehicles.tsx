@@ -2,7 +2,6 @@
 
 import {
   collection,
-  deleteDoc,
   doc,
   getDocs,
   orderBy,
@@ -10,16 +9,11 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import {
-  deleteObject,
-  getDownloadURL,
-  listAll,
-  ref as storageRef,
-} from "firebase/storage";
+import { getDownloadURL, ref as storageRef } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiEdit3, FiMoreVertical, FiTrash2 } from "react-icons/fi";
+import { FiEdit3, FiMoreVertical } from "react-icons/fi";
 import { db, storage } from "./firebase";
 
 // Enhanced function: accepts isOwnProfile and filters visibility
@@ -151,63 +145,6 @@ function EmptyVehiclesState({ isOwnProfile }: { isOwnProfile: boolean }) {
           Add Your First Vehicle
         </button>
       )}
-    </div>
-  );
-}
-
-// Enhanced delete confirmation modal
-function DeleteConfirmModal({
-  isOpen,
-  onClose,
-  onConfirm,
-  vehicleName,
-  isDeleting,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  vehicleName: string;
-  isDeleting: boolean;
-}) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[999998] flex items-center justify-center bg-black/60 backdrop-blur-md px-4 animate-fade-in">
-      <div className="bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md border border-white/20 animate-scale-in">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-            <FiTrash2 className="w-5 h-5 text-red-400" />
-          </div>
-          <h2 className="text-xl font-bold text-white">Delete Vehicle</h2>
-        </div>
-
-        <p className="text-zinc-300 mb-6 leading-relaxed">
-          Are you sure you want to delete{" "}
-          <span className="font-semibold text-white">{vehicleName}</span>? This
-          action cannot be undone and will remove all associated photos and
-          data.
-        </p>
-
-        <div className="flex gap-3">
-          <button
-            className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-zinc-700 text-white hover:bg-zinc-600 font-medium transition-all disabled:opacity-50"
-            onClick={onClose}
-            disabled={isDeleting}
-          >
-            Cancel
-          </button>
-          <button
-            className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white hover:bg-red-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            onClick={onConfirm}
-            disabled={isDeleting}
-          >
-            {isDeleting && (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            )}
-            {isDeleting ? "Deleting..." : "Delete Forever"}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
@@ -484,7 +421,7 @@ function VehicleCard({
           detail: "Photo alignment saved successfully!",
         })
       );
-    } catch (error) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to save alignment. Please try again.",
@@ -791,8 +728,8 @@ export const VehiclesListDiv: React.FC<{
           background: linear-gradient(
             to right,
             #3b82f6 0%,
-            #3b82f6 ${(props) => props.value || 50}%,
-            #374151 ${(props) => props.value || 50}%,
+            #3b82f6 50%,
+            #374151 50%,
             #374151 100%
           );
         }
