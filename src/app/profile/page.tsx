@@ -99,165 +99,12 @@ function ProfileSkeleton() {
   );
 }
 
-// Enhanced AI Assistant with better mobile responsiveness
-function AIAssistantCard({
-  isOwnProfile,
-  userName,
-}: {
-  isOwnProfile: boolean;
-  userName: string;
-}) {
-  const [input, setInput] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [suggestions] = useState([
-    "How to maintain my BMW engine?",
-    "Should I upgrade my suspension?",
-    "Best tires for daily driving?",
-    "How often should I change oil?",
-  ]);
-  const router = useRouter();
-
-  const handleAsk = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (isLoading) return;
-
-      setIsLoading(true);
-
-      // Simulate loading for better UX
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      if (!input.trim()) {
-        router.push("/ai");
-      } else {
-        router.push(`/ai?question=${encodeURIComponent(input)}`);
-      }
-
-      setIsLoading(false);
-    },
-    [input, router, isLoading]
-  );
-
-  const handleSuggestionClick = useCallback((suggestion: string) => {
-    setInput(suggestion);
-    setIsExpanded(false);
-  }, []);
-
-  return (
-    <section className="group" aria-labelledby="ai-assistant-heading">
-      <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl p-0.5 hover:from-blue-500/20 hover:to-purple-500/20 transition-all duration-700">
-        <div className="bg-zinc-950/90 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-white/10 hover:border-white/20 transition-all duration-500">
-          {/* Responsive header */}
-          <header className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="relative">
-              <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 transition-transform hover:scale-105">
-                <svg
-                  className="w-6 sm:w-7 h-6 sm:h-7 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.847a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.847.813a4.5 4.5 0 0 0-3.09 3.09Z"
-                  />
-                </svg>
-              </div>
-              <div className="absolute -top-1 -right-1 w-3 sm:w-4 h-3 sm:h-4 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h2
-                id="ai-assistant-heading"
-                className="text-xl sm:text-2xl font-bold text-white mb-1 truncate"
-              >
-                AI Assistant
-              </h2>
-              <p className="text-zinc-400 text-sm truncate">
-                {isOwnProfile
-                  ? "Get personalized automotive advice"
-                  : `Ask ${userName} about cars`}
-              </p>
-            </div>
-          </header>
-
-          {/* Enhanced input form with better mobile UX */}
-          <form onSubmit={handleAsk} className="space-y-4 sm:space-y-6">
-            <div className="relative group">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onFocus={() => setIsExpanded(true)}
-                onBlur={() => setTimeout(() => setIsExpanded(false), 200)}
-                placeholder={
-                  isOwnProfile
-                    ? "Ask about your vehicles..."
-                    : `Ask ${userName} about cars...`
-                }
-                className="w-full bg-white/5 border border-white/20 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 pr-14 sm:pr-16 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-white/10 transition-all text-base sm:text-lg backdrop-blur-sm hover:bg-white/10"
-                aria-label="Ask AI assistant"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="cursor-pointer absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center hover:shadow-xl hover:shadow-blue-500/25 hover:scale-105 transition-all duration-300 group/btn disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
-                aria-label="Send question"
-              >
-                {isLoading ? (
-                  <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <svg
-                    className="w-4 sm:w-5 h-4 sm:h-5 text-white group-hover/btn:scale-110 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
-
-            {/* Responsive suggestions grid */}
-            {isExpanded && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                {suggestions.map((suggestion, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="cursor-pointer text-left p-3 sm:p-4 bg-white/5 hover:bg-white/10 rounded-xl text-sm text-zinc-300 hover:text-white transition-all border border-white/10 hover:border-white/20 backdrop-blur-sm"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            )}
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // Enhanced Profile Overview with better loading states
 function ProfileOverview({
   uid,
-  profileData,
   isOwnProfile,
 }: {
   uid: string;
-  profileData: ProfileData;
   isOwnProfile: boolean;
 }) {
   const [overview, setOverview] = useState({
@@ -801,7 +648,8 @@ function ProfileNotFound() {
           Profile Not Found
         </h1>
         <p className="text-zinc-400 mb-8 sm:mb-10 leading-relaxed text-base sm:text-lg px-2">
-          The profile you're looking for doesn't exist or has been removed.
+          The profile you&apos;re looking for doesn&apos;t exist or has been
+          removed.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <button
@@ -925,7 +773,7 @@ function ProfileInner() {
             detail: "Bio updated successfully!",
           })
         );
-      } catch (error) {
+      } catch {
         window.dispatchEvent(
           new CustomEvent("show-global-error", {
             detail: "Failed to update bio",
@@ -1030,11 +878,7 @@ function ProfileInner() {
 
           {/* Enhanced Profile Overview with staggered animations */}
           <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-            <ProfileOverview
-              uid={profileUid}
-              profileData={profileData}
-              isOwnProfile={isOwnProfile}
-            />
+            <ProfileOverview uid={profileUid} isOwnProfile={isOwnProfile} />
           </div>
 
           {/* Main Content Grid with responsive spacing */}
@@ -1079,30 +923,24 @@ function ProfileInner() {
                   Profile Info
                 </h2>
                 <div className="space-y-3 sm:space-y-4">
-                  {profileData.country && (
-                    <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 transition-all hover:border-white/20">
-                      <span className="text-base sm:text-lg">📍</span>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-zinc-400 text-xs">Location</div>
-                        <div className="text-white font-medium text-sm truncate">
-                          {profileData.country || "Unknown"}
-                        </div>
+                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 transition-all hover:border-white/20">
+                    <span className="text-base sm:text-lg">📍</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-zinc-400 text-xs">Location</div>
+                      <div className="text-white font-medium text-sm truncate">
+                        {profileData?.country || "Unknown"}
                       </div>
                     </div>
-                  )}
-                  {profileData.joinedAt && (
-                    <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 transition-all hover:border-white/20">
-                      <span className="text-base sm:text-lg">📅</span>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-zinc-400 text-xs">
-                          Member since
-                        </div>
-                        <div className="text-white font-medium text-sm truncate">
-                          {profileData?.joinedAt}
-                        </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 transition-all hover:border-white/20">
+                    <span className="text-base sm:text-lg">📅</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-zinc-400 text-xs">Member since</div>
+                      <div className="text-white font-medium text-sm truncate">
+                        {profileData?.joinedAt || "Unknown"}
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               </section>
 

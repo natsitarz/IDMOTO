@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { VehiclesListDiv } from "../parts/firebase-get-vehicles";
 
 interface ProfileVehiclesSectionProps {
@@ -15,71 +15,6 @@ function VehiclesMessage({ vehicleCount }: { vehicleCount: number | null }) {
         ? "It's time to add your first car!"
         : "Maybe it's time to add another car?"}
     </p>
-  );
-}
-
-function VehiclesAddButton({
-  vehicleCount,
-  letsAdd,
-}: {
-  vehicleCount: number | null;
-  letsAdd?: () => void;
-}) {
-  // Mobile detection (Tailwind: sm = 640px)
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  if (vehicleCount === null || !letsAdd) return null;
-
-  // Mobile: floating "+" button
-  if (isMobile) {
-    return (
-      <button
-        className="absolute right-4 z-20 h-10 w-10 flex items-center justify-center transition-all duration-200 bg-zinc-900/80 hover:bg-zinc-700/90 text-white font-semibold rounded-lg shadow-lg focus:outline-none focus:ring-blue-500/70 cursor-pointer"
-        onClick={letsAdd}
-        type="button"
-        aria-label="Add vehicle"
-      >
-        <svg
-          className="w-7 h-7"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.5}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 5v14m7-7H5"
-          />
-        </svg>
-      </button>
-    );
-  }
-
-  // Desktop: regular button
-  return (
-    <button
-      className="flex items-center justify-center gap-3 bg-zinc-800/80 hover:bg-zinc-700/90 text-white font-semibold rounded-lg px-4 py-2 shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/70 cursor-pointer"
-      onClick={letsAdd}
-      type="button"
-      style={{ maxWidth: 260 }}
-    >
-      <svg
-        className="w-5 h-5 text-blue-300"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-      </svg>
-    </button>
   );
 }
 
@@ -105,7 +40,7 @@ export function ProfileVehiclesSection({
           {letsAdd && <VehiclesMessage vehicleCount={vehicleCount} />}
         </div>
       </div>
-      <div className="w-full flex flex-wrap gap-6 justify-center sm:justify-start items-stretch min-h-[200px] z-10">
+      <div className="w-full flex flex-wrap gap-6 justify-center sm:justify-center items-stretch min-h-[200px] z-10">
         {uid ? (
           <VehiclesListDiv
             userId={uid}

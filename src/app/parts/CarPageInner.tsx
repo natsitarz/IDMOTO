@@ -12,7 +12,7 @@ import {
   uploadPhoto,
 } from "@/app/parts/firebase-customize-vehicle";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import {
   deleteObject,
   getDownloadURL,
@@ -22,7 +22,6 @@ import {
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import CarError from "./CarError";
 
 // Enhanced Loading Components
 function HeroSkeleton() {
@@ -31,12 +30,12 @@ function HeroSkeleton() {
       <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50" />
 
       {/* Action button skeleton */}
-      <div className="absolute top-4 right-6">
+      <div className="absolute top-4 right-6 z-10">
         <div className="w-10 h-10 bg-white/10 rounded-full animate-pulse" />
       </div>
 
       {/* Content skeleton */}
-      <div className="relative p-8 w-full">
+      <div className="relative p-8 w-full z-10">
         <div className="space-y-3 mb-4">
           <div className="h-8 bg-white/20 rounded w-64 animate-pulse" />
           <div className="h-4 bg-white/15 rounded w-48 animate-pulse" />
@@ -184,7 +183,7 @@ function ComprehensiveCarLoading() {
       </div>
 
       {/* Loading indicator */}
-      <div className="fixed bottom-6 right-6 bg-zinc-800/90 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl animate-fade-in">
+      <div className="fixed bottom-6 right-6 bg-zinc-800/90 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl animate-fade-in z-[50]">
         <div className="w-5 h-5 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
         <span className="text-white text-sm font-medium">
           Loading vehicle...
@@ -283,9 +282,7 @@ export default function CarPageInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [editingDesc, setEditingDesc] = useState(false);
   const [descValue, setDescValue] = useState("");
-  const [savingDesc, setSavingDesc] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
   async function fetchGallery(carId: string): Promise<string[]> {
@@ -322,7 +319,7 @@ export default function CarPageInner() {
       } else {
         setError("Vehicle not found. Please check the ID and try again.");
       }
-    } catch (err) {
+    } catch {
       setError(
         "Failed to load vehicle data. Please check your connection and try again."
       );
@@ -370,35 +367,6 @@ export default function CarPageInner() {
     await handlePhotoUpload(file, letsAddPhoto);
   };
 
-  const handleSaveDescription = async () => {
-    if (descValue.length > 20) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-error", {
-          detail: "Description should be no longer than 20 characters.",
-        })
-      );
-      return;
-    }
-    setSavingDesc(true);
-    try {
-      await updateDoc(doc(db, "vehicles", car.id), { description: descValue });
-      setCar({ ...car, description: descValue });
-      setEditingDesc(false);
-    } catch (e) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-error", {
-          detail: "Failed to update description.",
-        })
-      );
-    }
-    window.dispatchEvent(
-      new CustomEvent("show-global-success", {
-        detail: "Description updated successfully!",
-      })
-    );
-    setSavingDesc(false);
-  };
-
   const handleRemovePhoto = async (url: string) => {
     try {
       const u = new URL(url);
@@ -419,7 +387,7 @@ export default function CarPageInner() {
         const updatedGallery = await fetchGallery(carId);
         setCar((prev: any) => ({ ...prev, gallery: updatedGallery }));
       }
-    } catch (err) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to remove photo.",
@@ -483,15 +451,12 @@ export default function CarPageInner() {
   }
 
   // Check privacy permissions
-  if (
-    !user ||
-    (user && user.uid !== car.userID && car.visibility === "private")
-  ) {
+  if (user && user.uid !== car.userID && car.visibility === "private") {
     return <PrivateCarMessage />;
   }
 
   return (
-    <div className="relative min-h-[calc(100dvh-67px)] bg-zinc-900 flex flex-col items-center font-[family-name:var(--font-geist-sans)]">
+    <div className="relative min-h-[calc(100dvh-67px)] bg-zinc-900 flex flex-col items-center font-[family-name:var(--font-geist-sans)] px-4">
       {/* Hero Section */}
       <div className="animate-fade-in-opacity relative w-full h-96 max-h-[420px] flex items-end justify-start overflow-hidden rounded-b-3xl shadow-xl mb-4">
         <Image
@@ -502,11 +467,13 @@ export default function CarPageInner() {
           height={420}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent" />
-        {/* Edit button in top-right */}
-        <div className="absolute top-4 right-6">
+
+        {/* Edit button in top-right with standard z-index */}
+        <div className="absolute top-4 right-6 z-[40]">
           <CarActions car={car} user={user} handleUpload={handleUpload} />
         </div>
-        <div className="relative p-8">
+
+        <div className="relative p-8 z-10">
           <h1 className="text-3xl font-black text-white drop-shadow">
             {car.manufacturer} <span className="font-black">{car.model}</span>
           </h1>
@@ -530,11 +497,11 @@ export default function CarPageInner() {
       </div>
 
       <div className="animate-fade-in-up w-full px-4 grid gap-8 grid-cols-1 md:grid-cols-2">
-        <div className="rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6">
+        <div className="rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 z-[10]">
           <CarInfo car={car} />
           <CarMeta car={car} user={user} />
         </div>
-        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6">
+        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 z-[10]">
           <CarGallery
             car={car}
             user={user}
@@ -544,10 +511,10 @@ export default function CarPageInner() {
           />
         </div>
         {/* CarSpecs spans two columns on desktop */}
-        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 col-span-1 md:col-span-2">
+        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 col-span-1 md:col-span-2 z-[10]">
           <CarSpecs car={car} />
         </div>
-        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 col-span-1 md:col-span-2 mb-4">
+        <div className="animate-fade-in-up rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 col-span-1 md:col-span-2 mb-4 z-[10]">
           {carId && (
             <CarLogs carId={carId} isOwner={user?.uid === car.userID} />
           )}

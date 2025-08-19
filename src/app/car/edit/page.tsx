@@ -6,7 +6,7 @@ import CarFormSettings from "@/app/car/edit/parts/CarFormSettings";
 import CarFormSpecs from "@/app/car/edit/parts/CarFormSpecs";
 import { db } from "@/app/parts/firebase";
 import { useAuthUser, useCarData } from "@/app/parts/useCarEditHooks";
-import { doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 
 function LoadingMessage() {
@@ -150,9 +150,8 @@ export default function CarEditPage() {
   const [visibility, setVisibility] = useState<"public" | "private">("private");
 
   const deleteCar = async () => {
-    // Implement car deletion logic here or import from elsewhere
-    // For now, just a placeholder
-    throw new Error("deleteCar not implemented");
+    if (!carId) throw new Error("Car ID is required to delete a car.");
+    await deleteDoc(doc(db, "vehicles", carId));
   };
 
   const [saving, setSaving] = useState(false);

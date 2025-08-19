@@ -3,6 +3,8 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { FiEdit3, FiImage, FiMove, FiX } from "react-icons/fi";
 
 interface ProfileHeaderProps {
   displayName: string;
@@ -18,21 +20,250 @@ interface ProfileHeaderProps {
   backgroundPicUrl?: string;
 }
 
+// Enhanced Background Alignment Modal Component
+function BackgroundAlignmentModal({
+  isOpen,
+  onClose,
+  onSave,
+  backgroundUrl,
+  bgAlign,
+  setBgAlign,
+  saving,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  backgroundUrl: string;
+  bgAlign: number;
+  setBgAlign: (value: number) => void;
+  saving: boolean;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  if (!isOpen || !mounted) return null;
+
+  const modalContent = (
+    <>
+      {/* Fullscreen blurred backdrop */}
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999998]"
+        onClick={onClose}
+      />
+
+      {/* Modal content */}
+      <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+        <div className="w-full max-w-5xl mx-auto bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 animate-scale-in overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                <FiMove className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">
+                  Align Background Photo
+                </h2>
+                <p className="text-sm text-zinc-400">
+                  Adjust the vertical position of your background image
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="cursor-pointer w-10 h-10 rounded-full bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-400 hover:text-white transition-all flex items-center justify-center"
+            >
+              <FiX className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Main content */}
+          <div className="p-6">
+            {/* Header preview - exact same dimensions as real header */}
+            <div className="flex justify-center mb-8">
+              <div className="relative h-56 sm:h-84 w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl border border-zinc-700 group">
+                {/* Background image with alignment */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center cursor-grab active:cursor-grabbing transition-all duration-300"
+                  style={{
+                    backgroundImage: `url(${backgroundUrl})`,
+                    backgroundPosition: `center ${bgAlign}%`,
+                  }}
+                  onMouseDown={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const startY = e.clientY;
+                    const startAlign = bgAlign;
+                    let dragging = true;
+
+                    const onMouseMove = (moveEvent: MouseEvent) => {
+                      if (!dragging) return;
+                      const deltaY = moveEvent.clientY - startY;
+                      const percentDelta = (deltaY / rect.height) * 100;
+                      const newAlign = Math.max(
+                        0,
+                        Math.min(100, startAlign + percentDelta)
+                      );
+                      setBgAlign(newAlign);
+                    };
+
+                    const onMouseUp = () => {
+                      dragging = false;
+                      window.removeEventListener("mousemove", onMouseMove);
+                      window.removeEventListener("mouseup", onMouseUp);
+                    };
+
+                    window.addEventListener("mousemove", onMouseMove);
+                    window.addEventListener("mouseup", onMouseUp);
+                  }}
+                />
+
+                {/* Gradient overlay - same as real header */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(20,20,30,1) 0%, rgba(20,20,30,0.7) 40%, rgba(20,20,30,0.0) 100%)",
+                  }}
+                />
+
+                {/* Sample avatar and content to show positioning context */}
+                <div className="absolute bottom-0 left-0 right-0 flex items-center z-10 p-8">
+                  <div className="relative mr-4">
+                    <div className="w-[102px] h-[102px] rounded-full border-4 border-white bg-zinc-800 flex items-center justify-center">
+                      <svg
+                        className="w-12 h-12 text-zinc-400"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-end">
+                    <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
+                      Profile Preview
+                    </span>
+                    <div className="w-full max-w-xl mt-2">
+                      <span className="text-xs text-zinc-400 font-semibold mb-1 block">
+                        Bio
+                      </span>
+                      <span className="text-zinc-200 text-xs">
+                        Drag image above to adjust position
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Alignment indicator */}
+                <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white font-medium border border-white/20">
+                  Position: {Math.round(bgAlign)}%
+                </div>
+
+                {/* Hover effect */}
+                <div className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-500/50 transition-all duration-300" />
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="text-center mb-6">
+              <p className="text-zinc-300 text-sm">
+                <strong>Drag the preview above</strong> or use the slider below
+                to adjust the vertical position
+              </p>
+              <p className="text-zinc-500 text-xs mt-1">
+                0% = Top of image • 50% = Center • 100% = Bottom of image
+              </p>
+            </div>
+
+            {/* Slider control */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-zinc-300">
+                  Vertical Position
+                </label>
+                <span className="text-blue-400 font-medium text-sm">
+                  {Math.round(bgAlign)}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={bgAlign}
+                onChange={(e) => setBgAlign(Number(e.target.value))}
+                className="w-full h-3 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <div className="flex justify-between text-xs text-zinc-500 mt-2">
+                <span>Top</span>
+                <span>Center</span>
+                <span>Bottom</span>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-4">
+              <button
+                className="cursor-pointer flex-1 px-6 py-3 rounded-2xl bg-zinc-700 text-white hover:bg-zinc-600 font-medium transition-all disabled:opacity-50"
+                onClick={onClose}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button
+                className="cursor-pointer flex-1 px-6 py-3 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                disabled={saving}
+                onClick={onSave}
+              >
+                {saving && (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                )}
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  return createPortal(modalContent, document.body);
+}
+
 export function ProfileHeader({
   displayName,
   photoURL,
   uid,
-  country,
   bio,
-  onEdit,
-  onSaveBio,
   isOwnProfile,
 }: ProfileHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showAlignModal, setShowAlignModal] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [bgAlign, setBgAlign] = useState<number>(50); // 0 = top, 100 = bottom, 50 = center
   const [bgUrl, setBgUrl] = useState<string | undefined>(undefined);
+  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const editButtonRef = useRef<HTMLButtonElement>(null);
@@ -42,6 +273,11 @@ export function ProfileHeader({
     displayName && displayName !== "Loading…" ? displayName : "No name";
   const safePhotoURL =
     photoURL && photoURL !== "/logo.png" ? photoURL : "/logo.png";
+
+  // Handle mounting for portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!uid) return;
@@ -95,13 +331,13 @@ export function ProfileHeader({
       setBgUrl(url);
       window.dispatchEvent(
         new CustomEvent("show-global-success", {
-          detail: "Background photo updated!",
+          detail: "Background photo updated successfully!",
         })
       );
-    } catch (err) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
-          detail: "Failed to upload background photo.",
+          detail: "Failed to upload background photo. Please try again.",
         })
       );
     }
@@ -109,17 +345,41 @@ export function ProfileHeader({
     setMenuOpen(false);
   };
 
+  // Handle alignment save
+  const handleSaveAlignment = async () => {
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, "users", uid), { bgAlign });
+      setShowAlignModal(false);
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Background alignment saved successfully!",
+        })
+      );
+    } catch (error) {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to save alignment. Please try again.",
+        })
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <section className="w-full relative">
-      <div className="relative h-56 sm:h-84 w-full shadow-lg flex items-center justify-center px-2 sm:px-4 overflow-hidden rounded-3xl">
+      <div className="relative h-56 sm:h-84 w-full shadow-2xl flex items-center justify-center px-2 sm:px-4 overflow-hidden rounded-3xl border border-zinc-800/50">
         {/* Background image layer */}
         <div className="absolute inset-0 overflow-hidden z-0">
-          <img
+          <Image
             src={bgUrl || "/background-car-placeholder.png"}
             alt=""
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover transition-all duration-500"
             style={{ objectPosition: `center ${bgAlign}%` }}
             draggable={false}
+            priority
           />
           <div
             className="absolute inset-0 pointer-events-none"
@@ -129,10 +389,12 @@ export function ProfileHeader({
             }}
           />
         </div>
+
+        {/* Edit button - enhanced design */}
         {isOwnProfile && (
           <button
             ref={editButtonRef}
-            className="absolute top-4 right-4 z-30 cursor-pointer bg-white/80 hover:bg-white text-blue-700 font-bold px-3 py-1 rounded-full shadow transition text-xs flex items-center gap-1"
+            className="absolute top-4 right-4 z-[40] cursor-pointer bg-white/90 hover:bg-white text-blue-700 hover:text-blue-800 font-bold px-3 py-1.5 rounded-full shadow-lg transition-all text-xs flex items-center gap-1.5 backdrop-blur-sm border border-white/20 hover:scale-105"
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpen((v) => !v);
@@ -140,27 +402,16 @@ export function ProfileHeader({
             type="button"
             disabled={uploading}
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.232 5.232l3.536 3.536M9 13l6-6 3 3-6 6H9v-3z"
-              />
-            </svg>
-            Edit
+            <FiEdit3 className="w-4 h-4" />
+            <span>Edit</span>
           </button>
         )}
-        {/* Avatar */}
+
+        {/* Avatar and profile info */}
         <div className="flex items-center z-10 relative animate-fade-in-up">
           <div className="relative z-10 mr-4">
             <Image
-              className="rounded-full border-4 shadow-xl border-white bg-white"
+              className="rounded-full border-4 shadow-2xl border-white bg-white transition-all duration-300 hover:scale-105"
               src={safePhotoURL}
               alt="Profile photo"
               width={102}
@@ -170,16 +421,16 @@ export function ProfileHeader({
           </div>
           {/* Info next to avatar */}
           <div className="flex flex-col justify-end z-10">
-            <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
+            <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-2xl">
               {safeDisplayName}
             </span>
             {/* Bio */}
             <div className="w-full max-w-xl mt-2">
-              <span className="text-xs text-zinc-400 font-semibold mb-1 block">
+              <span className="text-xs text-zinc-400 font-semibold mb-1 block uppercase tracking-wider">
                 Bio
               </span>
               <div className="flex items-center gap-2 w-full">
-                <span className="text-zinc-200 text-xs truncate flex-1">
+                <span className="text-zinc-200 text-sm leading-relaxed">
                   {bio || (
                     <span className="italic text-zinc-500">No bio set</span>
                   )}
@@ -188,195 +439,188 @@ export function ProfileHeader({
             </div>
           </div>
         </div>
-        {/* Edit button with menu */}
-        {isOwnProfile && (
+
+        {/* Enhanced edit menu */}
+        {isOwnProfile && menuOpen && mounted && (
           <>
-            {menuOpen && (
-              <>
-                {/* Overlay for mobile */}
-                {!showAlignModal && (
-                  <div
-                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-md"
-                    onClick={() => setMenuOpen(false)}
-                  />
-                )}
-                <div
-                  className={`
-                    fixed left-1/2 top-1/2 z-50
-                    -translate-x-1/2 -translate-y-1/2
-                    w-[320px] max-w-[90vw]
-                    bg-zinc-900/95
-                    rounded-2xl
-                    border border-zinc-800
-                    flex flex-col
-                    overflow-hidden
-                    shadow-xl
-                    animate-fade-in-up
-                  `}
-                  ref={menuRef}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide border-b border-zinc-800"
-                    onClick={() => {
-                      fileInputRef.current?.click();
-                    }}
-                    disabled={uploading}
-                  >
-                    <svg
-                      className="w-5 h-5 text-green-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <rect
-                        x="3"
-                        y="5"
-                        width="18"
-                        height="14"
-                        rx="2"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                      />
-                      <circle
-                        cx="8.5"
-                        cy="10.5"
-                        r="1.5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 19l-5.5-7-4.5 6-3-4-4 5"
-                      />
-                    </svg>
-                    {uploading ? "Uploading..." : "Edit background photo"}
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={async (e) => {
-                      await handleBgPhotoChange(e);
-                      setMenuOpen(false);
-                    }}
-                    disabled={uploading}
-                  />
-                  <button
-                    className="cursor-pointer flex items-center gap-3 px-6 py-5 hover:bg-zinc-800 transition text-white font-semibold text-base tracking-wide"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setShowAlignModal(true);
-                    }}
-                  >
-                    <svg
-                      className="w-5 h-5 text-blue-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <rect
-                        x="4"
-                        y="10"
-                        width="16"
-                        height="4"
-                        rx="2"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 4v16"
-                      />
-                    </svg>
-                    Align background photo
-                  </button>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 z-[999998] bg-black/50 backdrop-blur-md"
+              onClick={() => setMenuOpen(false)}
+            />
+
+            {/* Menu */}
+            <div
+              className="fixed left-1/2 top-1/2 z-[999999] -translate-x-1/2 -translate-y-1/2 w-[320px] max-w-[90vw] bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-700/50 flex flex-col overflow-hidden shadow-2xl animate-fade-in-up"
+              ref={menuRef}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-zinc-700/50">
+                <h3 className="text-white font-semibold text-lg">
+                  Edit Background
+                </h3>
+                <p className="text-zinc-400 text-sm">
+                  Customize your profile header
+                </p>
+              </div>
+
+              {/* Upload Photo Button */}
+              <button
+                className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base border-b border-zinc-700/30 group"
+                onClick={() => {
+                  fileInputRef.current?.click();
+                }}
+                disabled={uploading}
+              >
+                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                  <FiImage className="text-green-400" size={18} />
                 </div>
-              </>
-            )}
+                <div className="flex-1 text-left">
+                  <div className="font-semibold">
+                    {uploading ? "Uploading..." : "Change Photo"}
+                  </div>
+                  <div className="text-zinc-400 text-sm">
+                    Update background image
+                  </div>
+                </div>
+                {uploading && (
+                  <div className="w-5 h-5 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+                )}
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleBgPhotoChange}
+                disabled={uploading}
+              />
+
+              {/* Align Photo Button */}
+              <button
+                className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base group"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setShowAlignModal(true);
+                }}
+              >
+                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                  <FiMove className="text-blue-400" size={18} />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-semibold">Align Photo</div>
+                  <div className="text-zinc-400 text-sm">
+                    Adjust image position
+                  </div>
+                </div>
+              </button>
+
+              {/* Cancel Button */}
+              <div className="px-6 py-4 border-t border-zinc-700/30">
+                <button
+                  className="cursor-pointer w-full px-4 py-2 bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-300 hover:text-white font-medium rounded-xl transition-all text-sm"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </>
         )}
       </div>
-      {showAlignModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-zinc-900 rounded-2xl shadow-xl p-6 w-[90vw] max-w-lg relative">
-            <h2 className="text-lg font-bold mb-4 text-white">
-              Align background photo
-            </h2>
-            <div
-              className="relative w-full h-25 rounded-xl mb-4 overflow-hidden bg-cover bg-center cursor-grab active:cursor-grabbing"
-              style={{
-                backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-                backgroundPosition: `center ${bgAlign}%`,
-              }}
-              onMouseDown={(e) => {
-                const startY = e.clientY;
-                const startAlign = bgAlign;
-                let dragging = true;
 
-                const onMouseMove = (moveEvent: MouseEvent) => {
-                  if (!dragging) return;
-                  const deltaY = moveEvent.clientY - startY;
-                  // Przesuwanie: 40px wysokości = 100%
-                  const percentDelta = (deltaY / 160) * 100;
-                  const newAlign = Math.max(
-                    0,
-                    Math.min(100, startAlign + percentDelta)
-                  );
-                  setBgAlign(newAlign);
-                };
+      {/* Background Alignment Modal */}
+      <BackgroundAlignmentModal
+        isOpen={showAlignModal}
+        onClose={() => setShowAlignModal(false)}
+        onSave={handleSaveAlignment}
+        backgroundUrl={bgUrl || "/background-car-placeholder.png"}
+        bgAlign={bgAlign}
+        setBgAlign={setBgAlign}
+        saving={saving}
+      />
 
-                const onMouseUp = () => {
-                  dragging = false;
-                  window.removeEventListener("mousemove", onMouseMove);
-                  window.removeEventListener("mouseup", onMouseUp);
-                };
+      {/* Enhanced Global Styles */}
+      <style jsx global>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-                window.addEventListener("mousemove", onMouseMove);
-                window.addEventListener("mouseup", onMouseUp);
-              }}
-            ></div>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={bgAlign}
-              onChange={(e) => setBgAlign(Number(e.target.value))}
-              className="w-full"
-            />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                className="cursor-pointer px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
-                onClick={() => setShowAlignModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="cursor-pointer px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-                onClick={async () => {
-                  await updateDoc(doc(db, "users", uid), { bgAlign });
-                  setShowAlignModal(false);
-                  window.dispatchEvent(
-                    new CustomEvent("show-global-success", {
-                      detail: "Background alignment saved!",
-                    })
-                  );
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        @keyframes scale-in {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -48%) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+
+        .animate-scale-in {
+          animation: scale-in 0.2s ease-out forwards;
+        }
+
+        /* Enhanced slider styles */
+        .slider {
+          background: linear-gradient(
+            to right,
+            #3b82f6 0%,
+            #3b82f6 var(--value, 50%),
+            #374151 var(--value, 50%),
+            #374151 100%
+          );
+        }
+
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 24px;
+          width: 24px;
+          border-radius: 50%;
+          background: #3b82f6;
+          cursor: pointer;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
+            0 6px 16px rgba(0, 0, 0, 0.4);
+          transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+          height: 24px;
+          width: 24px;
+          border-radius: 50%;
+          background: #3b82f6;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .slider::-moz-range-thumb:hover {
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
+            0 6px 16px rgba(0, 0, 0, 0.4);
+          transform: scale(1.1);
+        }
+      `}</style>
     </section>
   );
 }

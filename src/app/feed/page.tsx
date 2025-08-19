@@ -509,7 +509,7 @@ function PostCard({
         })
       );
       onEdit();
-    } catch (error) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to update post",
@@ -526,7 +526,7 @@ function PostCard({
     setLiking(true);
     try {
       await onLike();
-    } catch (error) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to update like",
@@ -544,7 +544,7 @@ function PostCard({
         try {
           const imgRef = storageRef(storage, `posts/${post.id}/image`);
           await deleteObject(imgRef);
-        } catch (error) {
+        } catch {
           console.log("Image already deleted or doesn't exist");
         }
       }
@@ -559,7 +559,7 @@ function PostCard({
 
       onDelete();
       setShowDeleteModal(false);
-    } catch (error) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to delete post",
