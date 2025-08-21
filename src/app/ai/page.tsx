@@ -1,6 +1,6 @@
 "use client";
 
-import { useFirebaseUser } from "@/app/parts/firebase-use-user";
+import { useAuth } from "@/app/parts/AuthProvider";
 import { askChatGPT } from "@/lib/chatgpt-client";
 import { askGemini } from "@/lib/gemini";
 import { useSearchParams } from "next/navigation";
@@ -42,7 +42,7 @@ function NotLoggedInMessage() {
 }
 
 function AIPageInner() {
-  const user = useFirebaseUser();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -94,7 +94,7 @@ function AIPageInner() {
         ...msgs,
         { from: "ai", text: aiReply || "Sorry, I couldn't find an answer." },
       ]);
-    } catch (err) {
+    } catch {
       setMessages((msgs) => [
         ...msgs,
         {

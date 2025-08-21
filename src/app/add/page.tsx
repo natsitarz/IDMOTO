@@ -12,31 +12,36 @@ const VISIBILITY_OPTIONS = [
 ];
 
 export default function Profile() {
-  const [user, setUser] = useState(auth.currentUser);
   const [hasCar, setHasCar] = useState<boolean | null>(null);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    onAuthStateChanged(auth, setUser);
-    if (user) {
-      document.getElementById("addCar")?.style.setProperty("display", "grid");
-      document
-        .getElementById("watermark")
-        ?.style.setProperty("display", "flex");
-      document.getElementById("navbar")?.style.setProperty("display", "flex");
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setLoading(false);
 
-      // Check if user already has a car
-      const checkUserCars = async () => {
-        const q = query(
-          collection(db, "vehicles"),
-          where("userID", "==", user.uid)
-        );
-        const snapshot = await getDocs(q);
-        setHasCar(!snapshot.empty);
-      };
-      checkUserCars();
-    }
-  }, [user]);
+      if (currentUser) {
+        document.getElementById("addCar")?.style.setProperty("display", "grid");
+        document
+          .getElementById("watermark")
+          ?.style.setProperty("display", "flex");
+        document.getElementById("navbar")?.style.setProperty("display", "flex");
+
+        // Check if user already has a car
+        const checkUserCars = async () => {
+          const q = query(
+            collection(db, "vehicles"),
+            where("userID", "==", currentUser.uid)
+          );
+          const snapshot = await getDocs(q);
+          setHasCar(!snapshot.empty);
+        };
+        checkUserCars();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Wrap the submit handler to include visibility
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -45,6 +50,10 @@ export default function Profile() {
     formData.append("visibility", visibility);
     await firebaseAddVehiclePublic(formData); // <-- przekazujesz FormData
   };
+
+  if (loading) {
+    return <AddCarSkeleton />;
+  }
 
   return (
     <div
@@ -254,6 +263,75 @@ export default function Profile() {
             Add it!
           </button>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// Skeleton loading component for add car page
+function AddCarSkeleton() {
+  return (
+    <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-gray-900 via-zinc-900 to-zinc-800 font-[family-name:var(--font-geist-sans)]">
+      <div className="w-full max-w-lg bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 flex flex-col items-center gap-10 animate-pulse relative overflow-hidden">
+        {/* Decorative gradient circle */}
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Header skeleton */}
+        <div className="flex flex-col items-center gap-2 z-10">
+          <div className="h-8 bg-white/10 rounded-lg w-48" />
+          <div className="h-4 bg-white/10 rounded w-64" />
+        </div>
+
+        {/* Form skeleton */}
+        <div className="flex flex-col items-center justify-center gap-5 w-full z-10">
+          {/* Manufacturer field */}
+          <div className="w-full flex flex-col gap-2">
+            <div className="h-4 bg-white/10 rounded w-24 ml-1" />
+            <div className="h-12 bg-white/10 rounded-xl" />
+          </div>
+
+          {/* Model field */}
+          <div className="w-full flex flex-col gap-2">
+            <div className="h-4 bg-white/10 rounded w-16 ml-1" />
+            <div className="h-12 bg-white/10 rounded-xl" />
+          </div>
+
+          {/* Year and Engine fields */}
+          <div className="w-full flex flex-col gap-2 md:flex-row md:gap-4">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 bg-white/10 rounded w-12 ml-1" />
+              <div className="h-12 bg-white/10 rounded-xl" />
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 bg-white/10 rounded w-16 ml-1" />
+              <div className="h-12 bg-white/10 rounded-xl" />
+            </div>
+          </div>
+
+          {/* Horsepower and Transmission fields */}
+          <div className="w-full flex flex-col gap-2 md:flex-row md:gap-4">
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 bg-white/10 rounded w-24 ml-1" />
+              <div className="h-12 bg-white/10 rounded-xl" />
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 bg-white/10 rounded w-28 ml-1" />
+              <div className="h-12 bg-white/10 rounded-xl" />
+            </div>
+          </div>
+
+          {/* Visibility section */}
+          <div className="w-full flex flex-col gap-2">
+            <div className="h-4 bg-white/10 rounded w-20 ml-1" />
+            <div className="flex gap-4">
+              <div className="h-10 bg-white/10 rounded-xl w-20" />
+              <div className="h-10 bg-white/10 rounded-xl w-20" />
+            </div>
+          </div>
+
+          {/* Submit button */}
+          <div className="w-full h-12 bg-blue-600/20 rounded-xl mt-2" />
+        </div>
       </div>
     </div>
   );

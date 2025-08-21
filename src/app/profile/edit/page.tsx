@@ -1,16 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useAuth } from "@/app/parts/AuthProvider";
+import LoadingScreen from "@/app/parts/LoadingScreen";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import EditProfileAvatar from "./parts/EditProfileAvatar";
 import EditProfileMain from "./parts/EditProfileMain";
 import EditProfileSecurity from "./parts/EditProfileSecurity";
 import EditProfileSocials from "./parts/EditProfileSocials";
 
-const PROFILE_MENU = [{ key: "main", label: "Profile" }];
+const PROFILE_MENU = [
+  { key: "main", label: "Profile" },
+  { key: "avatar", label: "Avatar" },
+  { key: "socials", label: "Socials" },
+  { key: "security", label: "Security" },
+];
 
 export default function EditProfilePage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [selected, setSelected] = useState("main");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Handle menu selection with smooth transition
+  const handleMenuSelect = (key: string) => {
+    if (key === selected) return;
+
+    setIsTransitioning(true);
+
+    // Small delay to show transition effect
+    setTimeout(() => {
+      setSelected(key);
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 100);
+    }, 150);
+  };
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
+
+  // Show loading while auth is being checked
+  if (loading) {
+    return <LoadingScreen message="Loading profile..." />;
+  }
+
+  // Don't render anything if user is not authenticated (will redirect)
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-zinc-900 font-[family-name:var(--font-geist-sans)]">
@@ -68,7 +111,7 @@ export default function EditProfilePage() {
                           : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
                       }`}
                     onClick={() => {
-                      setSelected(item.key);
+                      handleMenuSelect(item.key);
                       setMobileMenuOpen(false);
                     }}
                     type="button"
@@ -96,7 +139,7 @@ export default function EditProfilePage() {
                     : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
                 }`}
               style={{ minWidth: 0 }}
-              onClick={() => setSelected(item.key)}
+              onClick={() => handleMenuSelect(item.key)}
               type="button"
             >
               {item.label}
@@ -105,11 +148,87 @@ export default function EditProfilePage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-10 w-full">
-          {selected === "main" && <EditProfileMain />}
-          {selected === "avatar" && <EditProfileAvatar />}
-          {selected === "socials" && <EditProfileSocials />}
-          {selected === "security" && <EditProfileSecurity />}
+        <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-10 w-full relative">
+          {isTransitioning ? (
+            // Transition loading state that matches the content structure
+            <div className="w-full max-w-md space-y-6 animate-fade-in-scale">
+              {/* Title skeleton */}
+              <div className="text-center space-y-2">
+                <div className="h-8 w-48 bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-lg animate-pulse mx-auto" />
+                <div className="h-4 w-64 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded-lg animate-pulse mx-auto" />
+              </div>
+
+              {/* Content skeleton - adaptive to menu type */}
+              {selected === "main" ? (
+                <div className="space-y-6">
+                  {/* Avatar skeleton */}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-full animate-pulse" />
+                    <div className="h-4 w-32 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded-lg animate-pulse" />
+                  </div>
+
+                  {/* Form fields skeleton */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="h-4 w-20 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                      <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-16 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                      <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-24 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                      <div className="h-24 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                    </div>
+                    <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                  </div>
+                </div>
+              ) : selected === "avatar" ? (
+                <div className="space-y-6">
+                  <div className="w-32 h-32 bg-gradient-to-br from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-full animate-pulse mx-auto" />
+                  <div className="space-y-4">
+                    <div className="h-12 w-full bg-gradient-to-r from-blue-800/40 via-blue-700/60 to-blue-800/40 rounded-xl animate-pulse" />
+                    <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                  </div>
+                </div>
+              ) : selected === "socials" ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                    <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-20 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                    <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                  </div>
+                  <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                </div>
+              ) : (
+                // Security skeleton
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="h-4 w-28 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                      <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse" />
+                      <div className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="h-12 w-full bg-gradient-to-r from-red-800/40 via-red-700/60 to-red-800/40 rounded-xl animate-pulse" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="w-full animate-fade-in-scale">
+              {selected === "main" && <EditProfileMain />}
+              {selected === "avatar" && <EditProfileAvatar />}
+              {selected === "socials" && <EditProfileSocials />}
+              {selected === "security" && <EditProfileSecurity />}
+            </div>
+          )}
         </main>
       </div>
     </div>

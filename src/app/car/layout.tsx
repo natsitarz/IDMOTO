@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Navbar from "../parts/navbar";
 
 export const metadata: Metadata = {
-  title: ` `,
-  description: "Show the world your dream car",
+  title: "IDMOTO | Car Details",
+  description: "View detailed information about cars in the IDMOTO community",
 };
 
 export default function CarLayout({
@@ -12,10 +11,5 @@ export default function CarLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

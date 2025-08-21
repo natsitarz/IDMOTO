@@ -1,12 +1,12 @@
+import { useAuth } from "@/app/parts/AuthProvider";
 import { auth, db } from "@/app/parts/firebase";
-import { useFirebaseUser } from "@/app/parts/firebase-use-user";
 import { sendEmailVerification, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function EditProfileMain() {
-  const user = useFirebaseUser();
+  const { user } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [country, setCountry] = useState("");
   const [bio, setBio] = useState("");
@@ -22,8 +22,9 @@ export default function EditProfileMain() {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-          setCountry(userSnap.data().country || "");
-          setBio(userSnap.data().bio || "");
+          const userData = userSnap.data();
+          setCountry(userData.country || "");
+          setBio(userData.bio || "");
         }
         setLoading(false);
       };
@@ -43,7 +44,7 @@ export default function EditProfileMain() {
           })
         );
       }
-    } catch (err) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to send verification email.",
@@ -75,7 +76,7 @@ export default function EditProfileMain() {
           new CustomEvent("show-global-success", { detail: "Profile updated!" })
         );
       }
-    } catch (err: any) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to update profile.",
@@ -87,9 +88,68 @@ export default function EditProfileMain() {
 
   if (!user || loading) {
     return (
-      <div className="flex flex-col items-center justify-center gap-5 w-full z-10 py-16">
-        <div className="w-16 h-16 rounded-full border-4 border-blue-600/30 border-t-transparent animate-spin mb-4" />
-        <span className="text-zinc-400 text-sm">Loading profile...</span>
+      <div className="flex flex-col items-center justify-center gap-5 w-full z-10 py-8 animate-fade-in-scale">
+        {/* Header skeleton */}
+        <div className="flex flex-col items-center gap-2 z-10 w-full">
+          <div
+            className="h-8 w-48 bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-lg animate-pulse"
+            style={{ animationDelay: "0ms" }}
+          />
+          <div
+            className="h-4 w-64 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded-lg animate-pulse"
+            style={{ animationDelay: "100ms" }}
+          />
+
+          {/* Avatar skeleton */}
+          <div className="flex flex-col items-center gap-2 w-full mt-4">
+            <div
+              className="w-24 h-24 bg-gradient-to-br from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-full animate-pulse"
+              style={{ animationDelay: "200ms" }}
+            />
+            <div
+              className="h-4 w-32 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded-lg animate-pulse"
+              style={{ animationDelay: "300ms" }}
+            />
+          </div>
+        </div>
+
+        {/* Form fields skeleton */}
+        <div className="w-full max-w-md space-y-6">
+          <div className="space-y-2">
+            <div
+              className="h-4 w-20 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse"
+              style={{ animationDelay: "400ms" }}
+            />
+            <div
+              className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse"
+              style={{ animationDelay: "450ms" }}
+            />
+          </div>
+          <div className="space-y-2">
+            <div
+              className="h-4 w-16 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse"
+              style={{ animationDelay: "500ms" }}
+            />
+            <div
+              className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse"
+              style={{ animationDelay: "550ms" }}
+            />
+          </div>
+          <div className="space-y-2">
+            <div
+              className="h-4 w-24 bg-gradient-to-r from-zinc-800/20 via-zinc-700/40 to-zinc-800/20 rounded animate-pulse"
+              style={{ animationDelay: "600ms" }}
+            />
+            <div
+              className="h-24 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse"
+              style={{ animationDelay: "650ms" }}
+            />
+          </div>
+          <div
+            className="h-12 w-full bg-gradient-to-r from-zinc-800/40 via-zinc-700/60 to-zinc-800/40 rounded-xl animate-pulse"
+            style={{ animationDelay: "700ms" }}
+          />
+        </div>
       </div>
     );
   }

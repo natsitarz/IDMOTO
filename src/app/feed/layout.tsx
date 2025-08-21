@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Navbar from "../parts/navbar";
 
 export const metadata: Metadata = {
-  title: `Feed`,
-  description: "Show the world your dream car",
+  title: "IDMOTO | Feed",
+  description: "Discover amazing cars from the IDMOTO community",
 };
 
-export default function CarLayout({
+export default function FeedLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

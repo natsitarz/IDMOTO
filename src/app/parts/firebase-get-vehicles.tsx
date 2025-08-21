@@ -126,7 +126,7 @@ function EmptyVehiclesState({ isOwnProfile }: { isOwnProfile: boolean }) {
 
       {isOwnProfile && (
         <button
-          onClick={() => router.push("/add-car")}
+          onClick={() => router.push("/add")}
           className="cursor-pointer px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2"
         >
           <svg

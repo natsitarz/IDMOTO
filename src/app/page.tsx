@@ -1,19 +1,18 @@
 "use client";
 
-import { auth } from "@/app/parts/firebase";
+import { useAuth } from "@/app/parts/AuthProvider";
 import {
   addUserToDB,
   googleSignIn,
   redirectResults,
 } from "@/app/parts/firebase-sign";
-import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function HomePage() {
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [user, setUser] = useState(auth.currentUser);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -30,21 +29,20 @@ export default function HomePage() {
     handleRedirect();
   }, []);
 
-  // Auth state listener with proper cleanup
+  // Redirect to feed if user is logged in
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
+    if (!authLoading && user) {
+      const addUserAndRedirect = async () => {
         try {
-          await addUserToDB(firebaseUser);
+          await addUserToDB(user);
           router.replace("/feed");
         } catch (error) {
           console.error("Error adding user to DB:", error);
         }
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+      };
+      addUserAndRedirect();
+    }
+  }, [user, authLoading, router]);
 
   // Mobile detection with debounced resize
   useEffect(() => {
@@ -84,6 +82,27 @@ export default function HomePage() {
   const handleVideoError = useCallback(() => {
     setVideoError(true);
   }, []);
+
+  // Show loading screen while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="relative min-h-[calc(100dvh)] w-full flex items-center justify-center overflow-hidden bg-zinc-900">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-zinc-900 to-cyan-900 z-0" />
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        <div className="relative z-20 flex flex-col items-center gap-4">
+          <Image
+            src="/logo.png"
+            alt="IDMOTO"
+            width={280}
+            height={32}
+            priority
+            className="animate-pulse"
+          />
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-[calc(100dvh)] w-full flex items-center justify-center overflow-hidden bg-zinc-900">

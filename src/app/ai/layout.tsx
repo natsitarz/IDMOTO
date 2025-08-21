@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Navbar from "../parts/navbar";
 
 export const metadata: Metadata = {
-  title: "IDMOTO | Add vehicle",
-  description: "Show the world your dream car",
+  title: "IDMOTO | AI Assistant",
+  description: "Get AI-powered help and insights for your automotive needs",
 };
 
-export default function AddLayout({
+export default function AILayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

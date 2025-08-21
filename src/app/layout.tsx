@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "./parts/AuthProvider";
 import ClientErrorToaster from "./parts/ClientErrorToaster";
-import PageLoaderWrapper from "./parts/PageLoaderWrapper";
+import ConditionalNavbar from "./parts/ConditionalNavbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -94,9 +95,11 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased bg-zinc-900 text-white min-h-screen`}
       >
-        <PageLoaderWrapper />
-        <ClientErrorToaster />
-        {children}
+        <AuthProvider>
+          <ClientErrorToaster />
+          <ConditionalNavbar />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

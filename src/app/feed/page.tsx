@@ -354,34 +354,55 @@ function PostForm({
   );
 }
 
-// Enhanced skeleton loading for posts
+// Enhanced skeleton loading for posts with staggered animations
 function PostSkeleton() {
   return (
     <div className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-4 sm:p-6 mb-4 sm:mb-6 animate-pulse">
-      {/* Header skeleton */}
+      {/* Header skeleton with staggered animation */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-full animate-pulse" />
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-white/10 rounded w-24 animate-pulse" />
-          <div className="h-3 bg-white/10 rounded w-16 animate-pulse" />
+          <div
+            className="h-4 bg-gradient-to-r from-white/10 to-white/5 rounded w-24 animate-pulse"
+            style={{ animationDelay: "0.1s" }}
+          />
+          <div
+            className="h-3 bg-gradient-to-r from-white/10 to-white/5 rounded w-16 animate-pulse"
+            style={{ animationDelay: "0.2s" }}
+          />
         </div>
       </div>
 
-      {/* Content skeleton */}
+      {/* Content skeleton with staggered lines */}
       <div className="space-y-2 mb-4">
-        <div className="h-4 bg-white/10 rounded w-full animate-pulse" />
-        <div className="h-4 bg-white/10 rounded w-3/4 animate-pulse" />
-        <div className="h-4 bg-white/10 rounded w-1/2 animate-pulse" />
+        <div
+          className="h-4 bg-gradient-to-r from-white/10 to-white/5 rounded w-full animate-pulse"
+          style={{ animationDelay: "0.3s" }}
+        />
+        <div
+          className="h-4 bg-gradient-to-r from-white/10 to-white/5 rounded w-3/4 animate-pulse"
+          style={{ animationDelay: "0.4s" }}
+        />
+        <div
+          className="h-4 bg-gradient-to-r from-white/10 to-white/5 rounded w-1/2 animate-pulse"
+          style={{ animationDelay: "0.5s" }}
+        />
       </div>
 
-      {/* Image skeleton (random) */}
+      {/* Image skeleton (random) with delayed animation */}
       {Math.random() > 0.5 && (
-        <div className="w-full h-48 bg-white/10 rounded-2xl mb-4 animate-pulse" />
+        <div
+          className="w-full h-48 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl mb-4 animate-pulse"
+          style={{ animationDelay: "0.6s" }}
+        />
       )}
 
-      {/* Actions skeleton */}
+      {/* Actions skeleton with final delay */}
       <div className="flex items-center gap-2">
-        <div className="w-16 h-8 bg-white/10 rounded-full animate-pulse" />
+        <div
+          className="w-16 h-8 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse"
+          style={{ animationDelay: "0.7s" }}
+        />
       </div>
     </div>
   );
@@ -984,17 +1005,6 @@ export default function FeedPage() {
   return (
     <main className="min-h-[calc(100dvh-67px)] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-4 py-6 sm:py-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <header className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">
-            Community Feed
-          </h1>
-          <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Connect with fellow automotive enthusiasts, share your experiences,
-            and discover amazing vehicles from around the world.
-          </p>
-        </header>
-
         {/* Post Form or Login Prompt */}
         {userLoading ? (
           <div className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 mb-8 animate-pulse">

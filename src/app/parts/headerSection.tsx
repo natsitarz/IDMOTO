@@ -356,7 +356,7 @@ export function ProfileHeader({
           detail: "Background alignment saved successfully!",
         })
       );
-    } catch (error) {
+    } catch {
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to save alignment. Please try again.",
@@ -440,95 +440,99 @@ export function ProfileHeader({
           </div>
         </div>
 
-        {/* Enhanced edit menu */}
-        {isOwnProfile && menuOpen && mounted && (
-          <>
-            {/* Overlay */}
-            <div
-              className="fixed inset-0 z-[999998] bg-black/50 backdrop-blur-md"
-              onClick={() => setMenuOpen(false)}
-            />
-
-            {/* Menu */}
-            <div
-              className="fixed left-1/2 top-1/2 z-[999999] -translate-x-1/2 -translate-y-1/2 w-[320px] max-w-[90vw] bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-700/50 flex flex-col overflow-hidden shadow-2xl animate-fade-in-up"
-              ref={menuRef}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="px-6 py-4 border-b border-zinc-700/50">
-                <h3 className="text-white font-semibold text-lg">
-                  Edit Background
-                </h3>
-                <p className="text-zinc-400 text-sm">
-                  Customize your profile header
-                </p>
-              </div>
-
-              {/* Upload Photo Button */}
-              <button
-                className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base border-b border-zinc-700/30 group"
-                onClick={() => {
-                  fileInputRef.current?.click();
-                }}
-                disabled={uploading}
-              >
-                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
-                  <FiImage className="text-green-400" size={18} />
-                </div>
-                <div className="flex-1 text-left">
-                  <div className="font-semibold">
-                    {uploading ? "Uploading..." : "Change Photo"}
-                  </div>
-                  <div className="text-zinc-400 text-sm">
-                    Update background image
-                  </div>
-                </div>
-                {uploading && (
-                  <div className="w-5 h-5 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
-                )}
-              </button>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleBgPhotoChange}
-                disabled={uploading}
+        {/* Enhanced edit menu as fullscreen modal using portal */}
+        {isOwnProfile &&
+          menuOpen &&
+          mounted &&
+          createPortal(
+            <>
+              {/* Overlay */}
+              <div
+                className="fixed inset-0 z-[999998] bg-black/50 backdrop-blur-md"
+                onClick={() => setMenuOpen(false)}
               />
 
-              {/* Align Photo Button */}
-              <button
-                className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base group"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setShowAlignModal(true);
-                }}
+              {/* Menu */}
+              <div
+                className="fixed left-1/2 top-1/2 z-[999999] -translate-x-1/2 -translate-y-1/2 w-[320px] max-w-[90vw] bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-700/50 flex flex-col overflow-hidden shadow-2xl animate-fade-in-up"
+                ref={menuRef}
+                onClick={(e) => e.stopPropagation()}
               >
-                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                  <FiMove className="text-blue-400" size={18} />
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-zinc-700/50">
+                  <h3 className="text-white font-semibold text-lg">
+                    Edit Background
+                  </h3>
+                  <p className="text-zinc-400 text-sm">
+                    Customize your profile header
+                  </p>
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="font-semibold">Align Photo</div>
-                  <div className="text-zinc-400 text-sm">
-                    Adjust image position
-                  </div>
-                </div>
-              </button>
 
-              {/* Cancel Button */}
-              <div className="px-6 py-4 border-t border-zinc-700/30">
+                {/* Upload Photo Button */}
                 <button
-                  className="cursor-pointer w-full px-4 py-2 bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-300 hover:text-white font-medium rounded-xl transition-all text-sm"
-                  onClick={() => setMenuOpen(false)}
+                  className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base border-b border-zinc-700/30 group"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={uploading}
                 >
-                  Cancel
+                  <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                    <FiImage className="text-green-400" size={18} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold">
+                      {uploading ? "Uploading..." : "Change Photo"}
+                    </div>
+                    <div className="text-zinc-400 text-sm">
+                      Update background image
+                    </div>
+                  </div>
+                  {uploading && (
+                    <div className="w-5 h-5 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+                  )}
                 </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleBgPhotoChange}
+                  disabled={uploading}
+                />
+
+                {/* Align Photo Button */}
+                <button
+                  className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base group"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setShowAlignModal(true);
+                  }}
+                >
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                    <FiMove className="text-blue-400" size={18} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold">Align Photo</div>
+                    <div className="text-zinc-400 text-sm">
+                      Adjust image position
+                    </div>
+                  </div>
+                </button>
+
+                {/* Cancel Button */}
+                <div className="px-6 py-4 border-t border-zinc-700/30">
+                  <button
+                    className="cursor-pointer w-full px-4 py-2 bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-300 hover:text-white font-medium rounded-xl transition-all text-sm"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            </>,
+            document.body
+          )}
       </div>
 
       {/* Background Alignment Modal */}

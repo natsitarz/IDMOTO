@@ -1,7 +1,7 @@
 "use client";
 
+import { useAuth } from "@/app/parts/AuthProvider";
 import { db } from "@/app/parts/firebase";
-import { useFirebaseUser } from "@/app/parts/firebase-use-user";
 import { ProfileHeader } from "@/app/parts/headerSection";
 import { useShowMainDom } from "@/app/parts/showMainProf";
 import { ProfileVehiclesSection } from "@/app/parts/vehicleSection";
@@ -99,6 +99,14 @@ function ProfileSkeleton() {
   );
 }
 
+interface Vehicle {
+  manufacturer?: string;
+  model?: string;
+  createdAt?: { toDate?: () => Date };
+  userID?: string;
+  visibility?: string;
+}
+
 // Enhanced Profile Overview with better loading states
 function ProfileOverview({
   uid,
@@ -109,7 +117,7 @@ function ProfileOverview({
 }) {
   const [overview, setOverview] = useState({
     vehicleCount: 0,
-    favoriteVehicle: null as any,
+    favoriteVehicle: null as Vehicle | null,
     memberSince: "",
     recentActivity: [] as RecentActivity[],
   });
@@ -675,7 +683,7 @@ function ProfileNotFound() {
 // Main Profile Component with enhanced loading and responsive design
 function ProfileInner() {
   const searchParams = useSearchParams();
-  const user = useFirebaseUser();
+  const { user } = useAuth();
   useShowMainDom(user);
   const profileUid = searchParams.get("uid") || user?.uid || "";
   const isOwnProfile = !!user && user.uid === profileUid;

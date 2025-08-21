@@ -3,7 +3,7 @@ import "../globals.css";
 
 export const metadata: Metadata = {
   title: "IDMOTO | About",
-  description: "Show the world your dream car",
+  description: "Learn more about IDMOTO - the ultimate car community platform",
 };
 
 export default function AboutLayout({

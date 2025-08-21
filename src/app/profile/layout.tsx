@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Navbar from "../parts/navbar";
 
 export const metadata: Metadata = {
-  title: "Profile",
-  description: "Show the world your dream car",
+  title: "IDMOTO | Profile",
+  description: "View and manage your IDMOTO profile and car collection",
 };
 
 export default function ProfileLayout({
@@ -12,10 +11,5 @@ export default function ProfileLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
