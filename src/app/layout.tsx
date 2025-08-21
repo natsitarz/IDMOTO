@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./parts/AuthProvider";
@@ -11,7 +11,14 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://idmoto.vercel.app"),
   title: {
     default: "IDMOTO – Show off your ride!",
     template: "%s | IDMOTO",
@@ -71,11 +78,6 @@ export const metadata: Metadata = {
       "Create and share your car profile with IDMOTO. Join the ultimate car community.",
     images: ["/logo.png"],
     creator: "@idmoto",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
   verification: {
     google: process.env.GOOGLE_VERIFICATION_ID,

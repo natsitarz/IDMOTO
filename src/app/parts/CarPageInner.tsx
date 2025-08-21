@@ -315,7 +315,6 @@ export default function CarPageInner() {
         }
         carData.gallery = await fetchGallery(carId);
         setCar(carData);
-        document.title = `${carData.manufacturer} ${carData.model} | IDMOTO`;
       } else {
         setError("Vehicle not found. Please check the ID and try again.");
       }
