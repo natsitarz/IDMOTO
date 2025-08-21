@@ -12,72 +12,167 @@ import { useRef, useState } from "react";
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: "#111216",
-    width: 120,
-    height: 180,
+    backgroundColor: "#000000",
+    width: 280,
+    height: 160,
     padding: 0,
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: "row",
     position: "relative",
   },
-  border: {
+  // Main gradient background
+  gradientBg: {
     position: "absolute",
     top: 0,
     left: 0,
-    width: 120,
-    height: 180,
-    border: "1 solid #2d3a53",
+    width: 280,
+    height: 160,
+    backgroundColor: "#000000",
+    background:
+      "linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f172a 100%)",
+  },
+  // Border and accent lines
+  border: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    width: 276,
+    height: 156,
+    border: "2 solid #3b82f6",
+    borderRadius: 8,
+  },
+  accentLine: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    width: 264,
+    height: 2,
+    backgroundColor: "#60a5fa",
+  },
+  // Left section - QR and main info
+  leftSection: {
+    width: 140,
+    height: 160,
+    padding: 12,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   logo: {
-    width: 64,
-    height: 24,
-    marginTop: 14,
-    marginBottom: 10,
-    alignSelf: "center",
-    opacity: 0.92,
+    width: 48,
+    height: 18,
+    marginBottom: 8,
+    opacity: 0.95,
   },
-  qrBox: {
-    backgroundColor: "#181a20",
-    border: "1 solid #232b38",
-    width: 66,
-    height: 66,
-    alignSelf: "center",
-    marginBottom: 12,
+  qrContainer: {
+    backgroundColor: "#ffffff",
+    border: "2 solid #3b82f6",
+    borderRadius: 6,
+    width: 76,
+    height: 76,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    boxShadow: "0 2px 12px #0004",
+    padding: 4,
+    boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
   },
   qrImg: {
-    width: 66,
-    height: 66,
-    alignSelf: "center",
+    width: 68,
+    height: 68,
   },
-  label: {
-    color: "#3b82f6",
-    fontSize: 12,
+  scanLabel: {
+    color: "#60a5fa",
+    fontSize: 8,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 3,
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+    marginTop: 6,
+  },
+  // Right section - Car details
+  rightSection: {
+    width: 140,
+    height: 160,
+    padding: 12,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  brandSection: {
+    marginTop: 8,
+  },
+  carBrand: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "bold",
+    letterSpacing: 0.5,
     textTransform: "uppercase",
   },
-  carName: {
-    color: "#fff",
-    fontSize: 11,
+  carModel: {
+    color: "#e2e8f0",
+    fontSize: 12,
+    fontWeight: "normal",
+    letterSpacing: 0.3,
+    marginTop: 2,
+  },
+  // Specs section
+  specsSection: {
+    marginTop: 8,
+    width: "100%",
+  },
+  specRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 3,
+  },
+  specLabel: {
+    color: "#94a3b8",
+    fontSize: 7,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  specValue: {
+    color: "#f1f5f9",
+    fontSize: 7,
+    fontWeight: "bold",
+  },
+  // Bottom section
+  bottomSection: {
+    marginTop: "auto",
+    width: "100%",
+  },
+  userInfo: {
+    color: "#64748b",
+    fontSize: 8,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  idmotoLabel: {
+    color: "#3b82f6",
+    fontSize: 9,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 6,
-    letterSpacing: 0.8,
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
-  user: {
-    color: "#b3b3b3",
-    fontSize: 9,
-    textAlign: "center",
-    marginTop: 4,
-    letterSpacing: 0.3,
+  // Decorative elements
+  decorativeDot: {
+    position: "absolute",
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#3b82f6",
+  },
+  topDot: {
+    top: 16,
+    right: 16,
+  },
+  bottomDot: {
+    bottom: 16,
+    left: 16,
   },
 });
 
@@ -92,17 +187,67 @@ function StickerPDF({
 }) {
   return (
     <Document>
-      <Page size={[120, 180]} style={styles.page}>
+      <Page size={[280, 160]} style={styles.page}>
+        {/* Background gradient effect */}
+        <View style={styles.gradientBg} fixed />
+
+        {/* Main border */}
         <View style={styles.border} fixed />
-        <Image src={logoUrl} style={styles.logo} />
-        <View style={styles.qrBox}>
-          <Image src={qrPngUrl} style={styles.qrImg} />
+
+        {/* Accent line */}
+        <View style={styles.accentLine} fixed />
+
+        {/* Decorative dots */}
+        <View style={[styles.decorativeDot, styles.topDot]} fixed />
+        <View style={[styles.decorativeDot, styles.bottomDot]} fixed />
+
+        {/* Left Section - QR Code and Logo */}
+        <View style={styles.leftSection}>
+          <Image src={logoUrl} style={styles.logo} />
+
+          <View style={styles.qrContainer}>
+            <Image src={qrPngUrl} style={styles.qrImg} />
+          </View>
+
+          <Text style={styles.scanLabel}>Scan to View</Text>
         </View>
-        <Text style={styles.label}>SCAN TO VIEW</Text>
-        <Text style={styles.carName}>
-          {car.manufacturer} {car.model}
-        </Text>
-        <Text style={styles.user}>{car.user}</Text>
+
+        {/* Right Section - Car Information */}
+        <View style={styles.rightSection}>
+          {/* Brand and Model */}
+          <View style={styles.brandSection}>
+            <Text style={styles.carBrand}>{car.manufacturer || "Unknown"}</Text>
+            <Text style={styles.carModel}>{car.model || "Model"}</Text>
+          </View>
+
+          {/* Car Specifications */}
+          <View style={styles.specsSection}>
+            <View style={styles.specRow}>
+              <Text style={styles.specLabel}>Year</Text>
+              <Text style={styles.specValue}>{car.year || "N/A"}</Text>
+            </View>
+            <View style={styles.specRow}>
+              <Text style={styles.specLabel}>Engine</Text>
+              <Text style={styles.specValue}>{car.engine || "N/A"}</Text>
+            </View>
+            <View style={styles.specRow}>
+              <Text style={styles.specLabel}>Power</Text>
+              <Text style={styles.specValue}>
+                {car.horsepower ? `${car.horsepower} HP` : "N/A"}
+              </Text>
+            </View>
+            <View style={styles.specRow}>
+              <Text style={styles.specLabel}>Nm</Text>
+              <Text style={styles.specValue}>{car.nm || "N/A"}</Text>
+            </View>
+          </View>
+
+          {/* Bottom Info */}
+          <View style={styles.bottomSection}>
+            <Text style={styles.userInfo}>Owner: {car.user || "Unknown"}</Text>
+            <Text style={styles.idmotoLabel}>IDMOTO Community</Text>
+          </View>
+        </View>
       </Page>
     </Document>
   );
@@ -125,10 +270,10 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
     const img = new window.Image();
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = 440;
-      canvas.height = 440;
+      canvas.width = 272; // Higher resolution for better PDF quality
+      canvas.height = 272;
       const ctx = canvas.getContext("2d");
-      ctx?.drawImage(img, 0, 0, 440, 440);
+      ctx?.drawImage(img, 0, 0, 272, 272);
       setQrPngUrl(canvas.toDataURL("image/png"));
     };
     img.src = imageSrc;
@@ -174,7 +319,7 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
               className="flex gap-2 cursor-pointer border border-zinc-700 hover:bg-zinc-800 transition px-4 py-2 rounded-lg text-xs uppercase tracking-widest font-bold bg-zinc-900"
             >
               {({ loading }) =>
-                loading ? "Generating PDF..." : "Download sticker PDF"
+                loading ? "Generating PDF..." : "Download Car Sticker"
               }
             </PDFDownloadLink>
           ) : (
@@ -195,7 +340,7 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Get sticker
+              Get Car Sticker
             </button>
           ))}
       </div>
