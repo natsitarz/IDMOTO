@@ -520,6 +520,16 @@ export default function CarPageInner() {
         </div>
       </div>
 
+      {/* Enhanced Footer */}
+      <footer
+        className="mt-8 mb-8 sm:mt-8 sm:mb-8 pt-6 sm:pt-8 border-t border-white/10 text-center animate-fade-in"
+        style={{ animationDelay: "600ms" }}
+      >
+        <p className="text-zinc-500 text-sm">
+          © 2025 IDMOTO • Connecting car enthusiasts worldwide
+        </p>
+      </footer>
+
       {/* Enhanced Global Styles */}
       <style jsx global>{`
         @keyframes fade-in-opacity {
