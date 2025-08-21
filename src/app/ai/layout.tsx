@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "IDMOTO | AI Assistant",
+  title: "AI Assistant",
   description: "Get AI-powered help and insights for your automotive needs",
 };
 

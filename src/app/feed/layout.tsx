@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "IDMOTO | Feed",
+  title: "Feed",
   description: "Discover amazing cars from the IDMOTO community",
 };
 
