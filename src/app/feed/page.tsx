@@ -462,7 +462,7 @@ function AdPostCard() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in">
+    <div className="hidden w-full max-w-xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in">
       <div className="flex items-center gap-2 mb-4">
         <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
           <span className="text-emerald-400 text-xs">✨</span>
