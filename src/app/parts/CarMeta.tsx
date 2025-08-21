@@ -12,167 +12,276 @@ import { useRef, useState } from "react";
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: "#000000",
-    width: 280,
-    height: 160,
+    backgroundColor: "#0a0a0a",
+    width: 1098,
+    height: 648,
     padding: 0,
     display: "flex",
     flexDirection: "row",
     position: "relative",
+    fontFamily: "Helvetica",
   },
-  // Main gradient background
-  gradientBg: {
+  // Dark gradient background
+  gradientBackground: {
     position: "absolute",
     top: 0,
     left: 0,
-    width: 280,
-    height: 160,
-    backgroundColor: "#000000",
-    background:
-      "linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f172a 100%)",
+    width: 1098,
+    height: 648,
+    backgroundColor: "#0f0f0f",
   },
-  // Border and accent lines
-  border: {
+  // Main container with dark theme
+  mainContainer: {
     position: "absolute",
-    top: 2,
-    left: 2,
-    width: 276,
-    height: 156,
-    border: "2 solid #3b82f6",
-    borderRadius: 8,
+    top: 20,
+    left: 20,
+    width: 1058,
+    height: 608,
+    backgroundColor: "#1a1a1a",
+    border: "2 solid #333333",
+    padding: 40,
   },
-  accentLine: {
-    position: "absolute",
-    top: 8,
-    left: 8,
-    width: 264,
-    height: 2,
-    backgroundColor: "#60a5fa",
-  },
-  // Left section - QR and main info
+  // Dark left section with gradient - Logo and QR
   leftSection: {
-    width: 140,
-    height: 160,
-    padding: 12,
+    width: 400,
+    height: 648,
+    padding: 60,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    background:
+      "linear-gradient(135deg, #0a0a0a 0%, #1c1c1c 50%, #0a0a0a 100%)",
+    position: "relative",
+  },
+  // Logo container
+  logoContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: 80,
   },
   logo: {
-    width: 48,
-    height: 18,
-    marginBottom: 8,
-    opacity: 0.95,
+    width: 240,
+    height: 90,
+    marginBottom: 20,
+  },
+  // QR Code section
+  qrSection: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   qrContainer: {
     backgroundColor: "#ffffff",
-    border: "2 solid #3b82f6",
-    borderRadius: 6,
-    width: 76,
-    height: 76,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 4,
-    boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+    padding: 30,
+    marginBottom: 80,
   },
-  qrImg: {
-    width: 68,
-    height: 68,
+  qrCode: {
+    width: 180,
+    height: 180,
   },
-  scanLabel: {
-    color: "#60a5fa",
-    fontSize: 8,
+  qrLabel: {
+    color: "#ffffff",
+    fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
-    marginTop: 6,
+    marginBottom: 8,
   },
-  // Right section - Car details
+  qrSubtext: {
+    color: "#cccccc",
+    fontSize: 12,
+    textAlign: "center",
+  },
+  // Dark right section - Car information
   rightSection: {
-    width: 140,
-    height: 160,
-    padding: 12,
+    width: 698,
+    height: 648,
+    padding: 60,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    justifyContent: "center",
+    position: "relative",
+    background:
+      "linear-gradient(135deg, #0a0a0a 0%, #1c1c1c 50%, #0a0a0a 100%)",
+    backgroundColor: "#121212",
+    backgroundSize: "cover",
+    border: "2 solid #333333",
+    boxSizing: "border-box",
   },
-  brandSection: {
-    marginTop: 8,
+  // Dark car header section
+  carHeaderSection: {
+    borderBottom: "3 solid #333333",
+    paddingBottom: 40,
+    marginBottom: 60,
   },
-  carBrand: {
+  manufacturer: {
     color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "bold",
-    letterSpacing: 0.5,
+    fontSize: 48,
+    fontWeight: "800",
+    letterSpacing: 1,
     textTransform: "uppercase",
+    marginBottom: 16,
+    fontFamily: "Helvetica",
   },
-  carModel: {
-    color: "#e2e8f0",
-    fontSize: 12,
-    fontWeight: "normal",
-    letterSpacing: 0.3,
-    marginTop: 2,
+  model: {
+    color: "#3b82f6",
+    fontSize: 36,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    marginBottom: 20,
+    fontFamily: "Helvetica",
+    textTransform: "none",
   },
-  // Specs section
-  specsSection: {
-    marginTop: 8,
-    width: "100%",
+  engine: {
+    color: "#cccccc",
+    fontSize: 24,
+    fontWeight: "300",
+    backgroundColor: "#2a2a2a",
+    padding: "12 24",
+    borderRadius: 12,
+    border: "2 solid #444444",
   },
-  specRow: {
+  // Dark owner section
+  ownerSection: {
+    backgroundColor: "#2a2a2a",
+    borderRadius: 16,
+    padding: 40,
+    border: "2 solid #444444",
+    marginBottom: 40,
+  },
+  ownerLabel: {
+    color: "#cccccc",
+    fontSize: 14,
+    fontWeight: "300",
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    marginBottom: 12,
+    fontFamily: "Helvetica",
+  },
+  ownerName: {
+    color: "#ffffff",
+    fontSize: 28,
+    fontWeight: "800",
+    fontFamily: "Helvetica",
+  },
+  // Dark footer section
+  footerSection: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 3,
-  },
-  specLabel: {
-    color: "#94a3b8",
-    fontSize: 7,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  specValue: {
-    color: "#f1f5f9",
-    fontSize: 7,
-    fontWeight: "bold",
-  },
-  // Bottom section
-  bottomSection: {
+    alignItems: "center",
     marginTop: "auto",
-    width: "100%",
   },
-  userInfo: {
-    color: "#64748b",
-    fontSize: 8,
-    textAlign: "center",
-    marginBottom: 4,
+  websiteContainer: {
+    backgroundColor: "#333333",
+    borderRadius: 12,
+    padding: "16 32",
   },
-  idmotoLabel: {
-    color: "#3b82f6",
-    fontSize: 9,
-    fontWeight: "bold",
-    textAlign: "center",
+  websiteText: {
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "300",
     letterSpacing: 1,
-    textTransform: "uppercase",
+    fontFamily: "Helvetica",
+  },
+  carId: {
+    color: "#888888",
+    fontSize: 16,
+    fontWeight: "300",
+    fontFamily: "Helvetica",
+    letterSpacing: 1,
+  },
+  // Cut lines for sticker cutting
+  cutLineTopLeft: {
+    position: "absolute",
+    top: 5,
+    left: 5,
+    width: 40,
+    height: 2,
+    backgroundColor: "#ffffff",
+  },
+  cutLineTopLeftVertical: {
+    position: "absolute",
+    top: 5,
+    left: 5,
+    width: 2,
+    height: 40,
+    backgroundColor: "#ffffff",
+  },
+  cutLineTopRight: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    width: 40,
+    height: 2,
+    backgroundColor: "#ffffff",
+  },
+  cutLineTopRightVertical: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    width: 2,
+    height: 40,
+    backgroundColor: "#ffffff",
+  },
+  cutLineBottomLeft: {
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    width: 40,
+    height: 2,
+    backgroundColor: "#ffffff",
+  },
+  cutLineBottomLeftVertical: {
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    width: 2,
+    height: 40,
+    backgroundColor: "#ffffff",
+  },
+  cutLineBottomRight: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    width: 40,
+    height: 2,
+    backgroundColor: "#ff0000",
+  },
+  cutLineBottomRightVertical: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    width: 2,
+    height: 40,
+    backgroundColor: "#ff0000",
   },
   // Decorative elements
-  decorativeDot: {
+  decorativeCircle: {
     position: "absolute",
-    width: 4,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(59, 130, 246, 0.05)",
+    top: -100,
+    right: -100,
+  },
+  decorativeLine: {
+    position: "absolute",
     height: 4,
-    borderRadius: 2,
     backgroundColor: "#3b82f6",
+    borderRadius: 2,
   },
-  topDot: {
-    top: 16,
-    right: 16,
+  topLine: {
+    top: 60,
+    left: 60,
+    width: 120,
   },
-  bottomDot: {
-    bottom: 16,
-    left: 16,
+  bottomLine: {
+    bottom: 60,
+    right: 60,
+    width: 120,
   },
 });
 
@@ -187,65 +296,62 @@ function StickerPDF({
 }) {
   return (
     <Document>
-      <Page size={[280, 160]} style={styles.page}>
-        {/* Background gradient effect */}
-        <View style={styles.gradientBg} fixed />
+      <Page size={[1098, 648]} style={styles.page}>
+        {/* Premium background */}
+        <View style={styles.gradientBackground} fixed />
+        <View style={styles.mainContainer} fixed />
 
-        {/* Main border */}
-        <View style={styles.border} fixed />
+        {/* Cut lines for sticker cutting */}
+        <View style={styles.cutLineTopLeft} fixed />
+        <View style={styles.cutLineTopLeftVertical} fixed />
+        <View style={styles.cutLineTopRight} fixed />
+        <View style={styles.cutLineTopRightVertical} fixed />
+        <View style={styles.cutLineBottomLeft} fixed />
+        <View style={styles.cutLineBottomLeftVertical} fixed />
+        <View style={styles.cutLineBottomRight} fixed />
+        <View style={styles.cutLineBottomRightVertical} fixed />
 
-        {/* Accent line */}
-        <View style={styles.accentLine} fixed />
-
-        {/* Decorative dots */}
-        <View style={[styles.decorativeDot, styles.topDot]} fixed />
-        <View style={[styles.decorativeDot, styles.bottomDot]} fixed />
-
-        {/* Left Section - QR Code and Logo */}
+        {/* Left Section - Premium Logo and QR */}
         <View style={styles.leftSection}>
-          <Image src={logoUrl} style={styles.logo} />
-
-          <View style={styles.qrContainer}>
-            <Image src={qrPngUrl} style={styles.qrImg} />
+          <View style={styles.logoContainer}>
+            <Image src={logoUrl} style={styles.logo} />
           </View>
 
-          <Text style={styles.scanLabel}>Scan to View</Text>
+          <View style={styles.qrSection}>
+            <View style={styles.qrContainer}>
+              <Image src={qrPngUrl} style={styles.qrCode} />
+            </View>
+            <Text style={styles.qrLabel}>Scan to View Vehicle</Text>
+            <Text style={styles.qrSubtext}>Mobile Optimized Experience</Text>
+          </View>
         </View>
 
         {/* Right Section - Car Information */}
         <View style={styles.rightSection}>
-          {/* Brand and Model */}
-          <View style={styles.brandSection}>
-            <Text style={styles.carBrand}>{car.manufacturer || "Unknown"}</Text>
-            <Text style={styles.carModel}>{car.model || "Model"}</Text>
+          {/* Car Header */}
+          <View style={styles.carHeaderSection}>
+            <Text style={styles.manufacturer}>
+              {car.manufacturer || "MANUFACTURER"}
+              <Text style={styles.model}> {car.model || "Model Name"}</Text>
+            </Text>
+            <Text style={styles.engine}>
+              {`${car.engine} | ${car.year} | ${car.transmission}` ||
+                "Engine Specification"}
+            </Text>
           </View>
 
-          {/* Car Specifications */}
-          <View style={styles.specsSection}>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Year</Text>
-              <Text style={styles.specValue}>{car.year || "N/A"}</Text>
-            </View>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Engine</Text>
-              <Text style={styles.specValue}>{car.engine || "N/A"}</Text>
-            </View>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Power</Text>
-              <Text style={styles.specValue}>
-                {car.horsepower ? `${car.horsepower} HP` : "N/A"}
-              </Text>
-            </View>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Nm</Text>
-              <Text style={styles.specValue}>{car.nm || "N/A"}</Text>
-            </View>
+          {/* Owner Information */}
+          <View style={styles.ownerSection}>
+            <Text style={styles.ownerLabel}>Proudly Owned By</Text>
+            <Text style={styles.ownerName}>{car.user || "Vehicle Owner"}</Text>
           </View>
 
-          {/* Bottom Info */}
-          <View style={styles.bottomSection}>
-            <Text style={styles.userInfo}>Owner: {car.user || "Unknown"}</Text>
-            <Text style={styles.idmotoLabel}>IDMOTO Community</Text>
+          {/* Footer */}
+          <View style={styles.footerSection}>
+            <View style={styles.websiteContainer}>
+              <Text style={styles.websiteText}>idmoto.vercel.app</Text>
+            </View>
+            <Text style={styles.carId}>// THIS STICKER MAY CHANGE</Text>
           </View>
         </View>
       </Page>
@@ -256,7 +362,7 @@ function StickerPDF({
 export default function CarMeta({ car, user }: { car: any; user: any }) {
   const qrRef = useRef<SVGSVGElement>(null);
   const [qrPngUrl, setQrPngUrl] = useState<string | null>(null);
-  const logoUrl = "/logo.png"; // <-- podmień na swoją ścieżkę do logo PNG
+  const logoUrl = "/logo.png";
 
   // Convert SVG QR to PNG DataURL for react-pdf
   const handleGeneratePDF = () => {
@@ -270,10 +376,10 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
     const img = new window.Image();
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = 272; // Higher resolution for better PDF quality
-      canvas.height = 272;
+      canvas.width = 540; // Higher resolution for 1098x648 design
+      canvas.height = 540;
       const ctx = canvas.getContext("2d");
-      ctx?.drawImage(img, 0, 0, 272, 272);
+      ctx?.drawImage(img, 0, 0, 540, 540);
       setQrPngUrl(canvas.toDataURL("image/png"));
     };
     img.src = imageSrc;
@@ -315,7 +421,7 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
               document={
                 <StickerPDF car={car} qrPngUrl={qrPngUrl} logoUrl={logoUrl} />
               }
-              fileName={`car-sticker-${car.id}.pdf`}
+              fileName={`premium-car-sticker-${car.id}.pdf`}
               className="flex gap-2 cursor-pointer border border-zinc-700 hover:bg-zinc-800 transition px-4 py-2 rounded-lg text-xs uppercase tracking-widest font-bold bg-zinc-900"
             >
               {({ loading }) =>
