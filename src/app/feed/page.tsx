@@ -230,7 +230,7 @@ function PostForm({
             Share your thoughts
           </h3>
           <p className="text-zinc-400 text-xs sm:text-sm truncate">
-            What's happening in your automotive world?
+            What&apos;s happening in your automotive world?
           </p>
         </div>
       </div>
@@ -241,7 +241,7 @@ function PostForm({
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={500}
-          className="w-full rounded-2xl border border-white/20 bg-white/5 text-white px-4 py-3 sm:py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-zinc-500 resize-none text-sm sm:text-base backdrop-blur-sm"
+          className="w-full rounded-2xl border border-white/20 bg-white/5 text-white px-4 py-3 sm:py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-zinc-500 resize-none text-sm sm:text-base"
           rows={3}
           placeholder="Share your car experiences, tips, or just say hello..."
           disabled={uploading}
@@ -388,14 +388,6 @@ function PostSkeleton() {
           style={{ animationDelay: "0.5s" }}
         />
       </div>
-
-      {/* Image skeleton (random) with delayed animation */}
-      {Math.random() > 0.5 && (
-        <div
-          className="w-full h-48 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl mb-4 animate-pulse"
-          style={{ animationDelay: "0.6s" }}
-        />
-      )}
 
       {/* Actions skeleton with final delay */}
       <div className="flex items-center gap-2">
