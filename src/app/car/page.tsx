@@ -23,7 +23,7 @@ export async function generateMetadata({
 
   if (!carId || typeof carId !== "string") {
     return {
-      title: "Car Details | IDMOTO",
+      title: "Car Details",
       description:
         "View detailed information about cars in the IDMOTO community",
     };
@@ -40,7 +40,7 @@ export async function generateMetadata({
       const year = carData?.year || "";
 
       return {
-        title: `${manufacturer} ${model}${year ? ` ${year}` : ""} | IDMOTO`,
+        title: `${manufacturer} ${model}${year ? ` ${year}` : ""}`,
         description: `View details of this ${manufacturer} ${model} in the IDMOTO community. Check specifications, photos, and more.`,
       };
     }
@@ -49,7 +49,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: "Car Details | IDMOTO",
+    title: "Car Details",
     description: "View detailed information about cars in the IDMOTO community",
   };
 }
