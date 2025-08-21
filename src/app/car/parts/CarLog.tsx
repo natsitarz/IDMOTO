@@ -25,7 +25,7 @@ export default function CarLog({
   const [showAdd, setShowAdd] = useState(false);
   const [newLog, setNewLog] = useState("");
   const [logDate, setLogDate] = useState<string>(() =>
-    new Date().toISOString().slice(0, 16)
+    new Date().toISOString().slice(0, 10)
   );
   const [loading, setLoading] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -58,27 +58,61 @@ export default function CarLog({
     e.preventDefault();
     if (!newLog.trim()) return;
     setLoading(true);
-    const auth = getAuth();
-    const user = auth.currentUser;
-    const date = logDate
-      ? Timestamp.fromDate(new Date(logDate))
-      : serverTimestamp();
-    await addDoc(collection(db, "vehicles", carId, "logs"), {
-      text: newLog,
-      createdAt: date,
-      user: user?.displayName || user?.email || "Unknown",
-      userId: user?.uid || "",
-    });
-    setNewLog("");
-    setLogDate(new Date().toISOString().slice(0, 16));
-    setLoading(false);
-    setShowAdd(false);
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const date = logDate
+        ? Timestamp.fromDate(new Date(logDate))
+        : serverTimestamp();
+      await addDoc(collection(db, "vehicles", carId, "logs"), {
+        text: newLog,
+        createdAt: date,
+        user: user?.displayName || user?.email || "Unknown",
+        userId: user?.uid || "",
+      });
+      setNewLog("");
+      setLogDate(new Date().toISOString().slice(0, 10));
+      setShowAdd(false);
+      // Success toaster
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Log entry added successfully!",
+        })
+      );
+    } catch (error) {
+      console.error("Error adding log:", error);
+      // Failure toaster
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to add log entry. Please try again.",
+        })
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRemoveLog = async (logId: string) => {
     setRemovingId(logId);
-    await deleteDoc(doc(db, "vehicles", carId, "logs", logId));
-    setRemovingId(null);
+    try {
+      await deleteDoc(doc(db, "vehicles", carId, "logs", logId));
+      // Success toaster
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Log entry removed successfully!",
+        })
+      );
+    } catch (error) {
+      console.error("Error removing log:", error);
+      // Failure toaster
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to remove log entry. Please try again.",
+        })
+      );
+    } finally {
+      setRemovingId(null);
+    }
   };
 
   // Modal content as a separate variable for portal
@@ -122,7 +156,7 @@ export default function CarLog({
             Date
           </label>
           <input
-            type="datetime-local"
+            type="date"
             value={logDate}
             onChange={(e) => setLogDate(e.target.value)}
             className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base shadow-inner"
@@ -132,7 +166,7 @@ export default function CarLog({
         <button
           type="submit"
           disabled={loading || !newLog.trim()}
-          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow transition disabled:opacity-50"
+          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Adding..." : "Add Log"}
         </button>
@@ -187,7 +221,7 @@ export default function CarLog({
                 </span>
                 <span className="text-xs text-zinc-500">
                   {log.createdAt?.toDate
-                    ? log.createdAt.toDate().toLocaleString()
+                    ? log.createdAt.toDate().toLocaleDateString("en-GB")
                     : ""}
                 </span>
               </div>
@@ -198,7 +232,7 @@ export default function CarLog({
                 <button
                   onClick={() => handleRemoveLog(log.id)}
                   disabled={removingId === log.id}
-                  className="absolute bottom-2 right-2 text-xs text-red-400 hover:text-red-600 bg-zinc-800/70 rounded-full px-2 py-1 transition disabled:opacity-50"
+                  className="cursor-pointer absolute bottom-2 right-2 text-xs text-red-400 hover:text-red-600 bg-zinc-800/70 rounded-full px-2 py-1 transition disabled:opacity-50"
                   title="Remove log"
                 >
                   {removingId === log.id ? "..." : "Remove"}
