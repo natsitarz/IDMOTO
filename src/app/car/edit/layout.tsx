@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "../../globals.css";
 
 export const metadata: Metadata = {
-  title: "Edit Car",
+  title: "Edit Car | IDMOTO",
   description: "Update and manage your car profile details",
 };
 
