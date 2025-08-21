@@ -61,9 +61,11 @@ export default function CarLog({
     try {
       const auth = getAuth();
       const user = auth.currentUser;
+
       const date = logDate
         ? Timestamp.fromDate(new Date(logDate))
         : serverTimestamp();
+
       await addDoc(collection(db, "vehicles", carId, "logs"), {
         text: newLog,
         createdAt: date,
@@ -159,7 +161,11 @@ export default function CarLog({
             type="date"
             value={logDate}
             onChange={(e) => setLogDate(e.target.value)}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base shadow-inner"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base shadow-inner [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:invert"
+            style={{
+              colorScheme: "dark",
+            }}
+            lang="en-GB"
             required
           />
         </div>
