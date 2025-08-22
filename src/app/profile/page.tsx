@@ -864,7 +864,7 @@ function ProfileInner() {
         />
       </Head>
 
-      <main className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+      <main className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           {/* Enhanced Profile Header with better mobile spacing */}
           <header className="mb-8 sm:mb-12">

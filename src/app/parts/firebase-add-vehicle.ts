@@ -18,7 +18,7 @@ export const firebaseAddVehiclePublic = async (formData: FormData) => {
         userID: user.uid,
         description: "",
       });
-      window.location.href = "/profile";
+      window.location.href = "/profile?uid=" + user.uid;
     } catch (error) {
       console.error("Error adding document: ", error);
     }

@@ -995,7 +995,7 @@ export default function FeedPage() {
   }
 
   return (
-    <main className="min-h-[calc(100dvh-67px)] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-4 py-6 sm:py-8">
+    <main className="min-h-[calc(100dvh-67px)] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed px-4 py-6 sm:py-8">
       <div className="max-w-4xl mx-auto">
         {/* Post Form or Login Prompt */}
         {userLoading ? (

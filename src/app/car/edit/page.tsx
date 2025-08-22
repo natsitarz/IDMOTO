@@ -300,6 +300,7 @@ export default function CarEditPage() {
   const handleDeleteCar = async () => {
     try {
       await deleteCar();
+      router.push("/profile?uid=" + user.uid);
       window.dispatchEvent(
         new CustomEvent("show-global-success", { detail: "Car deleted!" })
       );
@@ -314,7 +315,7 @@ export default function CarEditPage() {
   };
 
   return (
-    <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-zinc-900 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed font-[family-name:var(--font-geist-sans)]">
       <div className="w-full max-w-3xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 rounded-3xl shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-0 flex flex-col md:flex-row items-stretch gap-0 animate-fade-in-scale relative overflow-hidden min-h-[860px]">
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
         <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />

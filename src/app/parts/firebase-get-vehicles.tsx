@@ -437,7 +437,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer h-72 w-54 flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer h-72 w-48 flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -652,7 +652,7 @@ export const VehiclesListDiv: React.FC<{
 
   // Render vehicles
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {vehicles.map((vehicle, index) => (
         <div
           key={vehicle.id}
