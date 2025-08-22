@@ -48,27 +48,40 @@ function BackgroundAlignmentModal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      document.body.classList.add("bg-alignment-modal-open");
     } else {
       document.body.style.overflow = "unset";
+      document.body.style.position = "unset";
+      document.body.style.width = "unset";
+      document.body.classList.remove("bg-alignment-modal-open");
     }
     return () => {
       document.body.style.overflow = "unset";
+      document.body.style.position = "unset";
+      document.body.style.width = "unset";
+      document.body.classList.remove("bg-alignment-modal-open");
     };
   }, [isOpen]);
 
   if (!isOpen || !mounted) return null;
 
+  // Ensure we have a portal container
+  const portalContainer =
+    document.getElementById("modal-root") || document.body;
+
   const modalContent = (
     <>
       {/* Fullscreen blurred backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999998]"
+        className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999999] bg-alignment-modal-backdrop"
         onClick={onClose}
       />
 
       {/* Modal content */}
-      <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-        <div className="w-full max-w-5xl mx-auto bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 animate-scale-in overflow-hidden">
+      <div className="fixed inset-0 z-[1000000] flex items-center justify-center p-4 bg-alignment-modal-container">
+        <div className="w-full max-w-5xl mx-auto bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 animate-fade-in-up overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
             <div className="flex items-center gap-3">
@@ -246,7 +259,7 @@ function BackgroundAlignmentModal({
     </>
   );
 
-  return createPortal(modalContent, document.body);
+  return createPortal(modalContent, portalContainer);
 }
 
 export function ProfileHeader({
@@ -507,20 +520,64 @@ export function ProfileHeader({
 
                 {/* Align Photo Button */}
                 <button
-                  className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base group"
+                  className={`cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base group ${
+                    !bgUrl || bgUrl.includes("background-car-placeholder.png")
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                   onClick={() => {
+                    // Only allow alignment if there's an actual uploaded background image
+                    if (
+                      !bgUrl ||
+                      bgUrl.includes("background-car-placeholder.png")
+                    ) {
+                      window.dispatchEvent(
+                        new CustomEvent("show-global-warning", {
+                          detail:
+                            "Please upload a background photo first before adjusting alignment.",
+                        })
+                      );
+                      setMenuOpen(false);
+                      return;
+                    }
+
+                    // Additional safety check to prevent conflicts
+                    if (showAlignModal) {
+                      return;
+                    }
+
                     setMenuOpen(false);
                     setOriginalBgAlign(bgAlign); // Save current value for potential revert
                     setShowAlignModal(true);
                   }}
+                  disabled={
+                    !bgUrl || bgUrl.includes("background-car-placeholder.png")
+                  }
                 >
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                    <FiMove className="text-blue-400" size={18} />
+                  <div
+                    className={`w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:bg-blue-500/30 transition-colors ${
+                      !bgUrl || bgUrl.includes("background-car-placeholder.png")
+                        ? "bg-zinc-600/20 group-hover:bg-zinc-600/20"
+                        : ""
+                    }`}
+                  >
+                    <FiMove
+                      className={`text-blue-400 ${
+                        !bgUrl ||
+                        bgUrl.includes("background-car-placeholder.png")
+                          ? "text-zinc-500"
+                          : ""
+                      }`}
+                      size={18}
+                    />
                   </div>
                   <div className="flex-1 text-left">
                     <div className="font-semibold">Align Photo</div>
                     <div className="text-zinc-400 text-sm">
-                      Adjust image position
+                      {!bgUrl ||
+                      bgUrl.includes("background-car-placeholder.png")
+                        ? "Upload a background photo first"
+                        : "Adjust image position"}
                     </div>
                   </div>
                 </button>
@@ -564,17 +621,6 @@ export function ProfileHeader({
           }
         }
 
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: translate(-50%, -48%) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
-
         .animate-fade-in-up {
           animation: fade-in-up 0.6s ease-out forwards;
         }
@@ -610,6 +656,21 @@ export function ProfileHeader({
           box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
             0 6px 16px rgba(0, 0, 0, 0.4);
           transform: scale(1.1);
+        }
+
+        /* Background alignment modal specific styles */
+        .bg-alignment-modal-backdrop {
+          z-index: 999999 !important;
+        }
+
+        .bg-alignment-modal-container {
+          z-index: 1000000 !important;
+        }
+
+        body.bg-alignment-modal-open {
+          overflow: hidden !important;
+          position: fixed !important;
+          width: 100% !important;
         }
 
         .slider::-moz-range-thumb {

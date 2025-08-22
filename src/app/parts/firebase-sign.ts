@@ -27,6 +27,11 @@ export const googleSignIn = () => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const user = result.user;
         if (credential) {
+          window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Successfully logged in.",
+        })
+      );
         }
       })
       .catch((error) => {

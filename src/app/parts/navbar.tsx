@@ -99,7 +99,7 @@ function AuthButton({
         onClick={handleClick}
         disabled={loading}
         className={cn(
-          "flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200",
+          "flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200",
           "bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300",
           "border border-red-500/30 hover:border-red-400/50",
           "focus:outline-none focus:ring-2 focus:ring-red-400/50",
@@ -125,10 +125,7 @@ function AuthButton({
       onClick={handleClick}
       disabled={loading}
       className={cn(
-        "flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200",
-        "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
-        "text-white font-medium shadow-lg hover:shadow-xl",
-        "focus:outline-none focus:ring-2 focus:ring-blue-400/50",
+        "cursor-pointer flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl hover:scale-105",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         "hover:scale-105 active:scale-95 cursor-pointer",
         isMobile && "w-full justify-center"

@@ -27,13 +27,13 @@ export function ProfileVehiclesSection({
 
   return (
     <section className="relative w-full mx-auto flex flex-col gap-8 bg-zinc-900/60 shadow-2xl border border-zinc-800/70 px-6 py-10 sm:px-12 sm:py-14 items-center overflow-hidden rounded-3xl">
-      <div className="animate-fade-in-up w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 z-10">
-        <div>
-          <h2 className="text-3xl font-black text-white tracking-tight drop-shadow flex items-center gap-2">
-            <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 bg-clip-text text-transparent">
-              {isOwnProfile ? "My Vehicles" : "User's Vehicles"}
+      <div className="animate-fade-in-up w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 z-10">
+        <div className="w-full justify-around flex flex-col">
+          <h2 className="text-3xl font-black text-white tracking-tight drop-shadow flex items-center justify-between gap-2">
+            <span className="text-2xl sm:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3 uppercase tracking-widest">
+              {isOwnProfile ? "Garage" : "User's Garage"}
             </span>
-            <span className="inline-flex items-center justify-center bg-zinc-800/80 text-blue-400 text-xs font-bold rounded-full px-3 py-1 ml-2 shadow-inner border border-blue-700/30">
+            <span className="inline-flex items-center justify-center bg-zinc-800/90 text-white text-xs font-bold rounded-full px-4 py-1 ml-2 shadow-inner border border-zinc-400/30">
               {vehicleCount !== null ? vehicleCount : "…"}
             </span>
           </h2>

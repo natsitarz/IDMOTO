@@ -10,6 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, ref as storageRef } from "firebase/storage";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -99,19 +100,13 @@ function EmptyVehiclesState({ isOwnProfile }: { isOwnProfile: boolean }) {
   return (
     <div className="col-span-full flex flex-col items-center justify-center py-16 px-4 animate-fade-in">
       <div className="w-20 h-20 mx-auto mb-6 bg-zinc-800/50 rounded-full flex items-center justify-center border border-zinc-700">
-        <svg
-          className="w-10 h-10 text-zinc-500"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 1-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m6.75 4.5v-3a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5v3m-6 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m6.75 4.5V21a1.5 1.5 0 0 1-1.5 1.5H9a1.5 1.5 0 0 1-1.5-1.5v-2.25A1.5 1.5 0 0 1 9 17.25h1.5m9-6.75V21a1.5 1.5 0 0 1-1.5 1.5H18a1.5 1.5 0 0 1-1.5-1.5v-3.75m4.5-6H22.5m-9 3.75a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5v3m-6-3h6"
-          />
-        </svg>
+        <Image
+          src="/check.png"
+          alt="No Vehicles"
+          width={50}
+          height={40}
+          className="text-zinc-400 select-none pointer-events-none"
+        />
       </div>
 
       <h3 className="text-xl font-bold text-white mb-3">
@@ -127,7 +122,7 @@ function EmptyVehiclesState({ isOwnProfile }: { isOwnProfile: boolean }) {
       {isOwnProfile && (
         <button
           onClick={() => router.push("/add")}
-          className="cursor-pointer px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2"
+          className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl hover:scale-105"
         >
           <svg
             className="w-5 h-5"
@@ -193,12 +188,12 @@ function AlignmentModal({
     <>
       {/* Fullscreen blurred backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999998]"
+        className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999990]"
         onClick={onClose}
       />
 
       {/* Modal content */}
-      <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[999991] flex items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 animate-scale-in overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">

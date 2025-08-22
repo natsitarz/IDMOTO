@@ -394,7 +394,7 @@ function RecentActivityCard({
     <section className="bg-white/5 backdrop-blur-sm rounded-3xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-500">
       <header className="mb-4 sm:mb-6">
         <h2 className="text-lg sm:text-xl font-bold text-white mb-2 flex items-center gap-2 sm:gap-3">
-          <div className="w-7 sm:w-8 h-7 sm:h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/25">
+          <div className="w-7 sm:w-8 h-7 sm:h-8 bg-gradient-to-r from-green-600 to-green-800 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
             <svg
               className="w-3 sm:w-4 h-3 sm:h-4 text-white"
               fill="none"
@@ -510,8 +510,8 @@ function ActivityHubCard({
             </svg>
           ),
           onClick: onAddVehicle,
-          gradient: "from-emerald-500 to-green-500",
-          hoverShadow: "hover:shadow-xl hover:shadow-emerald-500/25",
+          gradient: "from-emerald-600 to-green-700",
+          hoverShadow: "hover:shadow-lg hover:shadow-emerald-500/25",
         },
         {
           title: "Settings",
@@ -538,7 +538,7 @@ function ActivityHubCard({
           ),
           onClick: onEdit,
           gradient: "from-slate-500 to-gray-500",
-          hoverShadow: "hover:shadow-xl hover:shadow-slate-500/25",
+          hoverShadow: "hover:shadow-lg hover:shadow-slate-500/25",
         },
       ]
     : [];

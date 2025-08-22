@@ -39,11 +39,18 @@ export default function Profile() {
           setHasCar(!snapshot.empty);
         };
         checkUserCars();
+      } else {
+        router.push("/");
+        window.dispatchEvent(
+          new CustomEvent("show-global-error", {
+            detail: "Log in to add a vehicle.",
+          })
+        );
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   // Wrap the submit handler to include visibility
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,7 +69,7 @@ export default function Profile() {
       id="addCar"
       className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed font-[family-name:var(--font-geist-sans)]"
     >
-      <div className="w-full max-w-2xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 flex flex-col justify-center items-center gap-10 animate-fade-in relative overflow-hidden min-h-[calc(100dvh-67px)]">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 flex flex-col justify-center items-center gap-10 animate-fade-in-scale relative overflow-hidden min-h-[calc(100dvh-67px)]">
         {/* Decorative gradient circle */}
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col items-center gap-2 z-10">
@@ -274,7 +281,7 @@ export default function Profile() {
 function AddCarSkeleton() {
   return (
     <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed font-[family-name:var(--font-geist-sans)]">
-      <div className="w-full max-w-2xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 flex flex-col justify-center items-center gap-10 animate-fade-in relative overflow-hidden min-h-[calc(100dvh-67px)]">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 flex flex-col justify-center items-center gap-10 animate-fade-in-scale relative overflow-hidden min-h-[calc(100dvh-67px)]">
         {/* Decorative gradient circle */}
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
 

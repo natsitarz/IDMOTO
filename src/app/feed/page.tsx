@@ -2,6 +2,7 @@
 
 import { ModerationLevel } from "@/app/parts/contentModerator";
 import { db, storage } from "@/app/parts/firebase";
+import { googleSignIn } from "@/app/parts/firebase-sign";
 import SeePhoto from "@/app/parts/see-photo";
 import {
   ModerationFeedback,
@@ -125,6 +126,7 @@ function PostForm({
   onPost: () => void;
   currentUser: User;
 }) {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -151,6 +153,10 @@ function PostForm({
       );
     },
   });
+
+  const navigateToProfile = useCallback(() => {
+    router.push(`/profile?uid=${currentUser.uid}`);
+  }, [router, currentUser.uid]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -255,14 +261,20 @@ function PostForm({
       {/* Header */}
       <div className="flex items-center gap-3 sm:gap-4 mb-4">
         <div className="relative">
-          <Image
-            src={currentUser.photoURL || "/logo.png"}
-            alt={currentUser.displayName || "User"}
-            width={48}
-            height={48}
-            className="rounded-full object-cover w-10 h-10 sm:w-12 sm:h-12 border-2 border-white/20"
-          />
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-zinc-900 animate-pulse" />
+          <button
+            onClick={navigateToProfile}
+            className="cursor-pointer relative group/avatar transition-transform hover:scale-105"
+          >
+            <Image
+              src={currentUser.photoURL || "/logo.png"}
+              alt={currentUser.displayName || "User"}
+              width={48}
+              height={48}
+              className="rounded-full object-cover w-10 h-10 sm:w-12 sm:h-12 border-2 border-white/20 group-hover/avatar:border-white/40 transition-colors"
+            />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-zinc-900 animate-pulse" />
+          </button>
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-white truncate text-sm sm:text-base">
@@ -392,13 +404,26 @@ function PostForm({
 
         <button
           type="submit"
-          className="cursor-pointer px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
+          className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={isDisabled}
         >
+          <svg
+            className="w-4 h-4 sm:w-5 sm:h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
           {(uploading || isChecking) && (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           )}
-          <span className="text-sm sm:text-base">
+          <span className="text-sm font-medium hidden sm:inline">
             {uploading ? "Posting..." : isChecking ? "Checking..." : "Share"}
           </span>
         </button>
@@ -933,6 +958,51 @@ function EmptyState({ isLoggedIn }: { isLoggedIn: boolean }) {
   );
 }
 
+// Sign In Button Component with same logic as navbar
+function SignInButton() {
+  const [loading, setLoading] = useState(false);
+
+  const handleSignIn = useCallback(async () => {
+    setLoading(true);
+    try {
+      await googleSignIn();
+    } catch (error) {
+      console.error("Sign in error:", error);
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to sign in. Please try again.",
+        })
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return (
+    <button
+      onClick={handleSignIn}
+      disabled={loading}
+      className={[
+        "cursor-pointer gap-2 px-4 py-2 rounded-xl transition-all duration-200 overflow-hidden",
+        "hover:bg-white/15 hover:scale-105 active:scale-95",
+        "focus:outline-none focus:ring-2 focus:ring-blue-400/50",
+        "bg-white/10 text-white border border-white/20",
+      ].join(" ")}
+    >
+      {loading ? (
+        <>
+          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <span>Signing in...</span>
+        </>
+      ) : (
+        <>
+          <span>Sign In to Post</span>
+        </>
+      )}
+    </button>
+  );
+}
+
 // Main Feed Page Component
 export default function FeedPage() {
   const { user: currentUser, loading: userLoading } = useCurrentUser();
@@ -1093,12 +1163,7 @@ export default function FeedPage() {
               Sign in to share your automotive stories, connect with
               enthusiasts, and be part of our growing community.
             </p>
-            <button
-              onClick={() => (window.location.href = "/")}
-              className="cursor-pointer px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              Sign In to Post
-            </button>
+            <SignInButton />
           </div>
         )}
 
