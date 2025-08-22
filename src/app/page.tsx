@@ -11,11 +11,12 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function HomePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, initialized } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [hasCheckedInitialAuth, setHasCheckedInitialAuth] = useState(false);
 
   // Handle redirect results on mount
   useEffect(() => {
@@ -29,20 +30,36 @@ export default function HomePage() {
     handleRedirect();
   }, []);
 
-  // Redirect to feed if user is logged in
+  // Redirect to feed if user is logged in (but only after initial auth check)
   useEffect(() => {
+    // Only proceed if auth has been initialized
+    if (!initialized) return;
+
+    // Mark that we've checked initial auth state
+    if (!hasCheckedInitialAuth) {
+      setHasCheckedInitialAuth(true);
+      return;
+    }
+
+    // Only redirect if user exists and auth is not loading
     if (!authLoading && user) {
       const addUserAndRedirect = async () => {
         try {
           await addUserToDB(user);
+
           router.replace("/feed");
+          window.dispatchEvent(
+            new CustomEvent("show-global-success", {
+              detail: "Successfully logged in.",
+            })
+          );
         } catch (error) {
           console.error("Error adding user to DB:", error);
         }
       };
       addUserAndRedirect();
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, initialized, hasCheckedInitialAuth]);
 
   // Mobile detection with debounced resize
   useEffect(() => {
