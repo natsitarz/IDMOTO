@@ -1038,14 +1038,6 @@ export default function FeedPage() {
     return (
       <main className="min-h-[calc(100dvh-67px)] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-4 py-6 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          <header className="text-center mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">
-              Community Feed
-            </h1>
-            <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-              Loading...
-            </p>
-          </header>
           <div className="space-y-6">
             {[...Array(3)].map((_, i) => (
               <PostSkeleton key={i} />
