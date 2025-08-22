@@ -26,7 +26,7 @@ interface ValidationResult {
 }
 
 export async function validateContent(
-  content: string, 
+  content: string,
   contentType: 'post' | 'bio' | 'vehicle_description' | 'vehicle_data',
   metadata?: Record<string, unknown>
 ): Promise<ValidationResult> {

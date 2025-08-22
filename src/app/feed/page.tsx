@@ -188,25 +188,30 @@ function PostForm({
 
         if (!text.trim() && !image) return;
 
-        // Step 1: Server-side content validation and moderation
-        const securityCheck = await submitContentSecurely(text.trim(), "post");
-
-        if (!securityCheck.success) {
-          window.dispatchEvent(
-            new CustomEvent("show-global-error", {
-              detail: securityCheck.errors[0] || "Content validation failed",
-            })
+        // Step 1: Server-side content validation and moderation (only if there's text content)
+        if (text.trim()) {
+          const securityCheck = await submitContentSecurely(
+            text.trim(),
+            "post"
           );
-          return;
-        }
 
-        // Show warnings if any (non-blocking)
-        if (securityCheck.warnings.length > 0) {
-          window.dispatchEvent(
-            new CustomEvent("show-global-warning", {
-              detail: securityCheck.warnings[0],
-            })
-          );
+          if (!securityCheck.success) {
+            window.dispatchEvent(
+              new CustomEvent("show-global-error", {
+                detail: securityCheck.errors[0] || "Content validation failed",
+              })
+            );
+            return;
+          }
+
+          // Show warnings if any (non-blocking)
+          if (securityCheck.warnings.length > 0) {
+            window.dispatchEvent(
+              new CustomEvent("show-global-warning", {
+                detail: securityCheck.warnings[0],
+              })
+            );
+          }
         }
 
         // Step 2: Server-side file validation if image provided
@@ -1832,7 +1837,6 @@ export default function FeedPage() {
           box-shadow: 0 0 0 2px rgb(59 130 246 / 0.5);
         }
       `}</style>
-      ;
     </main>
   );
 }
