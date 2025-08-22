@@ -87,7 +87,7 @@ export default function HomePage() {
   if (authLoading) {
     return (
       <div className="relative min-h-[calc(100dvh)] w-full flex items-center justify-center overflow-hidden bg-zinc-900">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-zinc-900 to-cyan-900 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed z-0" />
         <div className="absolute inset-0 bg-black/50 z-10" />
         <div className="relative z-20 flex flex-col items-center gap-4">
           <Image
