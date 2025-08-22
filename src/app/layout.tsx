@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     siteName: "IDMOTO",
     images: [
       {
-        url: "/logo.png",
+        url: "/background-car-placeholder.png",
         width: 1200,
         height: 630,
         alt: "IDMOTO - The Ultimate Car Social Network Platform",
@@ -94,7 +94,7 @@ export const metadata: Metadata = {
       "Join IDMOTO, the ultimate car social network. Create your car profile, showcase your ride, and connect with automotive enthusiasts worldwide.",
     images: [
       {
-        url: "/logo.png",
+        url: "/background-car-placeholder.png",
         alt: "IDMOTO - The Ultimate Car Social Network Platform",
       },
     ],
