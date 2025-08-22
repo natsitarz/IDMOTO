@@ -100,9 +100,7 @@ export async function generateMetadata({
       }
 
       // Create comprehensive title and description
-      const carTitle = `${manufacturer} ${model}${
-        year ? ` ${year}` : ""
-      } | IDMOTO`;
+      const carTitle = `${manufacturer} ${model}${year ? ` ${year}` : ""}`;
       const yearText = year ? ` from ${year}` : "";
       const engineText = engine ? ` with ${engine}` : "";
       const hpText = horsepower ? ` (${horsepower}HP)` : "";
@@ -119,7 +117,7 @@ export async function generateMetadata({
           canonical: carUrl,
         },
         openGraph: {
-          title: carTitle,
+          title: carTitle + " | IDMOTO",
           description: carDescription,
           type: "article",
           url: carUrl,
