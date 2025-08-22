@@ -1,6 +1,7 @@
+import { Vehicle } from "@/types";
 import React from "react";
 
-export default function CarSpecs({ car }: { car: any }) {
+export default function CarSpecs({ car }: { car: Vehicle }) {
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">

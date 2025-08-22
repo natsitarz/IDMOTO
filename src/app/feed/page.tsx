@@ -9,6 +9,7 @@ import {
   ModerationStatus,
   useContentModeration,
 } from "@/app/parts/useContentModeration";
+import { FeedItem, FirebaseTimestamp, isAd, Post } from "@/types";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import {
   addDoc,
@@ -305,7 +306,7 @@ function PostForm({
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          maxLength={500}
+          maxLength={200}
           className="w-full rounded-2xl border border-white/20 bg-white/5 text-white px-4 py-3 sm:py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-zinc-500 resize-none text-sm sm:text-base"
           rows={3}
           placeholder="Share your car experiences, tips, or just say hello..."
@@ -313,7 +314,7 @@ function PostForm({
         />
         <div className="absolute bottom-3 right-4 flex items-center gap-2">
           <span className="text-xs text-zinc-400 select-none">
-            {text.length}/500
+            {text.length}/200
           </span>
           {text.length > 450 && (
             <div className="w-6 h-1 bg-zinc-700 rounded-full overflow-hidden">
@@ -481,7 +482,7 @@ function PostSkeleton() {
 // Extend Window type for adsbygoogle
 declare global {
   interface Window {
-    adsbygoogle?: any[];
+    adsbygoogle?: unknown[];
   }
 }
 
@@ -572,7 +573,7 @@ function PostCard({
   currentUser,
   showLike,
 }: {
-  post: any;
+  post: Post;
   onLike: () => void;
   onDelete: () => void;
   onEdit: () => void;
@@ -592,7 +593,9 @@ function PostCard({
   const handleEdit = useCallback(async () => {
     setEditSaving(true);
     try {
-      await updateDoc(doc(db, "posts", post.id), { text: editText.trim() });
+      await updateDoc(doc(db, "posts", post.id), {
+        text: (editText || "").trim(),
+      });
       setEditing(false);
       window.dispatchEvent(
         new CustomEvent("show-global-success", {
@@ -665,7 +668,7 @@ function PostCard({
     router.push(`/profile?uid=${post.userId}`);
   }, [router, post.userId]);
 
-  const formatDate = useCallback((timestamp: any) => {
+  const formatDate = useCallback((timestamp: FirebaseTimestamp | undefined) => {
     if (!timestamp?.toDate) return "Recently";
 
     const date = timestamp.toDate();
@@ -682,7 +685,7 @@ function PostCard({
     return date.toLocaleDateString();
   }, []);
 
-  const isLiked = post.likes?.includes(currentUser?.uid);
+  const isLiked = post.likes?.includes(currentUser?.uid || "");
   const likeCount = post.likes?.length || 0;
 
   return (
@@ -695,7 +698,7 @@ function PostCard({
         >
           <Image
             src={post.userPhoto || "/logo.png"}
-            alt={post.userName}
+            alt={post.userName || "User"}
             width={48}
             height={48}
             className="rounded-full object-cover w-10 h-10 sm:w-12 sm:h-12 border-2 border-white/20 group-hover/avatar:border-white/40 transition-colors"
@@ -890,13 +893,13 @@ function PostCard({
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                   rows={5}
-                  maxLength={500}
+                  maxLength={200}
                   autoFocus
                   placeholder="Edit your post..."
                   disabled={editSaving}
                 />
                 <span className="absolute bottom-3 right-4 text-xs text-zinc-400 select-none">
-                  {editText.length}/500
+                  {(editText || "").length}/200
                 </span>
               </div>
 
@@ -911,7 +914,7 @@ function PostCard({
                 <button
                   className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   onClick={handleEdit}
-                  disabled={editSaving || editText.trim().length === 0}
+                  disabled={editSaving || (editText || "").trim().length === 0}
                 >
                   {editSaving && (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1013,7 +1016,7 @@ function SignInButton() {
 // Main Feed Page Component
 export default function FeedPage() {
   const { user: currentUser, loading: userLoading } = useCurrentUser();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [postsError, setPostsError] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
@@ -1034,10 +1037,13 @@ export default function FeedPage() {
         q,
         (snapshot) => {
           setPosts(
-            snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }))
+            snapshot.docs.map(
+              (doc) =>
+                ({
+                  id: doc.id,
+                  ...doc.data(),
+                } as Post)
+            )
           );
           setPostsLoading(false);
         },
@@ -1070,7 +1076,7 @@ export default function FeedPage() {
   }, [loadPosts]);
 
   const handleLike = useCallback(
-    async (post: any) => {
+    async (post: Post) => {
       if (!currentUser) return;
 
       const ref = doc(db, "posts", post.id);
@@ -1091,7 +1097,7 @@ export default function FeedPage() {
   const feedItems = React.useMemo(() => {
     if (!mounted || posts.length === 0) return [];
 
-    const items: any[] = [];
+    const items: FeedItem[] = [];
 
     if (posts.length < 5) {
       // One ad at the top for small feeds
@@ -1221,7 +1227,7 @@ export default function FeedPage() {
           ) : (
             <div className="space-y-6">
               {feedItems.map((item, index) =>
-                item.isAd ? (
+                isAd(item) ? (
                   <div
                     key={item.id}
                     style={{ animationDelay: `${index * 100}ms` }}

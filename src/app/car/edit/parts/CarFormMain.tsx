@@ -1,3 +1,4 @@
+import { CarFormData } from "@/types";
 import React from "react";
 
 export default function CarFormMain({
@@ -7,8 +8,8 @@ export default function CarFormMain({
   saving,
   error,
 }: {
-  form: any;
-  setForm: React.Dispatch<React.SetStateAction<any>>;
+  form: CarFormData;
+  setForm: React.Dispatch<React.SetStateAction<CarFormData>>;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
   error: string | null;
@@ -18,7 +19,10 @@ export default function CarFormMain({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    setForm((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev: CarFormData) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   return (

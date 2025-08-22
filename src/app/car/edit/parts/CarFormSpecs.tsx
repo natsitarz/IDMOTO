@@ -1,4 +1,5 @@
 import { db } from "@/app/parts/firebase";
+import { CarFormData } from "@/types";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect } from "react";
 
@@ -11,8 +12,8 @@ export default function CarFormSpecs({
   carId,
   userId,
 }: {
-  form: any;
-  setForm: React.Dispatch<React.SetStateAction<any>>;
+  form: CarFormData;
+  setForm: React.Dispatch<React.SetStateAction<CarFormData>>;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
   error: string | null;
@@ -24,7 +25,10 @@ export default function CarFormSpecs({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    setForm((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev: CarFormData) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   // Fetch specs from Firestore on mount
@@ -35,7 +39,7 @@ export default function CarFormSpecs({
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setForm((prev: any) => ({
+        setForm((prev: CarFormData) => ({
           ...prev,
           nm: data.nm || "",
           version: data.version || "",

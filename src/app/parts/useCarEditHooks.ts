@@ -1,6 +1,7 @@
 import { auth, db } from "@/app/parts/firebase";
+import { CarFormData, Vehicle } from "@/types";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, DocumentSnapshot, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 
@@ -16,22 +17,26 @@ export function useAuthUser() {
 }
 
 function processCarSnapshot(
-  carSnap: any,
-  setCar: React.Dispatch<React.SetStateAction<any>>,
-  setForm: React.Dispatch<React.SetStateAction<any>>,
+  carSnap: DocumentSnapshot,
+  setCar: React.Dispatch<React.SetStateAction<Vehicle | null>>,
+  setForm: React.Dispatch<React.SetStateAction<CarFormData>>,
   setError: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   if (carSnap.exists()) {
-    const carData = carSnap.data();
+    const carData = carSnap.data() as Vehicle;
     setCar(carData);
     setForm({
       manufacturer: carData.manufacturer || "",
       model: carData.model || "",
-      year: carData.year || "",
+      year: String(carData.year || ""),
       engine: carData.engine || "",
-      horsepower: carData.horsepower || "",
+      horsepower: String(carData.horsepower || ""),
       transmission: carData.transmission || "",
       description: carData.description || "",
+      version: carData.version || "",
+      mileage: String(carData.mileage || ""),
+      color: carData.color || "",
+      nm: carData.nm || "",
     });
   } else {
     setError("Car not found.");
@@ -39,10 +44,10 @@ function processCarSnapshot(
 }
 
 export function useCarData(user: User | null, carId: string) {
-  const [car, setCar] = useState<any>(null);
+  const [car, setCar] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<CarFormData>({
     manufacturer: "",
     model: "",
     year: "",
@@ -65,7 +70,7 @@ export function useCarData(user: User | null, carId: string) {
     getDoc(doc(db, "vehicles", carId))
       .then((carSnap) => {
         processCarSnapshot(carSnap, setCar, setForm, setError);
-        const carData = carSnap.data();
+        const carData = carSnap.data() as Vehicle;
         if (carData) {
           setVisibility(carData.visibility || "private");
           setCanEdit(user && carData.ownerId === user.uid);
