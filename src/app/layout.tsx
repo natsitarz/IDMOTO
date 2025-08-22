@@ -1,5 +1,6 @@
 import { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import StructuredData from "./components/StructuredData";
 import "./globals.css";
 import { AuthProvider } from "./parts/AuthProvider";
 import ClientErrorToaster from "./parts/ClientErrorToaster";
@@ -151,44 +152,11 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080"
           crossOrigin="anonymous"
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "IDMOTO",
-              alternateName: "IDMOTO Car Social Network",
-              url: "https://idmoto.vercel.app",
-              description:
-                "The ultimate car social network. Create your car profile, showcase your ride, and connect with automotive enthusiasts worldwide.",
-              potentialAction: {
-                "@type": "SearchAction",
-                target:
-                  "https://idmoto.vercel.app/search?q={search_term_string}",
-                "query-input": "required name=search_term_string",
-              },
-              sameAs: [
-                "https://twitter.com/idmoto",
-                "https://facebook.com/idmoto",
-                "https://instagram.com/idmoto",
-              ],
-              publisher: {
-                "@type": "Organization",
-                name: "IDMOTO",
-                url: "https://idmoto.vercel.app",
-                logo: {
-                  "@type": "ImageObject",
-                  url: "https://idmoto.vercel.app/logo.png",
-                },
-              },
-            }),
-          }}
-        />
       </head>
       <body
         className={`${inter.className} antialiased bg-zinc-900 text-white min-h-screen`}
       >
+        <StructuredData />
         <AuthProvider>
           <ClientErrorToaster />
           <ConditionalNavbar />

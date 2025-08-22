@@ -1003,7 +1003,7 @@ function SignInButton() {
             height={22}
             className="transition-transform invert group-hover:scale-110"
           />
-          <span>Sign In to Post</span>
+          <span className="font-bold">Continue with Google</span>
         </>
       )}
     </button>
