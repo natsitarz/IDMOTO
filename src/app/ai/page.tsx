@@ -1,8 +1,7 @@
 "use client";
 
 import { useAuth } from "@/app/parts/AuthProvider";
-import { askChatGPT } from "@/lib/chatgpt-client";
-import { askGemini } from "@/lib/gemini";
+import { queryAI } from "@/lib/api-client";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 
@@ -86,20 +85,19 @@ function AIPageInner() {
     setInput("");
     setLoading(true);
 
-    const askAI = aiProvider === "gemini" ? askGemini : askChatGPT;
-
     try {
-      const aiReply = await askAI(userMessage);
+      const aiReply = await queryAI(userMessage, aiProvider);
       setMessages((msgs) => [
         ...msgs,
         { from: "ai", text: aiReply || "Sorry, I couldn't find an answer." },
       ]);
-    } catch {
+    } catch (error) {
+      console.error("AI query error:", error);
       setMessages((msgs) => [
         ...msgs,
         {
           from: "ai",
-          text: "Sorry, there was a problem contacting the AI.",
+          text: "Sorry, there was a problem contacting the AI. Please try again.",
         },
       ]);
     }

@@ -9,6 +9,7 @@ import {
   ModerationStatus,
   useContentModeration,
 } from "@/app/parts/useContentModeration";
+import { submitContentSecurely, validateFileUpload } from "@/lib/api-client";
 import { FeedItem, FirebaseTimestamp, isAd, Post } from "@/types";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import {
@@ -185,7 +186,44 @@ function PostForm({
 
         if (!text.trim() && !image) return;
 
-        // Check content with moderation system
+        // Step 1: Server-side content validation and moderation
+        const securityCheck = await submitContentSecurely(text.trim(), "post");
+
+        if (!securityCheck.success) {
+          window.dispatchEvent(
+            new CustomEvent("show-global-error", {
+              detail: securityCheck.errors[0] || "Content validation failed",
+            })
+          );
+          return;
+        }
+
+        // Show warnings if any (non-blocking)
+        if (securityCheck.warnings.length > 0) {
+          window.dispatchEvent(
+            new CustomEvent("show-global-warning", {
+              detail: securityCheck.warnings[0],
+            })
+          );
+        }
+
+        // Step 2: Server-side file validation if image provided
+        if (image) {
+          const fileValidation = await validateFileUpload(
+            image,
+            "temp-post-id"
+          );
+          if (!fileValidation.success) {
+            window.dispatchEvent(
+              new CustomEvent("show-global-error", {
+                detail: fileValidation.error || "File validation failed",
+              })
+            );
+            return;
+          }
+        }
+
+        // Step 3: Client-side moderation as backup (keep existing logic)
         const isContentAppropriate = await checkPost(text, image || undefined);
 
         if (!isContentAppropriate) {
@@ -486,47 +524,105 @@ declare global {
   }
 }
 
-// Fixed Ad Component with proper client-side rendering
+// Fixed Ad Component with OpaqueResponseBlocking handling
 function AdPostCard() {
   const [mounted, setMounted] = useState(false);
+  const [adLoaded, setAdLoaded] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
+  const [adVisible, setAdVisible] = useState(false);
   const adRef = useRef<HTMLElementTagNameMap["ins"] | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted && typeof window !== "undefined") {
-      // Load AdSense script dynamically
-      const script = document.createElement("script");
-      script.src =
-        "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080";
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      document.head.appendChild(script);
-
-      // Initialize ad after script loads
-      script.onload = () => {
+    if (mounted && typeof window !== "undefined" && !scriptError) {
+      const tryInitializeAd = () => {
         try {
-          if (window.adsbygoogle && adRef.current) {
-            window.adsbygoogle.push({});
+          if (
+            window.adsbygoogle &&
+            adRef.current &&
+            containerRef.current &&
+            !adLoaded
+          ) {
+            // Check if container has proper dimensions
+            const containerRect = containerRef.current.getBoundingClientRect();
+            if (containerRect.width > 0 && containerRect.height > 0) {
+              window.adsbygoogle.push({});
+              setAdLoaded(true);
+
+              // Check if ad actually renders content after a delay
+              setTimeout(() => {
+                if (adRef.current) {
+                  const adRect = adRef.current.getBoundingClientRect();
+                  const hasContent =
+                    adRef.current.children.length > 0 || adRect.height > 50; // AdSense adds content or increases height
+                  if (hasContent) {
+                    setAdVisible(true);
+                  } else {
+                    // Ad didn't load content, consider it failed
+                    setScriptError(true);
+                  }
+                }
+              }, 2000); // Wait 2 seconds for ad to load
+            } else {
+              // Retry after a short delay if container isn't sized yet
+              setTimeout(tryInitializeAd, 200);
+            }
           }
         } catch (e) {
           console.log("AdSense error:", e);
+          setScriptError(true);
         }
       };
 
-      return () => {
-        // Cleanup script if component unmounts
-        if (document.head.contains(script)) {
-          document.head.removeChild(script);
-        }
-      };
+      // Check if AdSense script is already loaded
+      const existingScript = document.querySelector(
+        'script[src*="adsbygoogle.js"]'
+      );
+
+      if (!existingScript) {
+        // Load AdSense script with minimal attributes to avoid OpaqueResponseBlocking
+        const script = document.createElement("script");
+        script.src =
+          "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1346635526682080";
+        script.async = true;
+        // Remove CORS attributes that may cause OpaqueResponseBlocking issues
+
+        document.head.appendChild(script);
+
+        script.onload = () => {
+          // Wait a bit for the container to be properly sized
+          setTimeout(() => {
+            tryInitializeAd();
+          }, 100);
+        };
+
+        script.onerror = (error) => {
+          console.log(
+            "AdSense script failed to load - likely due to ad blocker or OpaqueResponseBlocking:",
+            error
+          );
+          setScriptError(true);
+        };
+      } else {
+        // Script already exists, try to initialize
+        setTimeout(() => {
+          tryInitializeAd();
+        }, 100);
+      }
     }
-  }, [mounted]);
+  }, [mounted, adLoaded, scriptError, adVisible]);
 
-  // Don't render ads on server side
-  if (!mounted) {
+  // Don't render ads on server side or if not visible
+  if (!mounted || scriptError || (adLoaded && !adVisible)) {
+    return null;
+  }
+
+  // Show loading state only while mounted and trying to load
+  if (!adLoaded) {
     return (
       <div className="w-full max-w-xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -535,24 +631,32 @@ function AdPostCard() {
           </div>
           <span className="text-zinc-400 text-sm font-medium">Sponsored</span>
         </div>
-        <div className="w-full h-24 bg-white/5 rounded-2xl animate-pulse" />
+        <div className="w-full h-32 bg-white/5 rounded-2xl animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="hidden w-full max-w-xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in">
+    <div
+      ref={containerRef}
+      className="w-full max-w-xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in"
+    >
       <div className="flex items-center gap-2 mb-4">
         <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
           <span className="text-emerald-400 text-xs">✨</span>
         </div>
         <span className="text-zinc-400 text-sm font-medium">Sponsored</span>
       </div>
-      <div className="w-full flex justify-center min-h-[100px]">
+      <div className="w-full min-h-[120px] flex justify-center">
         <ins
           ref={adRef}
           className="adsbygoogle"
-          style={{ display: "block", minHeight: "100px" }}
+          style={{
+            display: "block",
+            width: "100%",
+            minWidth: "300px",
+            minHeight: "120px",
+          }}
           data-ad-client="ca-pub-1346635526682080"
           data-ad-slot="1287338924"
           data-ad-format="auto"
@@ -591,10 +695,47 @@ function PostCard({
   const [editSaving, setEditSaving] = useState(false);
 
   const handleEdit = useCallback(async () => {
+    if (!editText || editText.trim().length === 0) {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Post cannot be empty",
+        })
+      );
+      return;
+    }
+
     setEditSaving(true);
     try {
+      // Server-side validation before updating
+      const securityCheck = await submitContentSecurely(
+        editText.trim(),
+        "post"
+      );
+
+      if (!securityCheck.success) {
+        window.dispatchEvent(
+          new CustomEvent("show-global-error", {
+            detail: securityCheck.errors[0] || "Content validation failed",
+          })
+        );
+        setEditSaving(false);
+        return;
+      }
+
+      // Show warnings if any (non-blocking)
+      if (securityCheck.warnings.length > 0) {
+        window.dispatchEvent(
+          new CustomEvent("show-global-warning", {
+            detail: securityCheck.warnings[0],
+          })
+        );
+      }
+
+      // Use sanitized content if available
+      const finalText = securityCheck.sanitizedContent || editText.trim();
+
       await updateDoc(doc(db, "posts", post.id), {
-        text: (editText || "").trim(),
+        text: finalText,
       });
       setEditing(false);
       window.dispatchEvent(

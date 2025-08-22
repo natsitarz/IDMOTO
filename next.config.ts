@@ -21,6 +21,24 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "pagead2.googlesyndication.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "googleads.g.doubleclick.net",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.google.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
   eslint: {

@@ -1,5 +1,6 @@
+import { validateContent } from "@/lib/api-client";
 import { CarFormData } from "@/types";
-import React from "react";
+import React, { useState } from "react";
 
 export default function CarFormMain({
   form,
@@ -14,6 +15,8 @@ export default function CarFormMain({
   saving: boolean;
   error: string | null;
 }) {
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -23,6 +26,41 @@ export default function CarFormMain({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  // Enhanced form submission with validation
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate vehicle data before submission
+    const validation = await validateContent("", "vehicle_data", {
+      manufacturer: form.manufacturer,
+      model: form.model,
+      year: form.year,
+      engine: form.engine,
+      horsepower: form.horsepower,
+      transmission: form.transmission,
+      description: form.description,
+    });
+
+    if (!validation.isValid) {
+      // Show validation errors
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail:
+            validation.errors[0] || "Please check your vehicle information",
+        })
+      );
+      return;
+    }
+
+    // Show warnings (non-blocking)
+    if (validation.warnings.length > 0) {
+      setValidationWarnings(validation.warnings);
+    }
+
+    // Proceed with original form submission
+    onSubmit(e);
   };
 
   return (
@@ -38,7 +76,7 @@ export default function CarFormMain({
       </div>
       {/* Środek: ustawienia */}
       <form
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         className="flex-1 flex flex-col justify-center w-full gap-6"
       >
         <div className="w-full flex flex-col gap-2">
@@ -222,6 +260,18 @@ export default function CarFormMain({
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
+
+        {/* Validation Warnings */}
+        {validationWarnings.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {validationWarnings.map((warning, index) => (
+              <div key={index} className="text-yellow-400 text-sm text-center">
+                ⚠️ {warning}
+              </div>
+            ))}
+          </div>
+        )}
+
         {error && error === "Car info updated!" && (
           <div className="text-green-400 mt-2 text-center">{error}</div>
         )}

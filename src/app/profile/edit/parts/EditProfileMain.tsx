@@ -1,5 +1,6 @@
 import { useAuth } from "@/app/parts/AuthProvider";
 import { auth, db } from "@/app/parts/firebase";
+import { validateContent } from "@/lib/api-client";
 import { sendEmailVerification, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
@@ -13,6 +14,8 @@ export default function EditProfileMain() {
   const [saving, setSaving] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [loading, setLoading] = useState(true); // <-- loading state
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+  const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -55,35 +58,62 @@ export default function EditProfileMain() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (bio.length > 25) {
-      window.dispatchEvent(
-        new CustomEvent("show-global-error", {
-          detail: "Bio must be 25 characters or less.",
-        })
-      );
-      return;
-    }
-    setSaving(true);
+    setIsValidating(true);
+    setValidationWarnings([]);
+
+    let sanitizedBio = bio;
+
     try {
+      // Server-side bio validation
+      if (bio.trim()) {
+        const validation = await validateContent(bio, "bio");
+        if (!validation.isValid) {
+          setValidationWarnings(validation.errors);
+          setIsValidating(false);
+          return;
+        }
+
+        if (validation.warnings.length > 0) {
+          setValidationWarnings(validation.warnings);
+        }
+
+        sanitizedBio = validation.sanitizedContent || bio;
+      }
+
+      // Client-side length check (backup)
+      if (bio.length > 25) {
+        window.dispatchEvent(
+          new CustomEvent("show-global-error", {
+            detail: "Bio must be 25 characters or less.",
+          })
+        );
+        setIsValidating(false);
+        return;
+      }
+
+      setSaving(true);
       if (auth.currentUser && user) {
         await updateProfile(auth.currentUser, { displayName });
         await updateDoc(doc(db, "users", user.uid), {
           displayName,
           country,
-          bio,
+          bio: sanitizedBio,
         });
         window.dispatchEvent(
           new CustomEvent("show-global-success", { detail: "Profile updated!" })
         );
       }
-    } catch {
+    } catch (error) {
+      console.error("Profile update error:", error);
       window.dispatchEvent(
         new CustomEvent("show-global-error", {
           detail: "Failed to update profile.",
         })
       );
+    } finally {
+      setSaving(false);
+      setIsValidating(false);
     }
-    setSaving(false);
   };
 
   if (!user || loading) {
@@ -268,12 +298,38 @@ export default function EditProfileMain() {
           {bio.length}/25
         </span>
       </div>
+      {/* Validation warnings */}
+      {validationWarnings.length > 0 && (
+        <div className="w-full p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <svg
+              className="w-4 h-4 text-yellow-500 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-sm font-medium text-yellow-500">
+              Content Validation
+            </span>
+          </div>
+          {validationWarnings.map((warning, index) => (
+            <p key={index} className="text-sm text-yellow-400">
+              {warning}
+            </p>
+          ))}
+        </div>
+      )}
       <button
         type="submit"
-        disabled={saving}
+        disabled={saving || isValidating}
         className="cursor-pointer w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
       >
-        {saving ? "Saving..." : "Save Changes"}
+        {isValidating ? "Validating..." : saving ? "Saving..." : "Save Changes"}
       </button>
     </form>
   );

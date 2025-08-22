@@ -1,7 +1,8 @@
 import { db } from "@/app/parts/firebase";
+import { validateContent } from "@/lib/api-client";
 import { CarFormData } from "@/types";
 import { doc, getDoc } from "firebase/firestore";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function CarFormSpecs({
   form,
@@ -20,6 +21,9 @@ export default function CarFormSpecs({
   carId: string;
   userId: string;
 }) {
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+  const [isValidating, setIsValidating] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -29,6 +33,49 @@ export default function CarFormSpecs({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  // Enhanced form submission with validation
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsValidating(true);
+    setValidationWarnings([]);
+
+    try {
+      // Validate vehicle specs data
+      const specsData = {
+        nm: form.nm,
+        version: form.version,
+        mileage: form.mileage,
+        color: form.color,
+      };
+
+      const validation = await validateContent(
+        JSON.stringify(specsData),
+        "vehicle_data",
+        { section: "specifications" }
+      );
+
+      if (!validation.isValid) {
+        setValidationWarnings(validation.errors);
+        setIsValidating(false);
+        return;
+      }
+
+      if (validation.warnings.length > 0) {
+        setValidationWarnings(validation.warnings);
+      }
+
+      // Proceed with original submission
+      onSubmit(e);
+    } catch (error) {
+      console.error("Validation error:", error);
+      setValidationWarnings([
+        "Validation service temporarily unavailable. Please try again.",
+      ]);
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   // Fetch specs from Firestore on mount
@@ -63,9 +110,35 @@ export default function CarFormSpecs({
           Update your car specs below
         </p>
       </div>
+      {/* Validation warnings */}
+      {validationWarnings.length > 0 && (
+        <div className="w-full p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <svg
+              className="w-4 h-4 text-yellow-500 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-sm font-medium text-yellow-500">
+              Validation Warnings
+            </span>
+          </div>
+          {validationWarnings.map((warning, index) => (
+            <p key={index} className="text-sm text-yellow-400">
+              {warning}
+            </p>
+          ))}
+        </div>
+      )}
       {/* Środek: ustawienia */}
       <form
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         className="flex-1 flex flex-col justify-center w-full gap-6"
       >
         <div className="w-full flex flex-col gap-2 md:flex-row md:gap-4">
@@ -185,10 +258,14 @@ export default function CarFormSpecs({
         </div>
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || isValidating}
           className="cursor-pointer w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
         >
-          {saving ? "Saving..." : "Save Changes"}
+          {isValidating
+            ? "Validating..."
+            : saving
+            ? "Saving..."
+            : "Save Changes"}
         </button>
         {error && error === "Car info updated!" && (
           <div className="text-green-400 mt-2 text-center">{error}</div>

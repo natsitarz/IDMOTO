@@ -1,3 +1,4 @@
+import { validateFileUpload } from "@/lib/api-client";
 import { User } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytesResumable, UploadTaskSnapshot } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
@@ -12,6 +13,24 @@ export const uploadPhoto = async (file: File, user: User, carid: string): Promis
     if (!file) throw new Error("No file provided.");
     if (!user) throw new Error("User is not authenticated. Please log in.");
     if (!carid) throw new Error("Car ID is not provided.");
+
+    // Server-side file validation
+    try {
+        const validation = await validateFileUpload(file, carid);
+        if (!validation.success) {
+            throw new Error(validation.error || 'File validation failed');
+        }
+        
+        if (validation.message) {
+            console.warn('File upload info:', validation.message);
+        }
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'File validation failed';
+        window.dispatchEvent(
+            new CustomEvent("show-global-error", { detail: errorMessage })
+        );
+        throw error;
+    }
 
     const storageRef = ref(storage, `vehicles/${carid}/backgroundPic`);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -34,9 +53,10 @@ export const uploadPhoto = async (file: File, user: User, carid: string): Promis
                 try {
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                     resolve(downloadURL);
-                } catch (error: any) {
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
                     window.dispatchEvent(
-                      new CustomEvent("show-global-error", { detail: "Failed to get download URL: " + error.message })
+                      new CustomEvent("show-global-error", { detail: "Failed to get download URL: " + errorMessage })
                     );
                     reject(error);
                 }
@@ -77,9 +97,10 @@ export const letsAddPhoto = async (file: File, user: User, carid: string): Promi
 
     try {
         return await getDownloadURL(storageRef);
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         window.dispatchEvent(
-          new CustomEvent("show-global-error", { detail: "Failed to get download URL: " + error.message })
+          new CustomEvent("show-global-error", { detail: "Failed to get download URL: " + errorMessage })
         );
         throw error;
     }
