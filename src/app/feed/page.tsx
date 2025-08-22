@@ -1372,6 +1372,7 @@ export default function FeedPage() {
                   <div
                     key={item.id}
                     style={{ animationDelay: `${index * 100}ms` }}
+                    className="hidden"
                   >
                     <AdPostCard />
                   </div>
