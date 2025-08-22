@@ -983,7 +983,7 @@ function SignInButton() {
       onClick={handleSignIn}
       disabled={loading}
       className={[
-        "cursor-pointer gap-2 px-4 py-2 rounded-xl transition-all duration-200 overflow-hidden",
+        "cursor-pointer gap-2 px-4 py-2 rounded-xl transition-all duration-200 overflow-hidden flex",
         "hover:bg-white/15 hover:scale-105 active:scale-95",
         "focus:outline-none focus:ring-2 focus:ring-blue-400/50",
         "bg-white/10 text-white border border-white/20",
@@ -996,6 +996,13 @@ function SignInButton() {
         </>
       ) : (
         <>
+          <Image
+            src="/google.png"
+            alt="Google"
+            width={22}
+            height={22}
+            className="transition-transform invert group-hover:scale-110"
+          />
           <span>Sign In to Post</span>
         </>
       )}
@@ -1140,7 +1147,7 @@ export default function FeedPage() {
         ) : currentUser ? (
           <PostForm onPost={() => {}} currentUser={currentUser} />
         ) : (
-          <div className="w-full max-w-xl mx-auto bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-3xl border border-blue-500/20 p-6 sm:p-8 mb-8 sm:mb-12 text-center animate-fade-in">
+          <div className="w-full max-w-xl mx-auto bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-3xl border border-blue-500/20 p-6 sm:p-8 mb-8 sm:mb-12 flex flex-col items-center text-center animate-fade-in">
             <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
               <svg
                 className="w-8 h-8 text-blue-400"
