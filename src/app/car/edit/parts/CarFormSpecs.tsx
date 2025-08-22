@@ -49,7 +49,7 @@ export default function CarFormSpecs({
   }, [carId, userId]);
 
   return (
-    <div className="flex flex-col items-center justify-between w-full z-10 max-w-lg relative h-full">
+    <div className="flex flex-col items-center justify-between w-full z-10 max-w-lg relative h-full gap-8">
       {/* Tytuł na samej górze */}
       <div className="flex flex-col items-center gap-2 z-10 w-full">
         <h1 className="block text-2xl uppercase text-white tracking-widest font-extrabold drop-shadow">
