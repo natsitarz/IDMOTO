@@ -18,12 +18,14 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import {
   deleteObject,
@@ -295,7 +297,7 @@ function PostForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-4 sm:p-6 mb-6 sm:mb-8 transition-all duration-300 hover:border-white/20 animate-fade-in"
+      className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-4 sm:p-6 mb-6 sm:mb-8 transition-all duration-300 hover:border-white/20 animate-fade-in"
     >
       {/* Header */}
       <div className="flex items-center gap-3 sm:gap-4 mb-4">
@@ -376,7 +378,7 @@ function PostForm({
           />
           <button
             type="button"
-            className="cursor-pointer absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white font-bold transition-all shadow-lg opacity-0 group-hover:opacity-100"
+            className="cursor-pointer absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white font-bold transition-all shadow-lg opacity-0 group-hover:opacity-100 z-40"
             onClick={() => setImage(null)}
             aria-label="Remove image"
             disabled={uploading || isChecking}
@@ -474,7 +476,7 @@ function PostForm({
 // Enhanced skeleton loading for posts with staggered animations
 function PostSkeleton() {
   return (
-    <div className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-4 sm:p-6 mb-4 sm:mb-6 animate-pulse">
+    <div className="w-full bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-4 sm:p-6 mb-4 sm:mb-6 animate-pulse">
       {/* Header skeleton with staggered animation */}
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
@@ -530,12 +532,38 @@ function AdPostCard() {
   const [adLoaded, setAdLoaded] = useState(false);
   const [scriptError, setScriptError] = useState(false);
   const [adVisible, setAdVisible] = useState(false);
+  const [isHiding, setIsHiding] = useState(false);
+  const [shouldHide, setShouldHide] = useState(false);
   const adRef = useRef<HTMLElementTagNameMap["ins"] | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Set timeout to hide ad after 2 seconds if not loaded
+  useEffect(() => {
+    if (mounted && !adLoaded && !scriptError) {
+      timeoutRef.current = setTimeout(() => {
+        if (!adLoaded) {
+          console.log("Starting ad fade out animation");
+          setIsHiding(true);
+          // Remove from DOM exactly when animation finishes
+          setTimeout(() => {
+            console.log("Removing ad from DOM");
+            setShouldHide(true);
+          }, 2000); // 2000ms - exact match with CSS transition duration
+        }
+      }, 2000); // 4 seconds timeout
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [mounted, adLoaded, scriptError]);
 
   useEffect(() => {
     if (mounted && typeof window !== "undefined" && !scriptError) {
@@ -552,6 +580,11 @@ function AdPostCard() {
             if (containerRect.width > 0 && containerRect.height > 0) {
               window.adsbygoogle.push({});
               setAdLoaded(true);
+
+              // Clear timeout since ad is now loading
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+              }
 
               // Check if ad actually renders content after a delay
               setTimeout(() => {
@@ -616,15 +649,32 @@ function AdPostCard() {
     }
   }, [mounted, adLoaded, scriptError, adVisible]);
 
-  // Don't render ads on server side or if not visible
-  if (!mounted || scriptError || (adLoaded && !adVisible)) {
+  // Don't render ads on server side or if script error occurred early
+  if (!mounted || scriptError) {
     return null;
   }
 
-  // Show loading state only while mounted and trying to load
+  // Don't show if already loaded but not visible
+  if (adLoaded && !adVisible) {
+    return null;
+  }
+
+  // Hide completely after timeout + fade duration
+  if (shouldHide) {
+    return null;
+  }
+
+  // Show loading state only while mounted and trying to load (with fade out when hiding)
   if (!adLoaded) {
     return (
-      <div className="w-full max-w-xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in">
+      <div
+        className={`w-full max-w-4xl mx-auto bg-gradient-to-br from-emerald-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-4 sm:p-6 mb-4 sm:mb-6 transition-all duration-2000 ${
+          isHiding ? "opacity-0" : "opacity-100"
+        }`}
+        style={{
+          transition: "opacity 2000ms ease-out",
+        }}
+      >
         <div className="flex items-center gap-2 mb-4">
           <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
             <span className="text-emerald-400 text-xs">✨</span>
@@ -830,7 +880,7 @@ function PostCard({
   const likeCount = post.likes?.length || 0;
 
   return (
-    <article className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-300 p-4 sm:p-6 mb-4 sm:mb-6 group animate-fade-in">
+    <article className="w-full bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-300 p-4 sm:p-6 mb-4 sm:mb-6 group animate-fade-in">
       {/* Header */}
       <header className="flex items-center gap-3 sm:gap-4 mb-4">
         <button
@@ -1154,6 +1204,311 @@ function SignInButton() {
   );
 }
 
+// Profile Sidebar Component for Desktop
+function ProfileSidebar({
+  currentUser,
+  posts,
+  userLoading,
+}: {
+  currentUser: User | null;
+  posts: Post[];
+  userLoading: boolean;
+}) {
+  const router = useRouter();
+  const [vehicleCount, setVehicleCount] = useState(0);
+  const [vehiclesLoading, setVehiclesLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<{
+    bio: string;
+    displayName: string;
+    photoURL: string;
+    email: string;
+  } | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  const navigateToProfile = useCallback(() => {
+    if (currentUser) {
+      router.push(`/profile?uid=${currentUser.uid}`);
+    }
+  }, [router, currentUser]);
+
+  // Load user's profile data including bio
+  useEffect(() => {
+    if (currentUser) {
+      setProfileLoading(true);
+
+      const loadUserProfile = async () => {
+        try {
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserProfile({
+              bio: data.bio || "",
+              displayName:
+                data.displayName || currentUser.displayName || "User",
+              photoURL: data.photoURL || currentUser.photoURL || "/logo.png",
+              email: data.email || currentUser.email || "No email",
+            });
+          } else {
+            // Fallback to Firebase Auth data if no Firestore profile
+            setUserProfile({
+              bio: "",
+              displayName: currentUser.displayName || "User",
+              photoURL: currentUser.photoURL || "/logo.png",
+              email: currentUser.email || "No email",
+            });
+          }
+        } catch (error) {
+          console.error("Error loading user profile:", error);
+          // Fallback to Firebase Auth data on error
+          setUserProfile({
+            bio: "",
+            displayName: currentUser.displayName || "User",
+            photoURL: currentUser.photoURL || "/logo.png",
+            email: currentUser.email || "No email",
+          });
+        } finally {
+          setProfileLoading(false);
+        }
+      };
+
+      loadUserProfile();
+    } else {
+      setUserProfile(null);
+      setProfileLoading(false);
+    }
+  }, [currentUser]);
+
+  // Load user's vehicle count using the same method as profile
+  useEffect(() => {
+    if (currentUser) {
+      setVehiclesLoading(true);
+
+      const loadVehicleCount = async () => {
+        try {
+          const vehiclesQuery = query(
+            collection(db, "vehicles"),
+            where("userID", "==", currentUser.uid),
+            orderBy("createdAt", "desc")
+          );
+
+          const vehiclesSnapshot = await getDocs(vehiclesQuery);
+          setVehicleCount(vehiclesSnapshot.size);
+        } catch (error) {
+          console.error("Error loading vehicle count:", error);
+          setVehicleCount(0);
+        } finally {
+          setVehiclesLoading(false);
+        }
+      };
+
+      loadVehicleCount();
+    } else {
+      setVehicleCount(0);
+      setVehiclesLoading(false);
+    }
+  }, [currentUser]);
+
+  // Calculate user stats
+  const userPosts = posts.filter((post) => post.userId === currentUser?.uid);
+  const totalLikes = userPosts.reduce(
+    (total, post) => total + (post.likes?.length || 0),
+    0
+  );
+
+  // Show loading skeleton while checking auth
+  if (userLoading) {
+    return (
+      <aside className="hidden lg:block w-72 flex-shrink-0">
+        <div className="sticky top-24">
+          <div className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 mb-6 animate-pulse">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-white/10 rounded-full animate-pulse" />
+              <div className="h-6 bg-white/10 rounded w-32 mx-auto mb-2" />
+              <div className="h-4 bg-white/10 rounded w-24 mx-auto mb-4" />
+
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                  <div className="h-6 bg-white/10 rounded w-8 mx-auto mb-1" />
+                  <div className="h-3 bg-white/10 rounded w-10 mx-auto" />
+                </div>
+                <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                  <div className="h-6 bg-white/10 rounded w-8 mx-auto mb-1" />
+                  <div className="h-3 bg-white/10 rounded w-8 mx-auto" />
+                </div>
+                <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                  <div className="h-6 bg-white/10 rounded w-8 mx-auto mb-1" />
+                  <div className="h-3 bg-white/10 rounded w-10 mx-auto" />
+                </div>
+              </div>
+
+              <div className="h-10 bg-white/10 rounded-2xl w-full" />
+            </div>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6">
+            <div className="h-5 bg-white/10 rounded w-24 mb-4" />
+            <div className="space-y-3">
+              <div className="h-12 bg-white/10 rounded-2xl w-full" />
+              <div className="h-12 bg-white/10 rounded-2xl w-full" />
+            </div>
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
+  // Show login prompt only after auth check is complete
+  if (!currentUser) {
+    return (
+      <aside className="hidden lg:block w-72 flex-shrink-0">
+        <div className="sticky top-24 animate-fade-in">
+          <div className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 mb-6">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Welcome!</h3>
+              <p className="text-zinc-400 text-sm mb-4">
+                Sign in to see your profile and connect with the community
+              </p>
+              <SignInButton />
+            </div>
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="hidden lg:block w-72 flex-shrink-0">
+      <div className="sticky top-24 animate-fade-in">
+        {/* Profile Card */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 mb-6 hover:border-white/20 transition-all duration-300">
+          <div className="text-center">
+            <button
+              onClick={navigateToProfile}
+              className="cursor-pointer group relative mx-auto block mb-4"
+            >
+              <Image
+                src={
+                  userProfile?.photoURL || currentUser.photoURL || "/logo.png"
+                }
+                alt={
+                  userProfile?.displayName || currentUser.displayName || "User"
+                }
+                width={80}
+                height={80}
+                className="rounded-full object-cover w-20 h-20 border-3 border-white/20 group-hover:border-white/40 transition-all group-hover:scale-105"
+              />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-zinc-900 animate-pulse" />
+            </button>
+
+            <button
+              onClick={navigateToProfile}
+              className="cursor-pointer text-white hover:text-blue-400 transition-colors mb-2"
+            >
+              <h3 className="text-lg font-bold truncate">
+                {userProfile?.displayName || currentUser.displayName || "User"}
+              </h3>
+            </button>
+
+            <p className="text-zinc-400 text-sm mb-4 truncate">
+              {profileLoading
+                ? "Loading..."
+                : userProfile?.bio || "No bio provided."}
+            </p>
+
+            <div className="grid grid-cols-3 gap-3 mb-4 text-center">
+              <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                <div className="text-white font-bold text-lg">
+                  {userPosts.length}
+                </div>
+                <div className="text-zinc-400 text-xs">Posts</div>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                <div className="text-white font-bold text-lg">
+                  {vehiclesLoading ? "..." : vehicleCount}
+                </div>
+                <div className="text-zinc-400 text-xs">Cars</div>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                <div className="text-white font-bold text-lg">{totalLikes}</div>
+                <div className="text-zinc-400 text-xs">Likes</div>
+              </div>
+            </div>
+
+            <button
+              onClick={navigateToProfile}
+              className="cursor-pointer w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-all border border-white/20 hover:border-white/30 text-sm font-medium"
+            >
+              View Profile
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 animate-fade-in">
+          <h4 className="text-white font-semibold mb-4">Quick Actions</h4>
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push("/add")}
+              className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-2xl transition-all border border-white/10 hover:border-white/20 text-sm"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add New Car
+            </button>
+            <button
+              onClick={() => router.push("/profile/edit")}
+              className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-2xl transition-all border border-white/10 hover:border-white/20 text-sm"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                />
+              </svg>
+              Edit Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
 // Main Feed Page Component
 export default function FeedPage() {
   const { user: currentUser, loading: userLoading } = useCurrentUser();
@@ -1274,131 +1629,145 @@ export default function FeedPage() {
 
   return (
     <main className="min-h-[calc(100dvh-67px)] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed px-4 py-6 sm:py-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Post Form or Login Prompt */}
-        {userLoading ? (
-          <div className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 mb-8 animate-pulse">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-white/10 rounded-full" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-white/10 rounded w-32" />
-                <div className="h-3 bg-white/10 rounded w-24" />
-              </div>
-            </div>
-            <div className="h-20 bg-white/10 rounded-2xl mb-4" />
-            <div className="flex justify-between">
-              <div className="w-24 h-10 bg-white/10 rounded-2xl" />
-              <div className="w-16 h-10 bg-white/10 rounded-2xl" />
-            </div>
-          </div>
-        ) : currentUser ? (
-          <PostForm onPost={() => {}} currentUser={currentUser} />
-        ) : (
-          <div className="w-full max-w-xl mx-auto bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-3xl border border-blue-500/20 p-6 sm:p-8 mb-8 sm:mb-12 flex flex-col items-center text-center animate-fade-in">
-            <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-white mb-2">
-              Join the Conversation
-            </h2>
-            <p className="text-zinc-400 mb-4 leading-relaxed">
-              Sign in to share your automotive stories, connect with
-              enthusiasts, and be part of our growing community.
-            </p>
-            <SignInButton />
-          </div>
-        )}
-
-        {/* Posts Section */}
-        <section className="w-full max-w-2xl mx-auto">
-          {postsLoading ? (
-            <div className="space-y-6">
-              {[...Array(5)].map((_, i) => (
-                <PostSkeleton key={i} />
-              ))}
-            </div>
-          ) : postsError ? (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 mx-auto mb-6 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30">
-                <svg
-                  className="w-10 h-10 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Oops! Something went wrong
-              </h3>
-              <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-                {postsError}
-              </p>
-              <button
-                onClick={handleRetry}
-                disabled={retrying}
-                className="cursor-pointer px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
-              >
-                {retrying && (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                )}
-                {retrying ? "Retrying..." : "Try Again"}
-              </button>
-            </div>
-          ) : feedItems.length === 0 ? (
-            <EmptyState isLoggedIn={!!currentUser} />
-          ) : (
-            <div className="space-y-6">
-              {feedItems.map((item, index) =>
-                isAd(item) ? (
-                  <div
-                    key={item.id}
-                    style={{ animationDelay: `${index * 100}ms` }}
-                    className="hidden"
-                  >
-                    <AdPostCard />
+      <div className="max-w-5xl mx-auto">
+        <div className="flex gap-8">
+          {/* Main Content */}
+          <div className="flex-1 max-w-2xl lg:max-w-none">
+            {/* Post Form or Login Prompt */}
+            {userLoading ? (
+              <div className="w-full bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 p-6 mb-8 animate-pulse">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-white/10 rounded w-32" />
+                    <div className="h-3 bg-white/10 rounded w-24" />
                   </div>
-                ) : (
-                  <div
-                    key={item.id}
-                    style={{ animationDelay: `${index * 100}ms` }}
+                </div>
+                <div className="h-20 bg-white/10 rounded-2xl mb-4" />
+                <div className="flex justify-between">
+                  <div className="w-24 h-10 bg-white/10 rounded-2xl" />
+                  <div className="w-16 h-10 bg-white/10 rounded-2xl" />
+                </div>
+              </div>
+            ) : currentUser ? (
+              <PostForm onPost={() => {}} currentUser={currentUser} />
+            ) : (
+              <div className="w-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-3xl border border-blue-500/20 p-6 sm:p-8 mb-8 sm:mb-12 flex flex-col items-center text-center animate-fade-in lg:hidden">
+                <div className="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
                   >
-                    <PostCard
-                      post={item}
-                      onLike={() => handleLike(item)}
-                      onDelete={() => {}}
-                      onEdit={() => {}}
-                      isOwn={
-                        currentUser ? item.userId === currentUser.uid : false
-                      }
-                      currentUser={currentUser}
-                      showLike={!!currentUser}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                     />
-                  </div>
-                )
-              )}
-            </div>
-          )}
-        </section>
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2">
+                  Join the Conversation
+                </h2>
+                <p className="text-zinc-400 mb-4 leading-relaxed">
+                  Sign in to share your automotive stories, connect with
+                  enthusiasts, and be part of our growing community.
+                </p>
+                <SignInButton />
+              </div>
+            )}
 
+            {/* Posts Section */}
+            <section className="w-full max-w-2xl mx-auto">
+              {postsLoading ? (
+                <div className="space-y-6">
+                  {[...Array(5)].map((_, i) => (
+                    <PostSkeleton key={i} />
+                  ))}
+                </div>
+              ) : postsError ? (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30">
+                    <svg
+                      className="w-10 h-10 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    Oops! Something went wrong
+                  </h3>
+                  <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+                    {postsError}
+                  </p>
+                  <button
+                    onClick={handleRetry}
+                    disabled={retrying}
+                    className="cursor-pointer px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                  >
+                    {retrying && (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    )}
+                    {retrying ? "Retrying..." : "Try Again"}
+                  </button>
+                </div>
+              ) : feedItems.length === 0 ? (
+                <EmptyState isLoggedIn={!!currentUser} />
+              ) : (
+                <div className="space-y-6 transition-all duration-500 ease-out">
+                  {feedItems.map((item, index) =>
+                    isAd(item) ? (
+                      <div
+                        key={item.id}
+                        style={{ animationDelay: `${index * 100}ms` }}
+                        className="animate-fade-in transition-all duration-500 ease-out"
+                      >
+                        <AdPostCard />
+                      </div>
+                    ) : (
+                      <div
+                        key={item.id}
+                        style={{ animationDelay: `${index * 100}ms` }}
+                        className="transition-all duration-500 ease-out"
+                      >
+                        <PostCard
+                          post={item}
+                          onLike={() => handleLike(item)}
+                          onDelete={() => {}}
+                          onEdit={() => {}}
+                          isOwn={
+                            currentUser
+                              ? item.userId === currentUser.uid
+                              : false
+                          }
+                          currentUser={currentUser}
+                          showLike={!!currentUser}
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
+
+          {/* Right Sidebar - Profile */}
+          <ProfileSidebar
+            currentUser={currentUser}
+            posts={posts}
+            userLoading={userLoading}
+          />
+        </div>{" "}
         {/* Footer */}
         <footer className="text-center mt-16 sm:mt-20 pt-8 border-t border-white/10">
           <p className="text-zinc-500 text-sm">

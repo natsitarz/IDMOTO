@@ -1,11 +1,81 @@
 import { db } from "@/app/parts/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const VISIBILITY_OPTIONS = [
   { value: "public", label: "Public" },
   { value: "private", label: "Private" },
 ];
+
+// Reusable AcceptModal component for confirmations
+function AcceptModal({
+  open,
+  onAccept,
+  onCancel,
+  title,
+  description,
+  isLoading = false,
+}: {
+  open: boolean;
+  onAccept: () => void;
+  onCancel: () => void;
+  title: string;
+  description?: string;
+  isLoading?: boolean;
+}) {
+  if (!open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-fade-in">
+      <div className="bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-sm border border-white/20 animate-scale-in">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+            <svg
+              className="w-5 h-5 text-red-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-white">{title}</h2>
+        </div>
+
+        {description && (
+          <p className="text-zinc-300 mb-6 leading-relaxed">{description}</p>
+        )}
+
+        <div className="flex gap-3">
+          <button
+            className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-zinc-700 text-white hover:bg-zinc-600 font-medium transition-all disabled:opacity-50"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+          <button
+            className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-red-600 text-white hover:bg-red-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            onClick={onAccept}
+            disabled={isLoading}
+          >
+            {isLoading && (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            )}
+            {isLoading ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 export default function CarFormSettings({
   carId,
@@ -19,6 +89,7 @@ export default function CarFormSettings({
   onDeleteCar: () => void;
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
   const [visibility, setVisibility] = useState<"public" | "private" | null>(
@@ -71,6 +142,19 @@ export default function CarFormSettings({
     }
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await onDeleteCar();
+      setShowConfirm(false);
+    } catch (error) {
+      console.error("Error deleting car:", error);
+      // You might want to show an error message here
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (loading || visibility === null) {
     return (
@@ -170,37 +254,16 @@ export default function CarFormSettings({
           </button>
         </div>
       </div>
-      {/* Potwierdzenie usunięcia */}
-      {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-zinc-900 rounded-2xl shadow-xl p-6 w-[90vw] max-w-xs relative flex flex-col items-center">
-            <h3 className="text-lg font-bold text-white mb-4">
-              Confirm Delete
-            </h3>
-            <p className="text-zinc-300 mb-6 text-center">
-              Are you sure you want to delete this car from your collection?
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-3 w-full">
-              <button
-                className="cursor-pointer flex-1 px-4 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
-                onClick={() => setShowConfirm(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="cursor-pointer flex-1 px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                onClick={() => {
-                  setShowConfirm(false);
-                  onDeleteCar();
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+      {/* Delete Confirmation Modal */}
+      <AcceptModal
+        open={showConfirm}
+        title="Delete Car"
+        description="Are you sure you want to delete this car from your collection? This action cannot be undone."
+        onAccept={handleDelete}
+        onCancel={() => setShowConfirm(false)}
+        isLoading={deleting}
+      />
     </div>
   );
 }
