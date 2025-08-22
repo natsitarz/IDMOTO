@@ -210,8 +210,10 @@ export default function HomePage() {
               />
               Discord
             </a>
-            <span className="text-zinc-600 inline sm:hidden">|</span>
-            <span className="text-zinc-500">IDMOTO 2025©</span>
+            <span className="text-zinc-500 text-center">
+              © 2025 IDMOTO • Building the future of automotive social
+              networking
+            </span>
           </footer>
         </main>
       </div>

@@ -531,7 +531,7 @@ export default function CarPageInner() {
         style={{ animationDelay: "600ms" }}
       >
         <p className="text-zinc-500 text-sm">
-          © 2025 IDMOTO • Connecting car enthusiasts worldwide
+          © 2025 IDMOTO • Building the future of automotive social networking
         </p>
       </footer>
 
