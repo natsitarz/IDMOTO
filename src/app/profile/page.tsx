@@ -672,7 +672,7 @@ function ProfileNotFound() {
             disabled={loading}
             className="cursor-pointer px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl font-medium transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {loading ? "Loading..." : "Browse Profiles"}
+            {loading ? "Loading..." : "Feed"}
           </button>
         </div>
       </div>
@@ -683,7 +683,7 @@ function ProfileNotFound() {
 // Main Profile Component with enhanced loading and responsive design
 function ProfileInner() {
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading, initialized } = useAuth();
   useShowMainDom(user);
   const profileUid = searchParams.get("uid") || user?.uid || "";
   const isOwnProfile = !!user && user.uid === profileUid;
@@ -721,6 +721,20 @@ function ProfileInner() {
 
   // Enhanced profile data fetching with better loading states
   useEffect(() => {
+    // If auth is still loading, don't make any decisions yet
+    if (!initialized) {
+      setLoading(true);
+      setNotFound(false);
+      return;
+    }
+
+    // If user is logged in but no UID in URL, redirect to user's own profile
+    if (user && !searchParams.get("uid")) {
+      router.replace(`/profile?uid=${user.uid}`);
+      return;
+    }
+
+    // If no UID in URL and user is null (not logged in), show not found
     if (!searchParams.get("uid") && !user) {
       setNotFound(true);
       setLoading(false);
@@ -768,7 +782,7 @@ function ProfileInner() {
     }
 
     fetchUserData();
-  }, [profileUid, user, searchParams]);
+  }, [profileUid, user, searchParams, router, initialized]);
 
   const handleSaveBio = useCallback(
     async (newBio: string) => {

@@ -1,4 +1,4 @@
-import { getRedirectResult, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
+import { getRedirectResult, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
@@ -7,7 +7,11 @@ export const logOut = () => {
   if(typeof window !== "undefined") {
   auth.signOut().then(() => {
     localStorage.removeItem("user");
-    window.location.href = "../";
+    window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Successfully logged out.",
+        })
+      );
   }).catch((error) => {
     console.log(error);
   });

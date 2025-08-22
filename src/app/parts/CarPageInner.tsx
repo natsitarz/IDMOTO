@@ -318,7 +318,18 @@ export default function CarPageInner() {
       } else {
         setError("Vehicle not found. Please check the ID and try again.");
       }
-    } catch {
+    } catch (firebaseError: any) {
+      // Check if the error is due to missing permissions (private vehicle)
+      if (
+        firebaseError?.code === "permission-denied" ||
+        firebaseError?.message?.includes("Missing or insufficient permissions")
+      ) {
+        // Set a special car object to trigger the privacy check
+        setCar({ visibility: "private", userID: "unknown" });
+        setError(null); // Clear any existing error
+        setLoading(false); // Important: stop loading state
+        return;
+      }
       setError(
         "Failed to load vehicle data. Please check your connection and try again."
       );
@@ -454,8 +465,17 @@ export default function CarPageInner() {
     );
   }
 
-  // Check privacy permissions
-  if (user && user.uid !== car.userID && car.visibility === "private") {
+  // Check privacy permissions - private cars can only be viewed by their owners
+  if (car.visibility === "private") {
+    // If not logged in or not the owner, show private message
+    if (!user || user.uid !== car.userID) {
+      return <PrivateCarMessage />;
+    }
+  }
+
+  // If car has userID 'unknown', it means we got a permission error from Firestore
+  // This happens when trying to access a private vehicle without proper permissions
+  if (car.userID === "unknown") {
     return <PrivateCarMessage />;
   }
 

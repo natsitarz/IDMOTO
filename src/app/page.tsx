@@ -127,11 +127,11 @@ export default function HomePage() {
       )}
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50 z-10" />
+      <div className="absolute inset-0 bg-black/40 z-10" />
 
       {/* Content */}
       <div className="relative z-20 flex flex-1 items-center justify-center sm:justify-start w-full">
-        <main className="w-full sm:w-[400px] min-h-screen sm:h-screen flex flex-col justify-between items-center bg-black/60 sm:bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-8 sm:p-12 shadow-2xl transition-all mx-auto sm:mx-0 relative overflow-hidden backdrop-blur-sm">
+        <main className="w-full sm:w-[400px] min-h-screen sm:h-screen flex flex-col justify-between items-center bg-black/60 sm:bg-gradient-to-br from-zinc-950/50 via-zinc-900/50 to-zinc-950/50 p-8 sm:p-12 shadow-2xl transition-all mx-auto sm:mx-0 relative overflow-hidden backdrop-blur-sm">
           {/* Header */}
           <header className="flex flex-col items-center w-full gap-8 mt-4 relative z-10">
             <Image
