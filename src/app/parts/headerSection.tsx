@@ -162,15 +162,13 @@ function BackgroundAlignmentModal({
                   </div>
                   <div className="flex flex-col justify-end">
                     <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
-                      Profile Preview
+                      Preview
                     </span>
                     <div className="w-full max-w-xl mt-2">
                       <span className="text-xs text-zinc-400 font-semibold mb-1 block">
                         Bio
                       </span>
-                      <span className="text-zinc-200 text-xs">
-                        Drag image above to adjust position
-                      </span>
+                      <span className="text-zinc-200 text-xs">Lorem ipsum</span>
                     </div>
                   </div>
                 </div>
@@ -369,7 +367,7 @@ export function ProfileHeader({
 
   return (
     <section className="w-full relative">
-      <div className="relative h-56 sm:h-84 w-full shadow-2xl flex items-center justify-center px-2 sm:px-4 overflow-hidden rounded-3xl border border-zinc-800/50">
+      <div className="relative h-56 sm:h-84 w-full shadow-2xl flex px-2 sm:px-4 overflow-hidden rounded-3xl border border-zinc-800/50">
         {/* Background image layer */}
         <div className="absolute inset-0 overflow-hidden z-0">
           <Image
@@ -407,9 +405,9 @@ export function ProfileHeader({
           </button>
         )}
 
-        {/* Avatar and profile info */}
-        <div className="flex items-center z-10 relative animate-fade-in-up">
-          <div className="relative z-10 mr-4">
+        {/* Avatar and profile info - centered on mobile, bottom-left on desktop */}
+        <div className="absolute inset-0 sm:bottom-0 sm:top-auto sm:left-0 sm:right-0 flex items-center sm:items-end justify-center sm:justify-start z-10 p-4 sm:p-8 animate-fade-in-up">
+          <div className="relative mr-4">
             <Image
               className="rounded-full border-4 shadow-2xl border-white bg-white transition-all duration-300 hover:scale-105"
               src={safePhotoURL}
@@ -420,22 +418,20 @@ export function ProfileHeader({
             />
           </div>
           {/* Info next to avatar */}
-          <div className="flex flex-col justify-end z-10">
-            <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-2xl">
+          <div className="flex flex-col justify-center sm:justify-end text-left">
+            <span className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg">
               {safeDisplayName}
             </span>
             {/* Bio */}
             <div className="w-full max-w-xl mt-2">
-              <span className="text-xs text-zinc-400 font-semibold mb-1 block uppercase tracking-wider">
+              <span className="text-xs text-zinc-400 font-semibold mb-1 block">
                 Bio
               </span>
-              <div className="flex items-center gap-2 w-full">
-                <span className="text-zinc-200 text-sm leading-relaxed">
-                  {bio || (
-                    <span className="italic text-zinc-500">No bio set</span>
-                  )}
-                </span>
-              </div>
+              <span className="text-zinc-200 text-xs">
+                {bio || (
+                  <span className="italic text-zinc-500">No bio set</span>
+                )}
+              </span>
             </div>
           </div>
         </div>
