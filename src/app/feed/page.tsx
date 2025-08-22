@@ -1,7 +1,13 @@
 "use client";
 
+import { ModerationLevel } from "@/app/parts/contentModerator";
 import { db, storage } from "@/app/parts/firebase";
 import SeePhoto from "@/app/parts/see-photo";
+import {
+  ModerationFeedback,
+  ModerationStatus,
+  useContentModeration,
+} from "@/app/parts/useContentModeration";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import {
   addDoc,
@@ -25,6 +31,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -59,8 +66,8 @@ function AcceptModal({
 }) {
   if (!open) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-fade-in">
+  return createPortal(
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-fade-in">
       <div className="bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-sm border border-white/20 animate-scale-in">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
@@ -105,11 +112,12 @@ function AcceptModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
-// Enhanced Post Form with better loading states
+// Enhanced Post Form with content moderation
 function PostForm({
   onPost,
   currentUser,
@@ -122,6 +130,27 @@ function PostForm({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Content moderation hook
+  const {
+    isChecking,
+    isBlocked,
+    checkPost,
+    getBlockingMessage,
+    getSuggestions,
+    clearResult,
+  } = useContentModeration({
+    level: ModerationLevel.MEDIUM,
+    onBlock: (reasons) => {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: `Content blocked: ${
+            reasons[0] || "Inappropriate content detected"
+          }`,
+        })
+      );
+    },
+  });
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -149,6 +178,14 @@ function PostForm({
 
         if (!text.trim() && !image) return;
 
+        // Check content with moderation system
+        const isContentAppropriate = await checkPost(text, image || undefined);
+
+        if (!isContentAppropriate) {
+          // Content was blocked, user already notified via onBlock callback
+          return;
+        }
+
         setUploading(true);
         setUploadProgress(20);
 
@@ -161,6 +198,7 @@ function PostForm({
           createdAt: serverTimestamp(),
           imageUrl: "",
           likes: [],
+          moderationPassed: true, // Mark as moderation passed
         });
 
         setUploadProgress(60);
@@ -184,6 +222,7 @@ function PostForm({
         // Reset form
         setText("");
         setImage(null);
+        clearResult();
         onPost();
 
         window.dispatchEvent(
@@ -203,10 +242,10 @@ function PostForm({
         setUploadProgress(0);
       }
     },
-    [text, image, currentUser, onPost]
+    [text, image, currentUser, onPost, checkPost, clearResult]
   );
 
-  const isDisabled = uploading || (!text.trim() && !image);
+  const isDisabled = uploading || isChecking || (!text.trim() && !image);
 
   return (
     <form
@@ -235,6 +274,20 @@ function PostForm({
         </div>
       </div>
 
+      {/* Content Moderation Status */}
+      <ModerationStatus
+        isChecking={isChecking}
+        checkingText="Checking content for appropriateness..."
+      />
+
+      {/* Content Moderation Feedback */}
+      <ModerationFeedback
+        isBlocked={isBlocked}
+        message={getBlockingMessage()}
+        suggestions={getSuggestions()}
+        onDismiss={clearResult}
+      />
+
       {/* Text Input */}
       <div className="relative mb-4">
         <textarea
@@ -244,7 +297,7 @@ function PostForm({
           className="w-full rounded-2xl border border-white/20 bg-white/5 text-white px-4 py-3 sm:py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all placeholder:text-zinc-500 resize-none text-sm sm:text-base"
           rows={3}
           placeholder="Share your car experiences, tips, or just say hello..."
-          disabled={uploading}
+          disabled={uploading || isChecking}
         />
         <div className="absolute bottom-3 right-4 flex items-center gap-2">
           <span className="text-xs text-zinc-400 select-none">
@@ -275,7 +328,7 @@ function PostForm({
             className="cursor-pointer absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white font-bold transition-all shadow-lg opacity-0 group-hover:opacity-100"
             onClick={() => setImage(null)}
             aria-label="Remove image"
-            disabled={uploading}
+            disabled={uploading || isChecking}
           >
             ×
           </button>
@@ -305,7 +358,7 @@ function PostForm({
           type="button"
           className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
+          disabled={uploading || isChecking}
         >
           <svg
             className="w-4 h-4 sm:w-5 sm:h-5"
@@ -334,7 +387,7 @@ function PostForm({
           onChange={(e) => {
             if (e.target.files?.[0]) setImage(e.target.files[0]);
           }}
-          disabled={uploading}
+          disabled={uploading || isChecking}
         />
 
         <button
@@ -342,11 +395,11 @@ function PostForm({
           className="cursor-pointer px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
           disabled={isDisabled}
         >
-          {uploading && (
+          {(uploading || isChecking) && (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           )}
           <span className="text-sm sm:text-base">
-            {uploading ? "Posting..." : "Share"}
+            {uploading ? "Posting..." : isChecking ? "Checking..." : "Share"}
           </span>
         </button>
       </div>
@@ -716,64 +769,9 @@ function PostCard({
       {/* Content */}
       <div className="mb-4">
         {editing ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-fade-in">
-            <div className="bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 w-full max-w-md animate-scale-in">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                    />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-bold text-white">Edit Post</h2>
-              </div>
-
-              <div className="relative mb-6">
-                <textarea
-                  className="w-full bg-white/5 text-white rounded-2xl p-4 border border-white/20 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none resize-none transition-all backdrop-blur-sm"
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  rows={5}
-                  maxLength={500}
-                  autoFocus
-                  placeholder="Edit your post..."
-                  disabled={editSaving}
-                />
-                <span className="absolute bottom-3 right-4 text-xs text-zinc-400 select-none">
-                  {editText.length}/500
-                </span>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-zinc-700 text-white hover:bg-zinc-600 font-medium transition-all disabled:opacity-50"
-                  onClick={() => setEditing(false)}
-                  disabled={editSaving}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                  onClick={handleEdit}
-                  disabled={editSaving || editText.trim().length === 0}
-                >
-                  {editSaving && (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  )}
-                  {editSaving ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </div>
-          </div>
+          <p className="text-white leading-relaxed whitespace-pre-line break-words text-sm sm:text-base">
+            {post.text}
+          </p>
         ) : (
           <p className="text-white leading-relaxed whitespace-pre-line break-words text-sm sm:text-base">
             {post.text}
@@ -836,6 +834,70 @@ function PostCard({
         onCancel={() => setShowDeleteModal(false)}
         isLoading={deleting}
       />
+
+      {/* Edit Modal - Fullscreen Portal */}
+      {editing &&
+        createPortal(
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-fade-in">
+            <div className="bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 w-full max-w-md animate-scale-in">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-white">Edit Post</h2>
+              </div>
+
+              <div className="relative mb-6">
+                <textarea
+                  className="w-full bg-white/5 text-white rounded-2xl p-4 border border-white/20 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none resize-none transition-all backdrop-blur-sm"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  rows={5}
+                  maxLength={500}
+                  autoFocus
+                  placeholder="Edit your post..."
+                  disabled={editSaving}
+                />
+                <span className="absolute bottom-3 right-4 text-xs text-zinc-400 select-none">
+                  {editText.length}/500
+                </span>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-zinc-700 text-white hover:bg-zinc-600 font-medium transition-all disabled:opacity-50"
+                  onClick={() => setEditing(false)}
+                  disabled={editSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="cursor-pointer flex-1 px-4 py-3 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  onClick={handleEdit}
+                  disabled={editSaving || editText.trim().length === 0}
+                >
+                  {editSaving && (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  )}
+                  {editSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </article>
   );
 }
