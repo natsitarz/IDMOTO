@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import { type MetadataRoute } from "next";
 
 export const dynamic = "force-static";
@@ -19,18 +19,6 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const carsSnap = await getDocs(collection(db, "vehicles"));
-  const carUrls = carsSnap.docs.map((doc) => ({
-    url: `https://idmoto.vercel.app/car?id=${doc.id}`,
-    lastModified: new Date().toISOString(), // <-- string, nie Date
-  }));
-
-  const usersSnap = await getDocs(collection(db, "users"));
-  const userUrls = usersSnap.docs.map((doc) => ({
-    url: `https://idmoto.vercel.app/profile?uid=${doc.id}`,
-    lastModified: new Date().toISOString(),
-  }));
-
   const staticUrls = [
     {
       url: "https://idmoto.vercel.app/",
@@ -46,9 +34,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  return [
-    ...staticUrls,
-    ...carUrls,
-    ...userUrls,
-  ];
+  try {
+    // Only fetch public vehicles for sitemap (respects security rules)
+    const publicCarsQuery = query(
+      collection(db, "vehicles"),
+      where("visibility", "==", "public")
+    );
+    const carsSnap = await getDocs(publicCarsQuery);
+    const carUrls = carsSnap.docs.map((doc) => ({
+      url: `https://idmoto.vercel.app/car?id=${doc.id}`,
+      lastModified: new Date().toISOString(),
+    }));
+
+    // Fetch all users (user profiles are generally public)
+    const usersSnap = await getDocs(collection(db, "users"));
+    const userUrls = usersSnap.docs.map((doc) => ({
+      url: `https://idmoto.vercel.app/profile?uid=${doc.id}`,
+      lastModified: new Date().toISOString(),
+    }));
+
+    return [
+      ...staticUrls,
+      ...carUrls,
+      ...userUrls,
+    ];
+  } catch (error) {
+    console.warn("Failed to fetch dynamic content for sitemap:", error);
+    // Return static URLs only if Firebase fetch fails
+    return staticUrls;
+  }
 }
