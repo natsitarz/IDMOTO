@@ -355,6 +355,11 @@ export default function CarPageInner() {
       return;
     }
     await uploadFn(file, user, carId);
+    window.dispatchEvent(
+      new CustomEvent("show-global-success", {
+        detail: "Photo uploaded successfully!",
+      })
+    );
     await fetchCar(carId);
   };
 
@@ -496,7 +501,7 @@ export default function CarPageInner() {
       </div>
 
       <div className="animate-fade-in-up w-full px-4 grid gap-8 grid-cols-1 md:grid-cols-2">
-        <div className="rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 z-[10]">
+        <div className="flex flex-col justify-around rounded-2xl bg-zinc-900/80 shadow-2xl border border-white/20 backdrop-blur-md p-6 z-[10]">
           <CarInfo car={car} />
           <CarMeta car={car} user={user} />
         </div>
