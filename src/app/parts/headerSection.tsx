@@ -99,7 +99,7 @@ function BackgroundAlignmentModal({
               <div className="relative h-56 sm:h-84 w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl border border-zinc-700 group">
                 {/* Background image with alignment */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center cursor-grab active:cursor-grabbing transition-all duration-300"
+                  className="absolute inset-0 bg-cover bg-center cursor-grab active:cursor-grabbing transition-all duration-300 select-none"
                   style={{
                     backgroundImage: `url(${backgroundUrl})`,
                     backgroundPosition: `center ${bgAlign}%`,
@@ -142,7 +142,7 @@ function BackgroundAlignmentModal({
                 />
 
                 {/* Sample avatar and content to show positioning context */}
-                <div className="absolute bottom-0 left-0 right-0 flex items-center z-10 p-8">
+                <div className="absolute bottom-0 left-0 right-0 flex items-center z-10 p-8 select-none">
                   <div className="relative mr-4">
                     <div className="w-[102px] h-[102px] rounded-full border-4 border-white bg-zinc-800 flex items-center justify-center">
                       <svg
@@ -174,7 +174,7 @@ function BackgroundAlignmentModal({
                 </div>
 
                 {/* Alignment indicator */}
-                <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white font-medium border border-white/20">
+                <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white font-medium border border-white/20 select-none">
                   Position: {Math.round(bgAlign)}%
                 </div>
 
@@ -210,6 +210,7 @@ function BackgroundAlignmentModal({
                 max={100}
                 value={bgAlign}
                 onChange={(e) => setBgAlign(Number(e.target.value))}
+                style={{ "--value": `${bgAlign}%` } as React.CSSProperties}
                 className="w-full h-3 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
               />
               <div className="flex justify-between text-xs text-zinc-500 mt-2">
@@ -260,6 +261,7 @@ export function ProfileHeader({
   const [showAlignModal, setShowAlignModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [bgAlign, setBgAlign] = useState<number>(50); // 0 = top, 100 = bottom, 50 = center
+  const [originalBgAlign, setOriginalBgAlign] = useState<number>(50); // Store original value for cancel
   const [bgUrl, setBgUrl] = useState<string | undefined>(undefined);
   const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -285,6 +287,12 @@ export function ProfileHeader({
       }
     });
   }, [uid]);
+
+  // Cancel function to revert alignment changes
+  const handleCancelAlignment = () => {
+    setBgAlign(originalBgAlign); // Revert to original value
+    setShowAlignModal(false);
+  };
 
   // Always try to fetch background photo from storage, not from Firestore/doc
   useEffect(() => {
@@ -502,6 +510,7 @@ export function ProfileHeader({
                   className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base group"
                   onClick={() => {
                     setMenuOpen(false);
+                    setOriginalBgAlign(bgAlign); // Save current value for potential revert
                     setShowAlignModal(true);
                   }}
                 >
@@ -534,7 +543,7 @@ export function ProfileHeader({
       {/* Background Alignment Modal */}
       <BackgroundAlignmentModal
         isOpen={showAlignModal}
-        onClose={() => setShowAlignModal(false)}
+        onClose={handleCancelAlignment}
         onSave={handleSaveAlignment}
         backgroundUrl={bgUrl || "/background-car-placeholder.png"}
         bgAlign={bgAlign}

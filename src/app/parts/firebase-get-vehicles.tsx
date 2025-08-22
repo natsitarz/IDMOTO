@@ -238,7 +238,7 @@ function AlignmentModal({
             {/* Vehicle card preview - exact same dimensions as real card */}
             <div className="flex justify-center mb-8">
               <div
-                className="relative rounded-2xl overflow-hidden shadow-xl h-72 w-54 flex items-end cursor-grab active:cursor-grabbing border border-zinc-700 group"
+                className="relative rounded-2xl overflow-hidden shadow-xl h-72 w-54 flex items-end cursor-grab active:cursor-grabbing border border-zinc-700 group select-none"
                 style={{
                   backgroundImage: `url(${imageUrl})`,
                   backgroundSize: "cover",
@@ -278,7 +278,7 @@ function AlignmentModal({
                 <div className="absolute left-0 top-0 w-full h-1/3 bg-gradient-to-b from-white/10 to-transparent pointer-events-none opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
 
                 {/* Vehicle information - same as real card */}
-                <div className="relative z-10 w-full px-5 pb-5 pt-8 flex flex-col">
+                <div className="relative z-10 w-full px-5 pb-5 pt-8 flex flex-col select-none">
                   <h3 className="text-white text-2xl font-black drop-shadow-lg mb-0.5 truncate">
                     {vehicleName.split(" ")[0] || "Unknown"}
                   </h3>
@@ -297,7 +297,7 @@ function AlignmentModal({
                 <div className="pointer-events-none absolute inset-0 rounded-2xl group-hover:shadow-[0_0_40px_0_rgba(59,130,246,0.2)] transition-all duration-300" />
 
                 {/* Alignment indicator */}
-                <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg px-2 py-1 text-xs text-white font-medium border border-white/20">
+                <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg px-2 py-1 text-xs text-white font-medium border border-white/20 select-none">
                   {Math.round(bgAlignX)}%
                 </div>
               </div>
@@ -327,6 +327,7 @@ function AlignmentModal({
                 max={100}
                 value={bgAlignX}
                 onChange={(e) => setBgAlignX(Number(e.target.value))}
+                style={{ "--value": `${bgAlignX}%` } as React.CSSProperties}
                 className="w-full h-3 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
               />
               <div className="flex justify-between text-xs text-zinc-500 mt-1">
@@ -377,6 +378,9 @@ function VehicleCard({
   const [showActions, setShowActions] = useState(false);
   const [showAlignModal, setShowAlignModal] = useState(false);
   const [bgAlignX, setBgAlignX] = useState<number>(vehicle.bgAlignX ?? 50);
+  const [originalBgAlignX, setOriginalBgAlignX] = useState<number>(
+    vehicle.bgAlignX ?? 50
+  ); // Store original value for cancel
   const [savingAlign, setSavingAlign] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(true);
@@ -431,6 +435,12 @@ function VehicleCard({
       setSavingAlign(false);
     }
   }, [vehicle.id, bgAlignX]);
+
+  // Cancel function to revert alignment changes
+  const handleCancelAlignment = () => {
+    setBgAlignX(originalBgAlignX); // Revert to original value
+    setShowAlignModal(false);
+  };
 
   const bgImage = imageUrl || "/car-placeholder.png";
 
@@ -499,6 +509,7 @@ function VehicleCard({
               className="cursor-pointer flex items-center justify-center bg-blue-600/90 hover:bg-blue-700 text-white p-2.5 rounded-full shadow-lg border border-blue-400/30 transition-all duration-200 backdrop-blur-sm"
               onClick={(e) => {
                 e.stopPropagation();
+                setOriginalBgAlignX(bgAlignX); // Save current value for potential revert
                 setShowAlignModal(true);
                 setShowActions(false);
               }}
@@ -533,7 +544,7 @@ function VehicleCard({
       {/* Alignment Modal */}
       <AlignmentModal
         isOpen={showAlignModal}
-        onClose={() => setShowAlignModal(false)}
+        onClose={handleCancelAlignment}
         onSave={handleSaveAlignment}
         vehicleName={vehicleName}
         imageUrl={bgImage}
@@ -728,8 +739,8 @@ export const VehiclesListDiv: React.FC<{
           background: linear-gradient(
             to right,
             #3b82f6 0%,
-            #3b82f6 50%,
-            #374151 50%,
+            #3b82f6 var(--value, 50%),
+            #374151 var(--value, 50%),
             #374151 100%
           );
         }
