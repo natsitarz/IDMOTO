@@ -49,10 +49,28 @@ export const addUserToDB = async (user: any) => {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+
     if (userSnap.exists()) {
-      await updateDoc(userRef, {
+      const userData = userSnap.data();
+      const updateData: any = {
         postCreatedAt: null,
-      });
+      };
+
+      // Only add joinedAt if it doesn't exist
+      if (!userData.joinedAt) {
+        updateData.joinedAt = currentDate;
+      }
+
+      // Only add createdAt if it doesn't exist
+      if (!userData.createdAt) {
+        updateData.createdAt = currentDate;
+      }
+
+      await updateDoc(userRef, updateData);
     } else {
       await setDoc(userRef, {
         uid: user.uid,
@@ -60,14 +78,8 @@ export const addUserToDB = async (user: any) => {
         email: user.email,
         photoURL: user.photoURL,
         postCreatedAt: null,
-        joinedAt:  new Date().toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    }),
-        createdAt: new Date().toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    }),
+        joinedAt: currentDate,
+        createdAt: currentDate,
       });
     }
     // REMOVE window.location.href from here!
