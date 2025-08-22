@@ -4,6 +4,7 @@ import { auth, db } from "@/app/parts/firebase";
 import { firebaseAddVehiclePublic } from "@/app/parts/firebase-add-vehicle";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const VISIBILITY_OPTIONS = [
@@ -15,6 +16,7 @@ export default function Profile() {
   const [hasCar, setHasCar] = useState<boolean | null>(null);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -48,7 +50,7 @@ export default function Profile() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     formData.append("visibility", visibility);
-    await firebaseAddVehiclePublic(formData); // <-- przekazujesz FormData
+    await firebaseAddVehiclePublic(formData, router); // <-- passing FormData and router
   };
 
   if (loading) {

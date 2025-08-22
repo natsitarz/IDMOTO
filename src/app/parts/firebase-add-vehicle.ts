@@ -2,7 +2,10 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
-export const firebaseAddVehiclePublic = async (formData: FormData) => {
+export const firebaseAddVehiclePublic = async (
+  formData: FormData, 
+  router?: { push: (url: string) => void }
+) => {
   const formDataObject: { [key: string]: string } = {};
   formData.forEach((value, key) => {
     formDataObject[key] = value.toString();
@@ -18,7 +21,19 @@ export const firebaseAddVehiclePublic = async (formData: FormData) => {
         userID: user.uid,
         description: "",
       });
-      window.location.href = "/profile?uid=" + user.uid;
+      
+      // Use router if provided, otherwise fallback to window.location.href
+      if (router) {
+        router.push(`/profile?uid=${user.uid}`);
+      } else {
+        window.location.href = "/profile?uid=" + user.uid;
+      }
+      
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Successfully added a car.",
+        })
+      );
     } catch (error) {
       console.error("Error adding document: ", error);
     }
