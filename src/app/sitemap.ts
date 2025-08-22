@@ -19,18 +19,33 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = "https://idmoto.vercel.app";
+  const currentDate = new Date().toISOString();
+
   const staticUrls = [
     {
-      url: "https://idmoto.vercel.app/",
-      lastModified: new Date().toISOString(),
+      url: `${baseUrl}/`,
+      lastModified: currentDate,
+      changeFrequency: "daily" as const,
+      priority: 1.0,
     },
     {
-      url: "https://idmoto.vercel.app/feed",
-      lastModified: new Date().toISOString(),
+      url: `${baseUrl}/feed`,
+      lastModified: currentDate,
+      changeFrequency: "hourly" as const,
+      priority: 0.9,
     },
     {
-      url: "https://idmoto.vercel.app/profile",
-      lastModified: new Date().toISOString(),
+      url: `${baseUrl}/add`,
+      lastModified: currentDate,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: currentDate,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     },
   ];
 
@@ -42,15 +57,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
     const carsSnap = await getDocs(publicCarsQuery);
     const carUrls = carsSnap.docs.map((doc) => ({
-      url: `https://idmoto.vercel.app/car?id=${doc.id}`,
-      lastModified: new Date().toISOString(),
+      url: `${baseUrl}/car?id=${doc.id}`,
+      lastModified: currentDate,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
     }));
 
     // Fetch all users (user profiles are generally public)
     const usersSnap = await getDocs(collection(db, "users"));
     const userUrls = usersSnap.docs.map((doc) => ({
-      url: `https://idmoto.vercel.app/profile?uid=${doc.id}`,
-      lastModified: new Date().toISOString(),
+      url: `${baseUrl}/profile?uid=${doc.id}`,
+      lastModified: currentDate,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
     }));
 
     return [

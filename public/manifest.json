@@ -1,0 +1,84 @@
+{
+  "name": "IDMOTO - Car Social Network",
+  "short_name": "IDMOTO",
+  "description": "The ultimate car social network. Create your car profile, showcase your ride, and connect with automotive enthusiasts worldwide.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#18181b",
+  "theme_color": "#18181b",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["social", "automotive", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "IDMOTO Car Social Network Dashboard"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "IDMOTO Mobile App"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Profile",
+      "short_name": "Profile",
+      "description": "View and edit your car profile",
+      "url": "/profile",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Feed",
+      "short_name": "Feed",
+      "description": "Browse the latest car posts",
+      "url": "/feed",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Add Car",
+      "short_name": "Add Car",
+      "description": "Add a new car to your collection",
+      "url": "/add",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

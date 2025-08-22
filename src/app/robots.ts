@@ -6,9 +6,23 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        disallow: [
+          "/api/",
+          "/admin/",
+          "/_next/",
+          "/.*\\?",
+        ],
+      },
+      {
+        userAgent: "Googlebot",
+        allow: "/",
+        disallow: [
+          "/api/",
+          "/admin/",
+        ],
       },
     ],
     sitemap: "https://idmoto.vercel.app/sitemap.xml",
-    host: "https://idmoto.vercel.app", 
+    host: "https://idmoto.vercel.app",
   };
 }
