@@ -53,12 +53,14 @@ export async function generateMetadata({
         "View detailed information about cars in the IDMOTO community - the ultimate automotive social network.",
       type: "website",
       siteName: "IDMOTO",
+      locale: "en_US",
       images: [
         {
           url: "/background-car-placeholder.png",
           width: 1200,
           height: 630,
           alt: "IDMOTO - Discover amazing vehicles",
+          type: "image/png",
         },
       ],
     },
@@ -122,14 +124,27 @@ export async function generateMetadata({
           type: "article",
           url: carUrl,
           siteName: "IDMOTO",
+          locale: "en_US",
           images: [
             {
               url: carImageUrl,
               width: 1200,
               height: 630,
               alt: `${manufacturer} ${model}${year ? ` ${year}` : ""} - IDMOTO`,
+              type: "image/jpeg",
             },
           ],
+          authors: ["IDMOTO Community"],
+          publishedTime: new Date().toISOString(),
+          modifiedTime: new Date().toISOString(),
+          section: "Automotive",
+          tags: [
+            manufacturer,
+            model,
+            "automotive",
+            "car showcase",
+            "IDMOTO",
+          ].filter(Boolean),
         },
         twitter: {
           card: "summary_large_image",
@@ -160,6 +175,12 @@ export async function generateMetadata({
           "article:author": "IDMOTO Community",
           "article:section": "Automotive",
           "article:tag": `${manufacturer}, ${model}, automotive, car showcase`,
+          "og:image:secure_url": carImageUrl,
+          "og:image:width": "1200",
+          "og:image:height": "630",
+          "og:updated_time": new Date().toISOString(),
+          "fb:app_id": "idmoto",
+          "og:see_also": "https://idmoto.vercel.app/feed",
         },
       };
     }
