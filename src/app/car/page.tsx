@@ -42,15 +42,15 @@ export async function generateMetadata({
   const resolvedSearchParams = await searchParams;
   const carId = resolvedSearchParams?.id;
 
-  // Default metadata for invalid/missing car ID
+  // Default metadata for invalid/missing car ID or private cars
   const defaultMetadata: Metadata = {
-    title: "Car Details | IDMOTO",
+    title: "Vehicle Details | IDMOTO",
     description:
-      "View detailed information about cars in the IDMOTO community - the ultimate automotive social network.",
+      "Explore amazing vehicles on IDMOTO - the ultimate automotive social network. Connect with car enthusiasts and discover incredible rides.",
     openGraph: {
-      title: "Car Details | IDMOTO",
+      title: "Vehicle Details | IDMOTO",
       description:
-        "View detailed information about cars in the IDMOTO community - the ultimate automotive social network.",
+        "Explore amazing vehicles on IDMOTO - the ultimate automotive social network. Connect with car enthusiasts and discover incredible rides.",
       type: "website",
       siteName: "IDMOTO",
       locale: "en_US",
@@ -66,9 +66,9 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: "Car Details | IDMOTO",
+      title: "Vehicle Details | IDMOTO",
       description:
-        "View detailed information about cars in the IDMOTO community - the ultimate automotive social network.",
+        "Explore amazing vehicles on IDMOTO - the ultimate automotive social network. Connect with car enthusiasts and discover incredible rides.",
       images: ["/background-car-placeholder.png"],
     },
   };
@@ -84,6 +84,13 @@ export async function generateMetadata({
 
     if (carSnap.exists()) {
       const carData = carSnap.data();
+
+      // Check if car is private - if so, return default metadata
+      if (carData?.visibility === "private") {
+        console.log("Private car detected, using default metadata");
+        return defaultMetadata;
+      }
+
       const manufacturer = carData?.manufacturer || "Unknown";
       const model = carData?.model || "Model";
       const year = carData?.year || "";
@@ -184,7 +191,19 @@ export async function generateMetadata({
         },
       };
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    // Handle permission errors for private vehicles
+    const firebaseError = error as { code?: string; message?: string };
+    if (
+      firebaseError?.code === "permission-denied" ||
+      firebaseError?.message?.includes("Missing or insufficient permissions")
+    ) {
+      console.log(
+        "Permission denied for car metadata - likely private vehicle"
+      );
+      return defaultMetadata;
+    }
+
     console.error("Error fetching car data for metadata:", error);
   }
 

@@ -48,9 +48,9 @@ function isRateLimited(identifier: string, maxRequests: number = 100, windowMs: 
 
 // Server-side validation rules
 const VALIDATION_RULES = {
-  maxPostLength: 500,
-  maxBioLength: 200,
-  maxVehicleDescLength: 1000,
+  maxPostLength: 200,
+  maxBioLength: 25,
+  maxVehicleDescLength: 25,
   bannedDomains: ['bit.ly', 'tinyurl.com', 'short.link'], // Suspicious URL shorteners
   requiredFields: {
     vehicle: ['manufacturer', 'model'],
@@ -91,9 +91,17 @@ export async function POST(req: NextRequest) {
 
     const { content, contentType, metadata }: ValidationRequest = await req.json();
 
-    if (!content || !contentType) {
+    if (!contentType) {
       return NextResponse.json(
-        { error: "Content and contentType are required" }, 
+        { error: "ContentType is required" }, 
+        { status: 400 }
+      );
+    }
+
+    // For vehicle_data, content can be empty as data is in metadata
+    if (contentType !== 'vehicle_data' && (!content || content.trim().length === 0)) {
+      return NextResponse.json(
+        { error: "Content is required for this content type" }, 
         { status: 400 }
       );
     }
@@ -119,11 +127,14 @@ function validateContent(content: string, contentType: string, metadata?: Record
   const warnings: string[] = [];
   let sanitizedContent = content;
 
-  // Basic text validation
-  const maxLength = getMaxLength(contentType);
-  const textValidation = validateTextInput(content, maxLength);
-  if (!textValidation.isValid) {
-    errors.push(textValidation.error!);
+  // For vehicle_data, skip text validation as data is in metadata
+  if (contentType !== 'vehicle_data') {
+    // Basic text validation
+    const maxLength = getMaxLength(contentType);
+    const textValidation = validateTextInput(content, maxLength);
+    if (!textValidation.isValid) {
+      errors.push(textValidation.error!);
+    }
   }
 
   // Content-specific validation
@@ -142,14 +153,16 @@ function validateContent(content: string, contentType: string, metadata?: Record
       break;
   }
 
-  // Sanitize content
-  sanitizedContent = sanitizeContent(content);
+  // Sanitize content (handle empty content for vehicle_data)
+  sanitizedContent = content ? sanitizeContent(content) : "";
 
-  // Check for suspicious URLs
-  validateUrls(content, errors, warnings);
-
-  // Check for spam patterns
-  validateSpamPatterns(content, warnings);
+  // Check for suspicious URLs (only if content exists)
+  if (content && content.trim().length > 0) {
+    validateUrls(content, errors, warnings);
+    
+    // Check for spam patterns
+    validateSpamPatterns(content, warnings);
+  }
 
   return {
     isValid: errors.length === 0,

@@ -12,16 +12,17 @@ import {
   uploadPhoto,
 } from "@/app/parts/firebase-customize-vehicle";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import {
   deleteObject,
   getDownloadURL,
   listAll,
   ref as storageRef,
 } from "firebase/storage";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { FiEdit3 } from "react-icons/fi";
 
 // Enhanced Loading Components
 function HeroSkeleton() {
@@ -274,6 +275,214 @@ function PrivateCarMessage() {
   );
 }
 
+// Background Alignment Modal Component
+function BackgroundAlignmentModal({
+  isOpen,
+  onClose,
+  onSave,
+  carName,
+  imageUrl,
+  bgAlignX,
+  setBgAlignX,
+  savingAlign,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  carName: string;
+  imageUrl: string;
+  bgAlignX: number;
+  setBgAlignX: (value: number) => void;
+  savingAlign: boolean;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  if (!isOpen || !mounted) return null;
+
+  const modalContent = (
+    <>
+      {/* Fullscreen blurred backdrop */}
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[999990]"
+        onClick={onClose}
+      />
+
+      {/* Modal content */}
+      <div className="fixed inset-0 z-[999991] flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl mx-auto bg-zinc-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 animate-scale-in overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                <FiEdit3 className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">
+                  Align Background Photo
+                </h2>
+                <p className="text-sm text-zinc-400">{carName}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="cursor-pointer w-10 h-10 rounded-full bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-400 hover:text-white transition-all flex items-center justify-center"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Main content */}
+          <div className="p-6">
+            {/* Car hero preview - exact same dimensions as actual hero */}
+            <div className="flex justify-center mb-8">
+              <div
+                className="relative w-full h-96 max-h-[420px] rounded-b-3xl overflow-hidden shadow-xl flex items-end cursor-grab active:cursor-grabbing border border-zinc-700 group select-none"
+                style={{
+                  backgroundImage: `url(${imageUrl})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: `center ${bgAlignX}%`,
+                }}
+                onMouseDown={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const startY = e.clientY;
+                  const startAlign = bgAlignX;
+                  let dragging = true;
+
+                  const onMouseMove = (moveEvent: MouseEvent) => {
+                    if (!dragging) return;
+                    const deltaY = moveEvent.clientY - startY;
+                    const percentDelta = (deltaY / rect.height) * 100;
+                    const newAlign = Math.max(
+                      0,
+                      Math.min(100, startAlign + percentDelta)
+                    );
+                    setBgAlignX(newAlign);
+                  };
+
+                  const onMouseUp = () => {
+                    dragging = false;
+                    window.removeEventListener("mousemove", onMouseMove);
+                    window.removeEventListener("mouseup", onMouseUp);
+                  };
+
+                  window.addEventListener("mousemove", onMouseMove);
+                  window.addEventListener("mouseup", onMouseUp);
+                }}
+              >
+                {/* Overlay for readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent pointer-events-none transition-all duration-300" />
+
+                {/* Car information preview */}
+                <div className="relative z-10 w-full px-8 pb-8 pt-8 flex flex-col select-none">
+                  <h3 className="text-3xl font-black text-white drop-shadow-lg mb-0.5">
+                    {carName.split(" ")[0] || "Unknown"}
+                  </h3>
+                  <div className="text-zinc-200 text-xl font-semibold drop-shadow">
+                    {carName.split(" ")[1] || "Model"}
+                  </div>
+                  <div className="text-zinc-400 text-sm mt-1.5 drop-shadow">
+                    Drag up/down to adjust background position
+                  </div>
+                </div>
+
+                {/* Alignment indicator */}
+                <div className="absolute top-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white font-medium border border-white/20 select-none">
+                  {Math.round(bgAlignX)}%
+                </div>
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="text-center mb-6">
+              <p className="text-zinc-300 text-sm">
+                <strong>Drag the preview above vertically</strong> or use the
+                slider below to adjust the vertical position
+              </p>
+            </div>
+
+            {/* Slider control */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-zinc-300">
+                  Vertical Position
+                </label>
+                <span className="text-blue-400 font-medium text-sm">
+                  {Math.round(bgAlignX)}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={bgAlignX}
+                onChange={(e) => setBgAlignX(Number(e.target.value))}
+                style={{ "--value": `${bgAlignX}%` } as React.CSSProperties}
+                className="w-full h-3 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <div className="flex justify-between text-xs text-zinc-500 mt-1">
+                <span>Top</span>
+                <span>Center</span>
+                <span>Bottom</span>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-4">
+              <button
+                className="cursor-pointer flex-1 px-6 py-3 rounded-2xl bg-zinc-700 text-white hover:bg-zinc-600 font-medium transition-all disabled:opacity-50"
+                onClick={onClose}
+                disabled={savingAlign}
+              >
+                Cancel
+              </button>
+              <button
+                className="cursor-pointer flex-1 px-6 py-3 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                disabled={savingAlign}
+                onClick={onSave}
+              >
+                {savingAlign && (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                )}
+                {savingAlign ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  return createPortal(modalContent, document.body);
+}
+
 export default function CarPageInner() {
   const [hasMounted, setHasMounted] = useState(false);
   const searchParams = useSearchParams();
@@ -284,6 +493,12 @@ export default function CarPageInner() {
   const [user, setUser] = useState<User | null>(null);
   const [descValue, setDescValue] = useState("");
   const [retrying, setRetrying] = useState(false);
+
+  // Background alignment modal state
+  const [showAlignModal, setShowAlignModal] = useState(false);
+  const [bgAlignX, setBgAlignX] = useState<number>(50);
+  const [originalBgAlignX, setOriginalBgAlignX] = useState<number>(50);
+  const [savingAlign, setSavingAlign] = useState(false);
 
   async function fetchGallery(carId: string): Promise<string[]> {
     const folderRef = storageRef(storage, `vehicles/${carId}/`);
@@ -411,6 +626,45 @@ export default function CarPageInner() {
     }
   };
 
+  // Handle alignment save
+  const handleSaveAlignment = useCallback(async () => {
+    if (!carId) return;
+    setSavingAlign(true);
+    try {
+      await updateDoc(doc(db, "vehicles", carId), { bgAlignX });
+      setShowAlignModal(false);
+      window.dispatchEvent(
+        new CustomEvent("show-global-success", {
+          detail: "Background alignment saved successfully!",
+        })
+      );
+      // Update the car state with new alignment
+      setCar((prev: any) => ({ ...prev, bgAlignX }));
+    } catch {
+      window.dispatchEvent(
+        new CustomEvent("show-global-error", {
+          detail: "Failed to save alignment. Please try again.",
+        })
+      );
+    } finally {
+      setSavingAlign(false);
+    }
+  }, [carId, bgAlignX]);
+
+  // Cancel function to revert alignment changes
+  const handleCancelAlignment = () => {
+    setBgAlignX(originalBgAlignX);
+    setShowAlignModal(false);
+  };
+
+  // Open alignment modal
+  const openAlignmentModal = () => {
+    const currentAlign = car?.bgAlignX ?? 50;
+    setBgAlignX(currentAlign);
+    setOriginalBgAlignX(currentAlign);
+    setShowAlignModal(true);
+  };
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -482,19 +736,24 @@ export default function CarPageInner() {
   return (
     <div className="relative min-h-[calc(100dvh-67px)] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed flex flex-col items-center font-[family-name:var(--font-geist-sans)] px-4">
       {/* Hero Section */}
-      <div className="animate-fade-in-opacity relative w-full h-96 max-h-[420px] flex items-end justify-start overflow-hidden rounded-b-3xl shadow-xl mb-4">
-        <Image
-          src={car.image}
-          alt={`${car.manufacturer} ${car.model}`}
-          className="absolute inset-0 w-full h-full object-cover blur-none"
-          width={1920}
-          height={420}
-        />
+      <div
+        className="animate-fade-in-opacity relative w-full h-96 max-h-[420px] flex items-end justify-start overflow-hidden rounded-b-3xl shadow-xl mb-4"
+        style={{
+          backgroundImage: `url(${car.image})`,
+          backgroundSize: "cover",
+          backgroundPosition: `center ${car.bgAlignX ?? 50}%`,
+        }}
+      >
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent" />
 
         {/* Edit button in top-right with standard z-index */}
         <div className="absolute top-4 right-6 z-[40]">
-          <CarActions car={car} user={user} handleUpload={handleUpload} />
+          <CarActions
+            car={car}
+            user={user}
+            handleUpload={handleUpload}
+            onOpenAlignModal={openAlignmentModal}
+          />
         </div>
 
         <div className="relative p-8 z-10">
@@ -555,6 +814,18 @@ export default function CarPageInner() {
         </p>
       </footer>
 
+      {/* Background Alignment Modal */}
+      <BackgroundAlignmentModal
+        isOpen={showAlignModal}
+        onClose={handleCancelAlignment}
+        onSave={handleSaveAlignment}
+        carName={`${car.manufacturer || "Unknown"} ${car.model || "Model"}`}
+        imageUrl={car.image || "/background-car-placeholder.png"}
+        bgAlignX={bgAlignX}
+        setBgAlignX={setBgAlignX}
+        savingAlign={savingAlign}
+      />
+
       {/* Enhanced Global Styles */}
       <style jsx global>{`
         @keyframes fade-in-opacity {
@@ -598,6 +869,68 @@ export default function CarPageInner() {
 
         .animate-fade-in {
           animation: fade-in 0.6s ease-out forwards;
+        }
+
+        @keyframes scale-in {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out forwards;
+        }
+
+        /* Custom slider styles */
+        .slider {
+          background: linear-gradient(
+            to right,
+            #3b82f6 0%,
+            #3b82f6 var(--value, 50%),
+            #374151 var(--value, 50%),
+            #374151 100%
+          );
+        }
+
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 24px;
+          width: 24px;
+          border-radius: 50%;
+          background: #3b82f6;
+          cursor: pointer;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
+            0 6px 16px rgba(0, 0, 0, 0.4);
+          transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+          height: 24px;
+          width: 24px;
+          border-radius: 50%;
+          background: #3b82f6;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3),
+            0 4px 12px rgba(0, 0, 0, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .slider::-moz-range-thumb:hover {
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
+            0 6px 16px rgba(0, 0, 0, 0.4);
+          transform: scale(1.1);
         }
       `}</style>
     </div>

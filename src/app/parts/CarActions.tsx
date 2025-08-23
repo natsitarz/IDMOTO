@@ -1,16 +1,20 @@
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiEdit2, FiImage } from "react-icons/fi";
+import { FiEdit2, FiImage, FiMove } from "react-icons/fi";
 
 export default function CarActions({
   car,
   user,
   handleUpload,
+  onOpenAlignModal,
 }: {
   car: any;
   user: any;
   handleUpload: (file: File) => void;
+  onOpenAlignModal?: () => void;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -80,7 +84,7 @@ export default function CarActions({
         <button
           className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base border-b border-zinc-700/30 group"
           onClick={() => {
-            window.location.href = `/car/edit?id=${car.id}`;
+            router.push(`/car/edit?id=${car.id}`);
             setOpen(false);
           }}
         >
@@ -118,6 +122,27 @@ export default function CarActions({
             }}
           />
         </label>
+
+        {/* Align Background Button */}
+        {onOpenAlignModal && (
+          <button
+            className="cursor-pointer flex items-center gap-3 px-6 py-4 hover:bg-zinc-800/50 transition-all text-white font-medium text-base border-b border-zinc-700/30 group"
+            onClick={() => {
+              onOpenAlignModal();
+              setOpen(false);
+            }}
+          >
+            <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+              <FiMove className="text-purple-400" size={18} />
+            </div>
+            <div className="flex-1 text-left">
+              <div className="font-semibold">Align Background</div>
+              <div className="text-zinc-400 text-sm">
+                Adjust background image position
+              </div>
+            </div>
+          </button>
+        )}
 
         {/* Cancel Button */}
         <div className="px-6 py-4 border-t border-zinc-700/30">
