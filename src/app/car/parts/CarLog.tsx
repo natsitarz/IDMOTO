@@ -122,7 +122,7 @@ export default function CarLog({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
       <form
         onSubmit={handleAddLog}
-        className="relative w-full sm:w-[400px] mt-8 bg-zinc-900 rounded-t-2xl sm:rounded-2xl shadow-2xl border border-zinc-700 p-6 flex flex-col gap-4"
+        className="relative w-full sm:w-[400px] mt-8 bg-zinc-900 sm:rounded-2xl shadow-2xl border border-zinc-700 p-6 flex flex-col gap-4"
         style={{ maxWidth: 400 }}
       >
         <button
@@ -161,7 +161,7 @@ export default function CarLog({
             type="date"
             value={logDate}
             onChange={(e) => setLogDate(e.target.value)}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base shadow-inner [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:invert"
+            className="rounded-xl max-w-[200px] border border-zinc-700 bg-zinc-900/80 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base shadow-inner [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:invert"
             style={{
               colorScheme: "dark",
             }}
