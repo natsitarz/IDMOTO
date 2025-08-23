@@ -656,18 +656,52 @@ export const VehiclesListDiv: React.FC<{
     return <EmptyVehiclesState isOwnProfile={isOwnProfile} />;
   }
 
-  // Render vehicles
+  // Render vehicles with conditional vertical scrolling
+  // Only use vertical scrolling on desktop (md breakpoint) when more than 9 vehicles (3x3 grid)
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {vehicles.map((vehicle, index) => (
-        <div
-          key={vehicle.id}
-          style={{ animationDelay: `${index * 100}ms` }}
-          className="animate-fade-in-up"
-        >
-          <VehicleCard vehicle={vehicle} isOwnProfile={isOwnProfile} />
-        </div>
-      ))}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2 pb-4">
+      {/* Desktop: Vertical scroll container when > 9 vehicles */}
+      <div className="hidden md:contents">
+        {vehicles.length > 9 ? (
+          <div className="md:col-span-3 max-h-[880px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 pt-2">
+            <div className="grid grid-cols-3 gap-6 pb-6">
+              {vehicles.map((vehicle, index) => (
+                <div
+                  key={vehicle.id}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                  className="animate-fade-in-up"
+                >
+                  <VehicleCard vehicle={vehicle} isOwnProfile={isOwnProfile} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          // Desktop: Regular grid when ≤ 9 vehicles
+          vehicles.map((vehicle, index) => (
+            <div
+              key={vehicle.id}
+              style={{ animationDelay: `${index * 100}ms` }}
+              className="animate-fade-in-up"
+            >
+              <VehicleCard vehicle={vehicle} isOwnProfile={isOwnProfile} />
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Mobile & Tablet: Always regular grid (no vertical scroll) */}
+      <div className="md:hidden contents">
+        {vehicles.map((vehicle, index) => (
+          <div
+            key={vehicle.id}
+            style={{ animationDelay: `${index * 100}ms` }}
+            className="animate-fade-in-up"
+          >
+            <VehicleCard vehicle={vehicle} isOwnProfile={isOwnProfile} />
+          </div>
+        ))}
+      </div>
 
       {/* Enhanced Global Styles */}
       <style jsx global>{`
@@ -774,6 +808,38 @@ export const VehiclesListDiv: React.FC<{
           box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
             0 6px 16px rgba(0, 0, 0, 0.4);
           transform: scale(1.1);
+        }
+
+        /* Custom scrollbar styles for vertical scroll container */
+        .scrollbar-thin {
+          scrollbar-width: thin;
+        }
+
+        .scrollbar-thumb-zinc-700 {
+          scrollbar-color: #374151 #18181b;
+        }
+
+        .scrollbar-track-zinc-900 {
+          scrollbar-color: #374151 #18181b;
+        }
+
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: #18181b;
+          border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: #374151;
+          border-radius: 10px;
+          border: 2px solid #18181b;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: #4b5563;
         }
       `}</style>
     </div>
