@@ -430,7 +430,7 @@ export function ProfileHeader({
         <div className="absolute inset-0 sm:bottom-0 sm:top-auto sm:left-0 sm:right-0 flex items-center sm:items-end justify-center sm:justify-start z-10 p-4 sm:p-8 animate-fade-in-up">
           <div className="relative mr-4">
             <Image
-              className="rounded-full border-4 shadow-2xl border-white bg-white transition-all duration-300 hover:scale-105"
+              className="rounded-full border-3 shadow-2xl border-white bg-white transition-all duration-300 hover:scale-105"
               src={safePhotoURL}
               alt="Profile photo"
               width={102}

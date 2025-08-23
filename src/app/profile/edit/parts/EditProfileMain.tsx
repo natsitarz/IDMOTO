@@ -5,10 +5,12 @@ import { sendEmailVerification, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { set } from "zod";
 
 export default function EditProfileMain() {
   const { user } = useAuth();
   const [displayName, setDisplayName] = useState("");
+  const [uid, setUid] = useState("");
   const [country, setCountry] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
@@ -28,6 +30,7 @@ export default function EditProfileMain() {
           const userData = userSnap.data();
           setCountry(userData.country || "");
           setBio(userData.bio || "");
+          setUid(userData.uid || "");
         }
         setLoading(false);
       };
@@ -297,6 +300,11 @@ export default function EditProfileMain() {
         <span className="text-xs text-zinc-500 text-right">
           {bio.length}/25
         </span>
+      </div>
+      <div className="w-full bg-zinc-900/60 border border-zinc-800/50 rounded-xl px-4 py-3 backdrop-blur-sm">
+        <p className="text-xs font-mono text-zinc-400 tracking-wider uppercase opacity-80">
+          <span className="text-zinc-200 font-black">UID:</span> {uid}
+        </p>
       </div>
       {/* Validation warnings */}
       {validationWarnings.length > 0 && (
