@@ -75,7 +75,7 @@ export default function SeePhoto({
         alt={alt}
         width={thumbWidth}
         height={thumbHeight}
-        className={`object-cover w-full h-full rounded cursor-pointer ${className}`}
+        className={`w-full h-full rounded cursor-pointer ${className}`}
         onClick={() => setOpen(true)}
         draggable={false}
       />

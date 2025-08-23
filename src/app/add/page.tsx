@@ -70,8 +70,29 @@ export default function Profile() {
       className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed font-[family-name:var(--font-geist-sans)]"
     >
       <div className="w-full max-w-2xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-10 flex flex-col justify-center items-center gap-10 animate-fade-in-scale relative overflow-hidden min-h-[calc(100dvh-67px)]">
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="cursor-pointer absolute top-4 right-4 z-20 p-2 text-zinc-300 hover:text-white transition-all duration-200 group"
+          aria-label="Go back"
+        >
+          <svg
+            className="w-5 h-5 transform group-hover:scale-110 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
         {/* Decorative gradient circle */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
         <div className="flex flex-col items-center gap-2 z-10">
           <h1 className="block text-2xl uppercase text-white tracking-widest font-extrabold drop-shadow">
             Add vehicle
@@ -100,7 +121,7 @@ export default function Profile() {
               type="text"
               name="manufacturer"
               id="manufacturer"
-              placeholder="Manufacturer"
+              placeholder="ex. Toyota"
               required
               className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
             />
@@ -116,7 +137,7 @@ export default function Profile() {
               type="text"
               name="model"
               id="model"
-              placeholder="Model"
+              placeholder="ex. Civic Type R"
               required
               className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
             />
@@ -133,7 +154,7 @@ export default function Profile() {
                 type="number"
                 name="year"
                 id="year"
-                placeholder="Year"
+                placeholder="ex. 2004"
                 required
                 min="1866"
                 max="2100"
@@ -171,7 +192,7 @@ export default function Profile() {
                 type="text"
                 name="engine"
                 id="engine"
-                placeholder="Engine"
+                placeholder="ex. 1.9 TDI"
                 required
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
               />
@@ -189,7 +210,7 @@ export default function Profile() {
                 type="number"
                 name="horsepower"
                 id="horsepower"
-                placeholder="Horsepower"
+                placeholder="ex. 192"
                 required
                 min="0"
                 step="1"
@@ -226,7 +247,7 @@ export default function Profile() {
                 type="text"
                 name="transmission"
                 id="transmission"
-                placeholder="Transmission"
+                placeholder="ex. Manual"
                 required
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 text-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition font-medium text-base placeholder:text-zinc-400 shadow-inner"
               />
@@ -246,7 +267,7 @@ export default function Profile() {
                   key={option.value}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition border ${
                     visibility === option.value
-                      ? "bg-blue-600/80 border-blue-500 text-white"
+                      ? "bg-zinc-600/80 border-zinc-600 text-white"
                       : "bg-zinc-900/80 border-zinc-700 text-zinc-200"
                   }`}
                 >
@@ -266,7 +287,12 @@ export default function Profile() {
             </div>
           </div>
           <button
-            className="cursor-pointer w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 px-4 py-3 rounded-xl text-sm uppercase text-white font-bold tracking-widest mt-2 shadow-lg transition disabled:opacity-50 antialiased font-sans text-center disabled:cursor-not-allowed"
+            className={[
+              "cursor-pointer gap-2 px-10 py-2 rounded-xl transition-all duration-200 overflow-hidden flex",
+              "hover:bg-white/15 hover:scale-105 active:scale-95",
+              "focus:outline-none focus:ring-2 focus:ring-blue-400/50",
+              "bg-white/10 text-white border border-white/20",
+            ].join(" ")}
             type="submit"
           >
             Add it!

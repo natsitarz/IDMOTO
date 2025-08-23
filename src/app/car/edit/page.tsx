@@ -317,6 +317,25 @@ export default function CarEditPage() {
   return (
     <div className="min-h-[calc(100dvh-67px)] flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 bg-fixed font-[family-name:var(--font-geist-sans)]">
       <div className="w-full max-w-3xl bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 shadow-2xl border border-zinc-800/60 backdrop-blur-lg p-0 flex flex-col md:flex-row items-stretch gap-0 animate-fade-in-scale relative overflow-hidden min-h-[calc(100dvh-67px)]">
+        <button
+          onClick={() => router.back()}
+          className="cursor-pointer absolute top-4 right-4 z-20 p-2 text-zinc-300 hover:text-white transition-all duration-200 group"
+          aria-label="Go back"
+        >
+          <svg
+            className="w-5 h-5 transform group-hover:scale-110 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none z-0" />
         <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none z-0" />
         {/* Mobile menu */}

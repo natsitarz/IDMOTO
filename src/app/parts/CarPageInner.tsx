@@ -83,7 +83,7 @@ function GallerySkeleton() {
   return (
     <div className="space-y-4">
       <div className="h-6 bg-white/10 rounded w-24 animate-pulse" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
@@ -931,6 +931,32 @@ export default function CarPageInner() {
           box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4),
             0 6px 16px rgba(0, 0, 0, 0.4);
           transform: scale(1.1);
+        }
+
+        /* Custom scrollbar styles for gallery */
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: #52525b #27272a;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: #27272a;
+          border-radius: 4px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: #52525b;
+          border-radius: 4px;
+          transition: background 0.2s ease;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: #71717a;
         }
       `}</style>
     </div>
