@@ -200,7 +200,7 @@ function GalleryList({
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
       {sortedGallery.map((url: string, idx: number) => (
         <div
           key={idx}
