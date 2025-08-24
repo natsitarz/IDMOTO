@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
+import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef, useState } from "react";
 
@@ -360,6 +361,7 @@ function StickerPDF({
 }
 
 export default function CarMeta({ car, user }: { car: any; user: any }) {
+  const router = useRouter();
   const qrRef = useRef<SVGSVGElement>(null);
   const [qrPngUrl, setQrPngUrl] = useState<string | null>(null);
   const logoUrl = "/logo.png";
@@ -390,12 +392,12 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">
         <p className="text-sm text-zinc-400">
           Added by{" "}
-          <a
-            href={`/profile?uid=${car.userID}`}
-            className="text-blue-400 hover:underline font-medium"
+          <button
+            onClick={() => router.push(`/profile?uid=${car.userID}`)}
+            className="text-blue-400 hover:underline font-medium cursor-pointer bg-transparent border-none p-0"
           >
             {car.user || "Unknown User"}
-          </a>
+          </button>
         </p>
         {user?.uid === car.userID && (
           <span className="text-xs bg-zinc-800/60 text-zinc-300 px-3 py-1 rounded-full font-mono tracking-wide">
@@ -415,6 +417,11 @@ export default function CarMeta({ car, user }: { car: any; user: any }) {
             level="H"
           />
         </div>
+        {user?.uid !== car.userID && (
+          <span className="text-white font-light bg-transparent border-none p-0">
+            Scan to View
+          </span>
+        )}
         {user?.uid === car.userID &&
           (qrPngUrl ? (
             <PDFDownloadLink
