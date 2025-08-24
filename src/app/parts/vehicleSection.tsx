@@ -40,7 +40,7 @@ export function ProfileVehiclesSection({
           {letsAdd && <VehiclesMessage vehicleCount={vehicleCount} />}
         </div>
       </div>
-      <div className="w-full flex flex-wrap gap-6 justify-center sm:justify-center items-stretch min-h-[200px] z-10">
+      <div className="w-full flex flex-wrap gap-6 justify-center items-stretch min-h-[200px] flex-col  bg-white/5 rounded-xl p-4 shadow-inner z-10">
         {uid ? (
           <VehiclesListDiv
             userId={uid}

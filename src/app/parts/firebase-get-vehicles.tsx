@@ -442,7 +442,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer sm:h-72 sm:w-48 h-80 w-64 flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer sm:h-72 sm:w-46 h-80 w-64 flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -659,7 +659,7 @@ export const VehiclesListDiv: React.FC<{
   // Render vehicles with conditional vertical scrolling
   // Only use vertical scrolling on desktop (md breakpoint) when more than 9 vehicles (3x3 grid)
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2 pb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2">
       {/* Desktop: Vertical scroll container when > 9 vehicles */}
       <div className="hidden md:contents">
         {vehicles.length > 9 ? (
@@ -696,7 +696,7 @@ export const VehiclesListDiv: React.FC<{
           <div
             key={vehicle.id}
             style={{ animationDelay: `${index * 100}ms` }}
-            className="animate-fade-in-up"
+            className="animate-fade-in-up mx-auto"
           >
             <VehicleCard vehicle={vehicle} isOwnProfile={isOwnProfile} />
           </div>
