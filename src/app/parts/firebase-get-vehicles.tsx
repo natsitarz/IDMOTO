@@ -74,7 +74,7 @@ async function fetchVehiclesForUser(userId: string, isOwnProfile: boolean) {
 // Enhanced skeleton loader for vehicle cards
 function VehicleCardSkeleton() {
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-xl w-40 sm:w-44 md:w-44 lg:w-44 aspect-[2/3] mx-auto bg-zinc-900/50 border border-zinc-800 animate-pulse">
+    <div className="relative rounded-2xl overflow-hidden shadow-xl w-40 sm:w-40 md:w-44 lg:w-44 aspect-[2/3] mx-auto bg-zinc-900/50 border border-zinc-800 animate-pulse">
       {/* Background skeleton */}
       <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50" />
 
@@ -442,7 +442,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer w-40 sm:w-44 md:w-44 lg:w-44 aspect-[2/3] mx-auto flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer w-44 sm:w-44 md:w-44 lg:w-44 aspect-[2/3] mx-auto flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -667,7 +667,13 @@ export const VehiclesListDiv: React.FC<{
   // Render vehicles with conditional vertical scrolling
   // Only use vertical scrolling on desktop (md breakpoint) when more than 9 vehicles (3x3 grid)
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2">
+    <div
+      className={
+        vehicles.length === 1
+          ? "flex justify-center pt-2"
+          : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2"
+      }
+    >
       {/* Desktop: Vertical scroll container when > 9 vehicles */}
       <div className="hidden md:contents">
         {vehicles.length > 9 ? (
@@ -685,7 +691,7 @@ export const VehiclesListDiv: React.FC<{
             </div>
           </div>
         ) : (
-          // Desktop: Regular grid when ≤ 9 vehicles
+          // Desktop: Regular grid when ≤ 9 vehicles, or single centered item
           vehicles.map((vehicle, index) => (
             <div
               key={vehicle.id}
