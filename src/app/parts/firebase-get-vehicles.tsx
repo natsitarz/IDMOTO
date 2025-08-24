@@ -442,7 +442,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer w-44 sm:w-44 md:w-44 lg:w-44 aspect-[2/3] mx-auto flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer w-56 sm:w-44 md:w-44 lg:w-44 aspect-[2/3] mx-auto flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -469,8 +469,8 @@ function VehicleCard({
             <div
               className={`px-2 py-1 rounded-full text-xs font-semibold backdrop-blur-sm border ${
                 vehicle.visibility === "private"
-                  ? "bg-red-500/20 border-red-500/40 text-red-300"
-                  : "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+                  ? "bg-red-900/60 border-red-500/40 text-red-400"
+                  : "bg-emerald-900/60 border-emerald-500/40 text-emerald-400"
               }`}
             >
               {vehicle.visibility === "private" ? "Private" : "Public"}
@@ -481,7 +481,7 @@ function VehicleCard({
         {/* Actions button - only for owner */}
         {isOwnProfile && (
           <button
-            className="cursor-pointer absolute top-4 right-4 z-10 bg-zinc-900/80 hover:bg-zinc-800/90 text-white rounded-full p-2.5 shadow-lg transition-all duration-200 flex items-center justify-center backdrop-blur-sm border border-white/10"
+            className="cursor-pointer absolute top-2 right-2 z-10 bg-zinc-900/60 hover:bg-zinc-800/90 text-white rounded-full p-2.5 shadow-lg transition-all duration-200 flex items-center justify-center backdrop-blur-sm border border-white/10"
             onClick={(e) => {
               e.stopPropagation();
               setShowActions((prev) => !prev);
@@ -489,13 +489,13 @@ function VehicleCard({
             aria-label="Show vehicle actions"
             type="button"
           >
-            <FiMoreVertical size={18} />
+            <FiMoreVertical size={14} />
           </button>
         )}
 
         {/* Action buttons - only for owner */}
         {isOwnProfile && showActions && (
-          <div className="absolute top-4 right-16 z-20 flex flex-row gap-2 animate-fade-in">
+          <div className="absolute top-2 right-12 z-20 flex flex-row gap-2 animate-fade-in">
             {/* Align button */}
             <button
               type="button"
@@ -509,7 +509,7 @@ function VehicleCard({
                 setShowActions(false);
               }}
             >
-              <FiEdit3 size={16} />
+              <FiEdit3 size={14} />
             </button>
           </div>
         )}
@@ -677,7 +677,7 @@ export const VehiclesListDiv: React.FC<{
       {/* Desktop: Vertical scroll container when > 9 vehicles */}
       <div className="hidden md:contents">
         {vehicles.length > 9 ? (
-          <div className="md:col-span-3 max-h-[880px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 pt-2">
+          <div className="md:col-span-3 max-h-[860px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 pt-2">
             <div className="grid grid-cols-3 gap-6 pb-6">
               {vehicles.map((vehicle, index) => (
                 <div
