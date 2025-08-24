@@ -74,7 +74,7 @@ async function fetchVehiclesForUser(userId: string, isOwnProfile: boolean) {
 // Enhanced skeleton loader for vehicle cards
 function VehicleCardSkeleton() {
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-xl h-72 w-54 bg-zinc-900/50 border border-zinc-800 animate-pulse">
+    <div className="relative rounded-2xl overflow-hidden shadow-xl w-full aspect-[2/3] bg-zinc-900/50 border border-zinc-800 animate-pulse">
       {/* Background skeleton */}
       <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50" />
 
@@ -230,10 +230,10 @@ function AlignmentModal({
 
           {/* Main content */}
           <div className="p-6">
-            {/* Vehicle card preview - exact same dimensions as real card */}
+            {/* Vehicle card preview - responsive dimensions matching real card */}
             <div className="flex justify-center mb-8">
               <div
-                className="relative rounded-2xl overflow-hidden shadow-xl h-72 w-54 flex items-end cursor-grab active:cursor-grabbing border border-zinc-700 group select-none"
+                className="relative rounded-2xl overflow-hidden shadow-xl w-64 aspect-[2/3] flex items-end cursor-grab active:cursor-grabbing border border-zinc-700 group select-none"
                 style={{
                   backgroundImage: `url(${imageUrl})`,
                   backgroundSize: "cover",
@@ -442,7 +442,7 @@ function VehicleCard({
   return (
     <>
       <div
-        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer sm:h-72 sm:w-46 h-80 w-64 flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
+        className="relative group rounded-2xl overflow-hidden shadow-xl cursor-pointer w-full aspect-[2/3] max-w-xs mx-auto sm:max-w-none flex items-end animate-fade-in-up transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-zinc-800 bg-gradient-to-br from-zinc-950/90 via-zinc-900/80 to-zinc-800/80"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
