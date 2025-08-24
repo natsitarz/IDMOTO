@@ -178,11 +178,14 @@ function PostForm({
         const diff = now - lastPost;
         if (diff < 60 * 1000) {
           const secondsLeft = Math.ceil((60 * 1000 - diff) / 1000);
+
+          // Show a single toaster with the current countdown
           window.dispatchEvent(
             new CustomEvent("show-global-error", {
               detail: `Please wait ${secondsLeft}s before posting again`,
             })
           );
+
           return;
         }
 
@@ -1236,57 +1239,78 @@ function ProfileSidebar({
     }
   }, [router, currentUser]);
 
-  // Load user's profile data including bio
+  // Initialize profile immediately when currentUser is available, then enhance with Firestore data
   useEffect(() => {
     if (currentUser) {
-      setProfileLoading(true);
+      // First, set basic profile data immediately
+      if (!userProfile) {
+        setUserProfile({
+          bio: "",
+          displayName: currentUser.displayName || "User",
+          photoURL: currentUser.photoURL || "/logo.png",
+          email: currentUser.email || "No email",
+        });
+      }
 
-      const loadUserProfile = async () => {
-        try {
-          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+      // Then load enhanced data from Firestore
+      if (!profileLoading) {
+        setProfileLoading(true);
 
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            setUserProfile({
-              bio: data.bio || "",
-              displayName:
-                data.displayName || currentUser.displayName || "User",
-              photoURL: data.photoURL || currentUser.photoURL || "/logo.png",
-              email: data.email || currentUser.email || "No email",
-            });
-          } else {
-            // Fallback to Firebase Auth data if no Firestore profile
-            setUserProfile({
-              bio: "",
-              displayName: currentUser.displayName || "User",
-              photoURL: currentUser.photoURL || "/logo.png",
-              email: currentUser.email || "No email",
-            });
+        const loadUserProfile = async () => {
+          try {
+            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
+            if (userDoc.exists()) {
+              const data = userDoc.data();
+              setUserProfile({
+                bio: data.bio || "No bio provided.",
+                displayName:
+                  data.displayName || currentUser.displayName || "User",
+                photoURL: data.photoURL || currentUser.photoURL || "/logo.png",
+                email: data.email || currentUser.email || "No email",
+              });
+            } else {
+              // If no Firestore document, set a default bio message
+              setUserProfile((prev) =>
+                prev
+                  ? { ...prev, bio: "No bio provided." }
+                  : {
+                      bio: "No bio provided.",
+                      displayName: currentUser.displayName || "User",
+                      photoURL: currentUser.photoURL || "/logo.png",
+                      email: currentUser.email || "No email",
+                    }
+              );
+            }
+          } catch (error) {
+            console.error("Error loading user profile:", error);
+            // Set fallback bio on error
+            setUserProfile((prev) =>
+              prev
+                ? { ...prev, bio: "No bio provided." }
+                : {
+                    bio: "No bio provided.",
+                    displayName: currentUser.displayName || "User",
+                    photoURL: currentUser.photoURL || "/logo.png",
+                    email: currentUser.email || "No email",
+                  }
+            );
+          } finally {
+            setProfileLoading(false);
           }
-        } catch (error) {
-          console.error("Error loading user profile:", error);
-          // Fallback to Firebase Auth data on error
-          setUserProfile({
-            bio: "",
-            displayName: currentUser.displayName || "User",
-            photoURL: currentUser.photoURL || "/logo.png",
-            email: currentUser.email || "No email",
-          });
-        } finally {
-          setProfileLoading(false);
-        }
-      };
+        };
 
-      loadUserProfile();
+        loadUserProfile();
+      }
     } else {
       setUserProfile(null);
       setProfileLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUser, userProfile, profileLoading]);
 
-  // Load user's vehicle count using the same method as profile
+  // Load vehicle count immediately when currentUser is available
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !vehiclesLoading) {
       setVehiclesLoading(true);
 
       const loadVehicleCount = async () => {
@@ -1308,11 +1332,11 @@ function ProfileSidebar({
       };
 
       loadVehicleCount();
-    } else {
+    } else if (!currentUser) {
       setVehicleCount(0);
       setVehiclesLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUser, vehiclesLoading]);
 
   // Calculate user stats
   const userPosts = posts.filter((post) => post.userId === currentUser?.uid);
@@ -1332,16 +1356,16 @@ function ProfileSidebar({
               <div className="h-6 bg-white/10 rounded w-32 mx-auto mb-2" />
               <div className="h-4 bg-white/10 rounded w-24 mx-auto mb-4" />
 
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+              <div className="grid grid-rows-3 gap-3 mb-4">
+                <div className="bg-white/5 rounded-2xl p-2 border border-white/10">
                   <div className="h-6 bg-white/10 rounded w-8 mx-auto mb-1" />
                   <div className="h-3 bg-white/10 rounded w-10 mx-auto" />
                 </div>
-                <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                <div className="bg-white/5 rounded-2xl p-2 border border-white/10">
                   <div className="h-6 bg-white/10 rounded w-8 mx-auto mb-1" />
                   <div className="h-3 bg-white/10 rounded w-8 mx-auto" />
                 </div>
-                <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                <div className="bg-white/5 rounded-2xl p-2 border border-white/10">
                   <div className="h-6 bg-white/10 rounded w-8 mx-auto mb-1" />
                   <div className="h-3 bg-white/10 rounded w-10 mx-auto" />
                 </div>
@@ -1432,25 +1456,23 @@ function ProfileSidebar({
             </button>
 
             <p className="text-zinc-400 text-sm mb-4 truncate">
-              {profileLoading
-                ? "Loading..."
-                : userProfile?.bio || "No bio provided."}
+              {userProfile?.bio || "No bio provided."}
             </p>
 
-            <div className="grid grid-cols-3 gap-3 mb-4 text-center">
-              <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+            <div className="grid grid-rows-3 gap-3 mb-4 text-center">
+              <div className="bg-white/5 rounded-2xl p-2 border border-white/10">
                 <div className="text-white font-bold text-lg">
                   {userPosts.length}
                 </div>
                 <div className="text-zinc-400 text-xs">Posts</div>
               </div>
-              <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+              <div className="bg-white/5 rounded-2xl p-2 border border-white/10">
                 <div className="text-white font-bold text-lg">
-                  {vehiclesLoading ? "..." : vehicleCount}
+                  {vehicleCount}
                 </div>
                 <div className="text-zinc-400 text-xs">Cars</div>
               </div>
-              <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+              <div className="bg-white/5 rounded-2xl p-2 border border-white/10">
                 <div className="text-white font-bold text-lg">{totalLikes}</div>
                 <div className="text-zinc-400 text-xs">Likes</div>
               </div>
