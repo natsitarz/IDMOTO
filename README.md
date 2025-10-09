@@ -15,9 +15,6 @@ Showcase your vehicles, personalize your profile, and get instant AI-powered car
 - **Vehicle Cards:**  
   Add, edit, and showcase your cars with beautiful, customizable cards (including photo alignment).
 
-- **AI Assistant:**  
-  Ask IDMOTO AI anything about your car, maintenance, or features – powered by Gemini & ChatGPT.
-
 - **Responsive Design:**  
   Fully mobile-friendly and visually stunning, with animated gradients and smooth transitions.
 
@@ -32,7 +29,6 @@ Showcase your vehicles, personalize your profile, and get instant AI-powered car
 - **React 18**
 - **Firebase** (Auth, Firestore, Storage)
 - **Tailwind CSS**
-- **Google Gemini API** & **OpenAI ChatGPT**
 - **TypeScript**
 
 ---
