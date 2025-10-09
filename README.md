@@ -1,7 +1,7 @@
 # IDMOTO 🚗✨
 
 **IDMOTO** is a modern, social web app for car enthusiasts.  
-Showcase your vehicles, personalize your profile, and get instant AI-powered car advice!
+Showcase your vehicles and personalize your profile.
 
 ![IDMOTO mockup](https://github.com/user-attachments/assets/ccee02ae-4149-4a90-9fe6-7394d2dafed6)
 
